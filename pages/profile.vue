@@ -18,6 +18,15 @@ const form = ref({
 
 const fileInput = ref(null);
 const files = ref();
+const changePassword = ref(false);
+const userRole = ref("");
+const userRoles = ref([
+  { name: "Admin", code: "NY" },
+  { name: "Customer Care", code: "RM" },
+  { name: "Finance", code: "LDN" },
+  { name: "Accounts", code: "IST" },
+  { name: "Traffic Ops", code: "PRS" },
+]);
 
 const onPhotoSelect = ($event) => {
   files.value = fileInput.value?.files;
@@ -44,84 +53,102 @@ const handleProfileUpdate = async () => {
   });
 };
 
-const testAPI = async () => {
-  const { data } = await useApiFetch("/api/user");
-  console.log(data);
-};
-
 definePageMeta({
   middleware: ["auth"],
 });
 </script>
 <template>
-  <div class="grid p-fluid">
-    <div class="col-6">
-      <div class="card">
-        <Button
-          @click="testAPI"
-          label="Test"
-          outlined
-          class="mr-2 mb-2"
-        ></Button>
-
-        <h5>Profile Image</h5>
-        <span class="p-float-label">
-          <FileUpload
-            ref="fileInput"
-            :showCancelButton="false"
-            :showUploadButton="false"
-            name="profile[]"
-            @select="onPhotoSelect($event)"
-            :multiple="true"
-            accept="image/*"
-            :maxFileSize="1000000"
-          >
-            <template #empty>
-              <p>Drag and drop files to here to upload.</p>
-            </template>
-          </FileUpload>
-
-          <div class="col-12 mb-2 lg:col-4 lg:mb-0">
-            <Button
-              @click="uploadPhoto"
-              label="Begin Upload"
-              icon="pi pi-cloud-upload"
-              size="small"
-              outlined
-              class="mr-2 mb-2"
-            ></Button>
-          </div>
-        </span>
-
-        <form @submit.prevent="handleProfileUpdate">
-          <h5>Name</h5>
-          <InputText v-model="form.name" type="text" placeholder="Name" />
-
-          <h5>Email</h5>
-          <span class="p-input-icon-left">
-            <i class="pi pi-user" />
-            <InputText v-model="form.email" type="email" placeholder="Email" />
-          </span>
-
-          <!-- <h5>Old Password</h5>
-          <InputText
-            v-model="form.password"
-            type="password"
-            placeholder="Old Password"
-          /> -->
-
-          <h5>New Password</h5>
-          <InputText
-            v-model="form.new_password"
-            type="text"
-            placeholder="New Password"
-          />
-
-          <div style="margin-top: 1rem">
-            <Button type="submit" label="Submit" class="mr-2 mb-2"></Button>
-          </div>
-        </form>
-      </div>
+  <!-- <div class="grid p-fluid"> -->
+  <div class="flex justify-content-end">
+    <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+      <Button outlined label="Add New" icon="pi pi-plus" />
     </div>
   </div>
+  <div class="flex justify-content-center">
+    <div class="col-7">
+      <div class="card">
+        <h5>Profile</h5>
+        <div class="grid p-fluid">
+          <div class="field col-12 md:col-12">
+            <Image
+              src="https://primefaces.org/cdn/primevue/images/galleria/galleria7.jpg"
+              alt="Image"
+              width="250"
+            />
+
+            <span class="p-float-label">
+              <FileUpload
+                ref="fileInput"
+                mode="basic"
+                name="profile[]"
+                accept="image/*"
+                :maxFileSize="1000000"
+                @upload="onUpload"
+                @select="onPhotoSelect($event)"
+              />
+            </span>
+          </div>
+        </div>
+
+        <div class="grid p-fluid">
+          <div class="col-12 md:col-12">
+            <form @submit.prevent="handleProfileUpdate">
+              <div class="field col-12 md:col-12">
+                <label for="state">Name</label>
+                <InputText v-model="form.name" type="text" placeholder="Name" />
+              </div>
+
+              <div class="field col-12 md:col-12">
+                <label for="state">Email</label>
+                <span class="p-input-icon-left">
+                  <i class="pi pi-user" />
+                  <InputText
+                    v-model="form.email"
+                    type="email"
+                    placeholder="Email"
+                  />
+                </span>
+              </div>
+
+              <div class="field col-12 md:col-12">
+                <label for="state">Roles</label>
+                <Dropdown
+                  id="state"
+                  v-model="userRole"
+                  :options="userRoles"
+                  optionLabel="name"
+                  placeholder="Select One"
+                ></Dropdown>
+              </div>
+
+              <div class="field col-6 md:col-6">
+                <h5>Change Password</h5>
+                <InputSwitch v-model="changePassword" />
+              </div>
+              <div v-if="changePassword" class="field col-12 md:col-12">
+                <label for="state">New Password</label>
+                <InputText
+                  :disabled="!changePassword"
+                  v-model="form.new_password"
+                  type="text"
+                  placeholder="New Password"
+                />
+              </div>
+
+              <div class="field col-12 md:col-12">
+                <Button type="submit" label="Submit" class="mr-2 mb-2"></Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- </div> -->
+  </div>
 </template>
+
+<style lang="scss" scoped>
+.p-input-icon-left {
+  width: 100%;
+}
+</style>

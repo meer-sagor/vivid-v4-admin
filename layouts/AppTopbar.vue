@@ -47,11 +47,6 @@ const onTopBarMenuButton = () => {
   topbarMenuActive.value = !topbarMenuActive.value;
 };
 
-const onSettingsClick = () => {
-  topbarMenuActive.value = false;
-  router.push("/utilities/documentation");
-};
-
 const topbarMenuClasses = computed(() => {
   return {
     "layout-topbar-menu-mobile-active": topbarMenuActive.value,
@@ -119,7 +114,13 @@ const userProfile = () => {
   if (auth.isLoggedIn) {
     return navigateTo("/profile");
   }
-}
+};
+
+const onSettingsClick = () => {
+  if (auth.isLoggedIn) {
+    return navigateTo("/roles");
+  }
+};
 </script>
 
 <template>
