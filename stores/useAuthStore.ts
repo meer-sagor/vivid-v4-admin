@@ -18,8 +18,10 @@ export const useAuthStore = defineStore('auth', () => {
         const user = ref<User | null>(null)
 
         async function logout() {
-            await useApiFetch("/logout", { method: "POST" });
+            await useApiFetch("/api/logout", { method: "POST" });
             user.value = null;
+            const authCookie = useCookie('XSRF-TOKEN')
+            authCookie.value = null
             navigateTo("/auth/login");
         }
     
@@ -31,12 +33,15 @@ export const useAuthStore = defineStore('auth', () => {
         }
         
         async function login(credentials: Credentials) {
-            await useApiFetch("/sanctum/csrf-cookie");
+            // await useApiFetch("/sanctum/csrf-cookie");
             
-            const login = await useApiFetch("/login", {
+            const login = await useApiFetch("/api/login", {
                 method: "POST",
                 body: credentials,
             });
+
+            const token = useCookie("XSRF-TOKEN");
+            token.value = login.data.value.data.token
             
             const user = await fetchUser();
 
