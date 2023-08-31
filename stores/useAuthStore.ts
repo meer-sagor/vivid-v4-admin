@@ -40,7 +40,7 @@ export const useAuthStore = defineStore('auth', () => {
             
             const user = await fetchUser();
 
-            console.log(user)
+            console.log('user', user)
     
             return login;
         }
