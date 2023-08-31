@@ -17,7 +17,7 @@ export function useApiFetch<T> (path: string, options: UseFetchOptions<T> = {}) 
   if (process.server) {
     headers = {
       ...headers,
-      ...useRequestHeaders(["cookie"])
+      ...useRequestHeaders(["referer", "cookie"])
     }
   }
 
