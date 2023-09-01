@@ -5,7 +5,7 @@ import AppFooter from "./AppFooter.vue";
 import AppSidebar from "./AppSidebar.vue";
 // import AppConfig from './AppConfig.vue';
 import { useLayout } from "./composables/layout";
-import {useAuthStore} from "~/stores/useAuthStore";
+import { useAuthStore } from "~/stores/useAuthStore";
 const { layoutConfig, layoutState, isSidebarActive } = useLayout();
 const outsideClickListener = ref(null);
 
@@ -77,8 +77,8 @@ console.log("test layout");
       <app-sidebar></app-sidebar>
     </div>
     <div class="layout-main-container">
-      <div class="layout-main">.
-        {{ auth.user }}
+      <div class="layout-main">
+        <!-- {{ auth.user }} -->
         <router-view></router-view>
       </div>
       <app-footer></app-footer>
