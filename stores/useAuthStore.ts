@@ -42,7 +42,7 @@ export const useAuthStore = defineStore('auth', () => {
 
             return login;
         }
-    
+
         const isLoggedIn = computed(() => !!user.value)
         
         return { user, login, isLoggedIn, fetchUser, logout }

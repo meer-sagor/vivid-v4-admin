@@ -1,13 +1,11 @@
 <script setup>
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useToast } from "primevue/usetoast";
-import { apiURL } from "@/config/environment";
+import {apiURL, baseURL} from "@/config/environment";
 import { useApiFetch } from "@/composables/useApiFetch";
 import {ref} from "vue";
 const toast = useToast();
 const auth = useAuthStore();
-
-const uploadURL = apiURL + "/api/profile-image";
 
 const form = ref({
   name: auth.user.name,
@@ -31,21 +29,29 @@ const userRoles = ref([
 const errorMessage = ref("");
 
 const onPhotoSelect = ($event) => {
-  files.value = this.$refs.fileInput.files[0];
-  // files.value = fileInput.value?.files;
+  files.value = fileInput.value?.files;
 };
 
-const uploadPhoto = () => {
-  const file = files.value;
-  console.log(file);
+const uploadHandler = async(event) => {
+  const fileUp = event.files[0];
+  const body = new FormData();
+  body.append("profile_img", fileUp);
 
-  toast.add({
-    severity: "info",
-    summary: "Success",
-    detail: "File Uploaded",
-    life: 3000,
+  const {data} = await useApiFetch("/api/profile/img/update",{
+    method: "POST",
+    body: body,
   });
-};
+
+  if (data.value) {
+    await auth.fetchUser()
+    toast.add({
+      severity: "info",
+      summary: "Success",
+      detail: "File Uploaded",
+      life: 3000,
+    });
+  }
+}
 
 const handleProfileUpdate = async () => {
   const {data, error} = await useApiFetch("/api/profile/update", {
@@ -74,7 +80,7 @@ function onErrorClose() {
 
 definePageMeta({
   middleware: ["auth"],
-});
+})
 </script>
 <template>
   <!-- <div class="grid p-fluid"> -->
@@ -107,10 +113,12 @@ definePageMeta({
               <FileUpload
                 ref="fileInput"
                 mode="basic"
-                name="profile"
                 accept="image/*"
                 :maxFileSize="1000000"
-                @upload="uploadPhoto"
+                name="profile_img"
+                :auto="true"
+                :customUpload="true"
+                @uploader="uploadHandler"
                 @select="onPhotoSelect($event)"
               />
             </span>
@@ -153,8 +161,9 @@ definePageMeta({
 
               <div class="field col-6 md:col-6">
                 <h5>Change Password</h5>
-                <InputSwitch v-model="changePassword" />
+                <InputSwitch v-model="form.changePassword" />
               </div>
+
               <div v-if="changePassword" class="field col-12 md:col-12">
                 <label for="state">New Password</label>
                 <InputText
