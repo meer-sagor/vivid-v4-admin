@@ -18,6 +18,7 @@ const form = ref({
 const fileInput = ref(null);
 const files = ref();
 const changePassword = ref(false);
+const uploading = ref(false);
 const userRole = ref("");
 const userRoles = ref([
   { name: "Admin", code: "NY" },
@@ -33,6 +34,7 @@ const onPhotoSelect = ($event) => {
 };
 
 const uploadHandler = async(event) => {
+  uploading.value = true;
   const fileUp = event.files[0];
   const body = new FormData();
   body.append("profile_img", fileUp);
@@ -44,6 +46,7 @@ const uploadHandler = async(event) => {
 
   if (data.value) {
     await auth.fetchUser()
+    uploading.value = false;
     toast.add({
       severity: "info",
       summary: "Success",
@@ -109,7 +112,7 @@ definePageMeta({
                   width="250"
               />
             </template>
-            <span class="p-float-label">
+            <span class="image-upload p-float-label">
               <FileUpload
                 ref="fileInput"
                 mode="basic"
@@ -121,6 +124,7 @@ definePageMeta({
                 @uploader="uploadHandler"
                 @select="onPhotoSelect($event)"
               />
+              <ProgressSpinner v-if="uploading" style="width: 30px; height: 30px;"></ProgressSpinner>
             </span>
           </div>
         </div>
@@ -189,5 +193,11 @@ definePageMeta({
 <style lang="scss" scoped>
 .p-input-icon-left {
   width: 100%;
+}
+.image-upload {
+  display: flex;
+}
+.p-progress-spinner{
+  margin: 4px 0 !important;
 }
 </style>
