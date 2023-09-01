@@ -11,9 +11,8 @@ export function useApiFetch<T> (path: string, options: UseFetchOptions<T> = {}) 
   const token = useCookie("XSRF-TOKEN");
 
   if (token.value) {
-    // headers['X-XSRF-TOKEN'] = token.value as string;
-    headers['Authentication'] = 'Bearer ' + token.value as string
-    // headers['Content-Type'] = 'application/x-www-form-urlencoded'
+    headers['X-XSRF-TOKEN'] = token.value as string;
+    // headers['Authentication'] = 'Bearer ' + token.value as string
   }
 
   if (process.server) {

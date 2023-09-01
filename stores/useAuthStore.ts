@@ -28,25 +28,18 @@ export const useAuthStore = defineStore('auth', () => {
         async function fetchUser() {
             const { data } = await useApiFetch("/api/user");
             user.value = data.value as User;
-
-            return user
         }
         
         async function login(credentials: Credentials) {
-            // await useApiFetch("/sanctum/csrf-cookie");
+             await useApiFetch("/sanctum/csrf-cookie");
             
-            const login = await useApiFetch("/api/login", {
+            const login = await useApiFetch("/login", {
                 method: "POST",
                 body: credentials,
             });
 
-            const token = useCookie("XSRF-TOKEN");
-            token.value = login.data.value.data.token
-            
-            const user = await fetchUser();
+            await fetchUser();
 
-            console.log('user', user)
-    
             return login;
         }
     
