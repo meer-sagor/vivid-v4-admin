@@ -78,7 +78,7 @@ console.log("test layout");
     </div>
     <div class="layout-main-container">
       <div class="layout-main">
-         {{ auth.user }}
+<!--         {{ auth.user }}-->
         <router-view></router-view>
       </div>
       <app-footer></app-footer>

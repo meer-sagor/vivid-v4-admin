@@ -3,6 +3,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { useToast } from "primevue/usetoast";
 import { apiURL } from "@/config/environment";
 import { useApiFetch } from "@/composables/useApiFetch";
+import {ref} from "vue";
 const toast = useToast();
 const auth = useAuthStore();
 
@@ -12,7 +13,7 @@ const form = ref({
   name: auth.user.name,
   old_email: auth.user.email,
   email: auth.user.email,
-  // password: "",
+  role: auth.user.role,
   new_password: "",
 });
 
@@ -27,13 +28,15 @@ const userRoles = ref([
   { name: "Accounts", code: "IST" },
   { name: "Traffic Ops", code: "PRS" },
 ]);
+const errorMessage = ref("");
 
 const onPhotoSelect = ($event) => {
-  files.value = fileInput.value?.files;
+  files.value = this.$refs.fileInput.files[0];
+  // files.value = fileInput.value?.files;
 };
 
 const uploadPhoto = () => {
-  const file = files.value[0];
+  const file = files.value;
   console.log(file);
 
   toast.add({
@@ -45,13 +48,29 @@ const uploadPhoto = () => {
 };
 
 const handleProfileUpdate = async () => {
-  console.log(form.value);
-
-  await useApiFetch("/api/profile/update", {
+  const {data, error} = await useApiFetch("/api/profile/update", {
     method: "POST",
     body: form.value,
   });
+
+  errorMessage.value = null;
+  if (error.value) {
+    errorMessage.value = error.value.data.message;
+  }
+
+  if (data.value) {
+    toast.add({
+      severity: "info",
+      summary: "Success",
+      detail: data.value.message,
+      life: 3000,
+    });
+  }
 };
+
+function onErrorClose() {
+  errorMessage.value = null;
+}
 
 definePageMeta({
   middleware: ["auth"],
@@ -70,20 +89,28 @@ definePageMeta({
         <h5>Profile</h5>
         <div class="grid p-fluid">
           <div class="field col-12 md:col-12">
-            <Image
-              src="https://primefaces.org/cdn/primevue/images/galleria/galleria7.jpg"
-              alt="Image"
-              width="250"
-            />
-
+            <template v-if="auth.user.profile_img_url">
+              <Image
+                  :src="auth.user.profile_img_url"
+                  alt="Image"
+                  width="250"
+              />
+            </template>
+            <template>
+              <Image
+                  src="https://primefaces.org/cdn/primevue/images/galleria/galleria7.jpg"
+                  alt="Image"
+                  width="250"
+              />
+            </template>
             <span class="p-float-label">
               <FileUpload
                 ref="fileInput"
                 mode="basic"
-                name="profile[]"
+                name="profile"
                 accept="image/*"
                 :maxFileSize="1000000"
-                @upload="onUpload"
+                @upload="uploadPhoto"
                 @select="onPhotoSelect($event)"
               />
             </span>
@@ -92,6 +119,9 @@ definePageMeta({
 
         <div class="grid p-fluid">
           <div class="col-12 md:col-12">
+            <Message severity="error" v-if="errorMessage" @close="onErrorClose">
+              {{ errorMessage }}
+            </Message>
             <form @submit.prevent="handleProfileUpdate">
               <div class="field col-12 md:col-12">
                 <label for="state">Name</label>
@@ -114,7 +144,7 @@ definePageMeta({
                 <label for="state">Roles</label>
                 <Dropdown
                   id="state"
-                  v-model="userRole"
+                  v-model="form.role"
                   :options="userRoles"
                   optionLabel="name"
                   placeholder="Select One"
