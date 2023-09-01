@@ -6,43 +6,55 @@ const model = ref([
     label: "General",
     items: [
       { label: "Dashboard", icon: "pi pi-fw pi-home", to: "/" },
-      { label: "Sales", icon: "pi pi-fw pi-wallet", to: "/sales" },
+      {
+        label: "Sales",
+        icon: "pi pi-fw pi-wallet",
+        to: "/general/sales",
+      },
       {
         label: "Ship Station Orders",
         icon: "pi pi-fw pi-truck",
-        to: "/ship-station-orders",
+        to: "/general/ship-station-orders",
       },
-      { label: "Department", icon: "pi pi-fw pi-sitemap", to: "/departments" },
-      { label: "Promo Code", icon: "pi pi-fw pi-tag", to: "/promo-code" },
+      {
+        label: "Department",
+        icon: "pi pi-fw pi-sitemap",
+        to: "/general/departments",
+      },
+      {
+        label: "Promo Code",
+        icon: "pi pi-fw pi-tag",
+        to: "/general/promo-code",
+      },
     ],
   },
   {
     label: "Home Section",
     items: [
       {
-        label: "Categories",
+        label: "Home Categories",
         icon: "pi pi-fw pi-id-card",
-        to: "/uikit/formlayout",
+        to: "/home/categories",
       },
       {
         label: "Top Categories",
         icon: "pi pi-fw pi-id-card",
-        to: "/uikit/formlayout",
+        to: "/home/top-categories",
       },
       {
-        label: "Products",
+        label: "Home Products",
         icon: "pi pi-fw pi-id-card",
-        to: "/uikit/formlayout",
+        to: "/home/products",
       },
       {
         label: "Custom Printing",
         icon: "pi pi-fw pi-id-card",
-        to: "/uikit/formlayout",
+        to: "/home/custom-printing",
       },
       {
         label: "Embroidery",
         icon: "pi pi-fw pi-id-card",
-        to: "/uikit/formlayout",
+        to: "/home/embroidery",
       },
     ],
   },
@@ -52,52 +64,52 @@ const model = ref([
       {
         label: "Manage Products",
         icon: "pi pi-fw pi-id-card",
-        to: "/uikit/formlayout",
+        to: "/dummy",
       },
       {
         label: "Categories",
         icon: "pi pi-fw pi-id-card",
-        to: "/uikit/formlayout",
+        to: "/dummy",
       },
       {
         label: "Brands",
         icon: "pi pi-fw pi-id-card",
-        to: "/uikit/formlayout",
+        to: "/dummy",
       },
       {
         label: "Colors",
         icon: "pi pi-fw pi-id-card",
-        to: "/uikit/formlayout",
+        to: "/dummy",
       },
       {
         label: "Sizes",
         icon: "pi pi-fw pi-id-card",
-        to: "/uikit/formlayout",
+        to: "/dummy",
       },
       {
         label: "Print Sides",
         icon: "pi pi-fw pi-id-card",
-        to: "/uikit/formlayout",
+        to: "/dummy",
       },
       {
         label: "Printing Price",
         icon: "pi pi-fw pi-id-card",
-        to: "/uikit/formlayout",
+        to: "/dummy",
         items: [
           {
             label: "Price Table",
             icon: "pi pi-fw pi-id-card",
-            to: "/uikit/formlayout",
+            to: "/dummy",
           },
           {
             label: "Price Dscount Table",
             icon: "pi pi-fw pi-id-card",
-            to: "/uikit/formlayout",
+            to: "/dummy",
           },
           {
             label: "Pricing Personalize Table",
             icon: "pi pi-fw pi-id-card",
-            to: "/uikit/formlayout",
+            to: "/dummy",
           },
         ],
       },
@@ -109,7 +121,7 @@ const model = ref([
       {
         label: "Manage Cliparts",
         icon: "pi pi-fw pi-eye",
-        to: "/blocks",
+        to: "/dummy",
         badge: "NEW",
       },
       {
@@ -144,7 +156,7 @@ const model = ref([
       {
         label: "Cliparts",
         icon: "pi pi-fw pi-eye",
-        to: "/blocks",
+        to: "/dummy",
         badge: "NEW",
       },
       {
@@ -167,99 +179,107 @@ const model = ref([
       {
         label: "Manage Users",
         icon: "pi pi-fw pi-prime",
-        to: "/utilities/icons",
+        to: "/dummy",
       },
       {
         label: "Manage Associates",
         icon: "pi pi-fw pi-desktop",
-        url: "https://www.primefaces.org/primeflex/",
-        target: "_blank",
+        to: "/dummy",
       },
       {
         label: "Manage Roles",
         icon: "pi pi-fw pi-desktop",
-        url: "https://www.primefaces.org/primeflex/",
-        target: "_blank",
+        to: "/dummy",
       },
     ],
   },
   {
     label: "Manage Pages",
     icon: "pi pi-fw pi-briefcase",
-    to: "/pages",
     items: [
       {
         label: "Pages",
         icon: "pi pi-fw pi-circle-off",
-        to: "/empty",
+        to: "/dummy",
       },
       {
         label: "Page Components",
         icon: "pi pi-fw pi-circle-off",
-        to: "/empty",
+        to: "/dummy",
       },
       {
         label: "Post",
         icon: "pi pi-fw pi-circle-off",
-        to: "/empty",
+        to: "/dummy",
       },
       {
         label: "Comments",
         icon: "pi pi-fw pi-exclamation-circle",
-        to: "/notfound",
+        to: "/dummy",
       },
     ],
   },
   {
     label: "Manage Media",
     icon: "pi pi-fw pi-briefcase",
-    to: "/pages",
     items: [
       {
         label: "Gallery",
         icon: "pi pi-fw pi-calendar",
-        to: "/timeline",
+        to: "/dummy",
       },
       {
         label: "Media",
         icon: "pi pi-fw pi-exclamation-circle",
-        to: "/notfound",
+        to: "/dummy",
       },
     ],
   },
   {
     label: "Settings",
     icon: "pi pi-fw pi-briefcase",
-    to: "/pages",
     items: [
       {
         label: "Newsletters",
         icon: "pi pi-fw pi-globe",
-        to: "/landing",
+        to: "/dummy",
       },
       {
         label: "Store Designs",
         icon: "pi pi-fw pi-user",
+        to: "/dummy",
       },
       {
         label: "History Record",
         icon: "pi pi-fw pi-pencil",
-        to: "/crud",
+        to: "/dummy",
       },
       {
         label: "Reserved Words",
         icon: "pi pi-fw pi-calendar",
-        to: "/timeline",
+        to: "/dummy",
       },
       {
         label: "Appearance",
         icon: "pi pi-fw pi-exclamation-circle",
-        to: "/notfound",
+        to: "/dummy",
       },
       {
         label: "Settings",
         icon: "pi pi-fw pi-circle-off",
-        to: "/empty",
+        to: "/dummy",
+      },
+    ],
+  },
+  {
+    label: "Documentation",
+    icon: "pi pi-fw pi-briefcase",
+    items: [
+      {
+        label: "API Documentation",
+        icon: "pi pi-fw pi-globe",
+        url: "http://localhost:8000/api/documentation#/default",
+        target: "_blank",
       },
     ],
   },
