@@ -1,6 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { environment } from "./config/environment"
+
 export default defineNuxtConfig({
-  devtools: { enabled: true },
+  devtools: { enabled: environment == 'dev' ? true : false },
   app: {
     head: {
         title: 'Vividcustoms - Admin Panel',
@@ -20,8 +22,8 @@ export default defineNuxtConfig({
   modules: [
     '@pinia/nuxt',
   ],
-  // devServer: {
-  //   port: 3002,
-  // },
+  devServer: {
+    port: 3002,
+  },
   css: ['primeicons/primeicons.css', 'primeflex/primeflex.scss', 'primevue/resources/primevue.min.css', '@/assets/styles.scss']
 })

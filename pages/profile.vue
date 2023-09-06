@@ -1,9 +1,9 @@
 <script setup>
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useToast } from "primevue/usetoast";
-import {apiURL, baseURL} from "@/config/environment";
+import { apiURL, baseURL } from "@/config/environment";
 import { useApiFetch } from "@/composables/useApiFetch";
-import {ref} from "vue";
+import { ref } from "vue";
 const toast = useToast();
 const auth = useAuthStore();
 
@@ -13,11 +13,11 @@ const form = ref({
   email: auth.user.email,
   role: auth.user.role,
   new_password: "",
+  confirm_password: "",
 });
 
 const fileInput = ref(null);
 const files = ref();
-const changePassword = ref(false);
 const uploading = ref(false);
 const userRole = ref("");
 const userRoles = ref([
@@ -33,19 +33,19 @@ const onPhotoSelect = ($event) => {
   files.value = fileInput.value?.files;
 };
 
-const uploadHandler = async(event) => {
+const uploadHandler = async (event) => {
   uploading.value = true;
   const fileUp = event.files[0];
   const body = new FormData();
   body.append("profile_img", fileUp);
 
-  const {data} = await useApiFetch("/api/profile/img/update",{
+  const { data } = await useApiFetch("/api/profile/img/update", {
     method: "POST",
     body: body,
   });
 
   if (data.value) {
-    await auth.fetchUser()
+    await auth.fetchUser();
     uploading.value = false;
     toast.add({
       severity: "info",
@@ -54,10 +54,10 @@ const uploadHandler = async(event) => {
       life: 3000,
     });
   }
-}
+};
 
 const handleProfileUpdate = async () => {
-  const {data, error} = await useApiFetch("/api/profile/update", {
+  const { data, error } = await useApiFetch("/api/profile/update", {
     method: "POST",
     body: form.value,
   });
@@ -77,39 +77,66 @@ const handleProfileUpdate = async () => {
   }
 };
 
+const isProfile = ref(true);
 function onErrorClose() {
   errorMessage.value = null;
 }
 
+const selectedProfile = ref({
+  name: "Update Profile",
+  id: 1,
+});
+
+const profileOptions = ref([
+  { name: "Update Profile", id: 1 },
+  { name: "Change Password", id: 2 },
+]);
+
+watch(selectedProfile, (value) => {
+  if (value.id === 1) {
+    isProfile.value = true;
+  } else {
+    isProfile.value = false;
+  }
+  console.log(value.id);
+});
+
+// console.log(selectedProfile.value);
+
 definePageMeta({
   middleware: ["auth"],
-})
+});
 </script>
 <template>
   <!-- <div class="grid p-fluid"> -->
-  <div class="flex justify-content-end">
+  <!-- <div class="flex justify-content-end">
     <div class="col-12 mb-2 lg:col-4 lg:mb-0">
       <Button outlined label="Add New" icon="pi pi-plus" />
     </div>
-  </div>
+  </div> -->
   <div class="flex justify-content-center">
     <div class="col-7">
-      <div class="card">
+      <div class="card card-w-title float-right">
+        <SelectButton
+          severity="secondary"
+          outlined
+          v-model="selectedProfile"
+          :options="profileOptions"
+          optionLabel="name"
+        />
+      </div>
+      <div class="card" v-if="isProfile">
         <h5>Profile</h5>
         <div class="grid p-fluid">
           <div class="field col-12 md:col-12">
             <template v-if="auth.user.profile_img_url">
-              <Image
-                  :src="auth.user.profile_img_url"
-                  alt="Image"
-                  width="250"
-              />
+              <Image :src="auth.user.profile_img_url" alt="Image" width="250" />
             </template>
             <template>
               <Image
-                  src="https://primefaces.org/cdn/primevue/images/galleria/galleria7.jpg"
-                  alt="Image"
-                  width="250"
+                src="https://primefaces.org/cdn/primevue/images/galleria/galleria7.jpg"
+                alt="Image"
+                width="250"
               />
             </template>
             <span class="image-upload p-float-label">
@@ -124,7 +151,10 @@ definePageMeta({
                 @uploader="uploadHandler"
                 @select="onPhotoSelect($event)"
               />
-              <ProgressSpinner v-if="uploading" style="width: 30px; height: 30px;"></ProgressSpinner>
+              <ProgressSpinner
+                v-if="uploading"
+                style="width: 30px; height: 30px"
+              ></ProgressSpinner>
             </span>
           </div>
         </div>
@@ -163,18 +193,35 @@ definePageMeta({
                 ></Dropdown>
               </div>
 
-              <div class="field col-6 md:col-6">
-                <h5>Change Password</h5>
-                <InputSwitch v-model="form.changePassword" />
+              <div class="field col-12 md:col-12">
+                <Button type="submit" label="Submit" class="mr-2 mb-2"></Button>
               </div>
-
-              <div v-if="changePassword" class="field col-12 md:col-12">
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="card" v-else>
+        <div class="grid p-fluid">
+          <div class="col-12 md:col-12">
+            <Message severity="error" v-if="errorMessage" @close="onErrorClose">
+              {{ errorMessage }}
+            </Message>
+            <form @submit.prevent="handleProfileUpdate">
+              <div class="field col-12 md:col-12">
                 <label for="state">New Password</label>
                 <InputText
-                  :disabled="!changePassword"
                   v-model="form.new_password"
                   type="text"
                   placeholder="New Password"
+                />
+              </div>
+
+              <div class="field col-12 md:col-12">
+                <label for="state">Confirm Password</label>
+                <InputText
+                  v-model="form.confirm_password"
+                  type="text"
+                  placeholder="Confirm Password"
                 />
               </div>
 
@@ -197,7 +244,7 @@ definePageMeta({
 .image-upload {
   display: flex;
 }
-.p-progress-spinner{
+.p-progress-spinner {
   margin: 4px 0 !important;
 }
 </style>

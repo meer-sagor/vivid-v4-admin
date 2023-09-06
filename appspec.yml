@@ -1,0 +1,21 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /var/www/vividcustoms/admin-panel
+    overwrite: true
+file_exists_behavior: OVERWRITE
+hooks:
+  BeforeInstall:
+  AfterInstall:
+    - location: deployment/install_dependencies.sh
+      timeout: 3000
+      runas: root
+    - location: deployment/change_permissions.sh
+      timeout: 2000
+      runas: root
+  ApplicationStart:
+    - location: deployment/start_server.sh
+      timeout: 1000
+      runas: root
+  ApplicationStop:

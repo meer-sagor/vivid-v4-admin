@@ -64,7 +64,7 @@ const model = ref([
       {
         label: "Manage Products",
         icon: "pi pi-fw pi-id-card",
-        to: "/dummy",
+        to: "/product",
       },
       {
         label: "Categories",
@@ -74,7 +74,7 @@ const model = ref([
       {
         label: "Brands",
         icon: "pi pi-fw pi-id-card",
-        to: "/dummy",
+        to: "/product/brands",
       },
       {
         label: "Colors",
