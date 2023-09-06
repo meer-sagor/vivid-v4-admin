@@ -1,5 +1,4 @@
 export const environment = "dev";
-const adminURL = "http://localhost:3000/";
 const apiDev = "http://localhost:8000";
 const apiProd = "http://18.119.12.43";
 
