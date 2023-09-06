@@ -9,11 +9,20 @@ export const useRolesStore = defineStore('roles', () => {
     const role = ref<Role | null>(null)
 
     async function getRoles() {
-        const { data } = await useApiFetch("/api/roles", {
-            method: "GET",
-        })
-        // roles.value = data.value.value.roles as Role[]
-        console.log(data.value.roles)
+        try {
+            const { data } = await useApiFetch("/api/roles");
+            roles.value = data.value as Role[];
+        } catch (error) {
+            console.log(error);
+        }
+        // const { data } = await useApiFetch("/api/roles"
+        // // {
+        // //     method: "GET",
+        // // }
+        // )
+        // console.log(data)
+        // roles.value = data.value as Role[]
+        
     }
 
     return { roles, getRoles }

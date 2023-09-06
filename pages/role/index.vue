@@ -11,17 +11,30 @@ const customers = ref([
     created_at: null,
   },
 ]);
-
-const fetchRoles = () => {
-  rolesStore.getRoles();
+const roles = ref([]);
+const fetchRoles = async () => {
+    await rolesStore.getRoles();
+    if (rolesStore.roles) {
+        roles.value = rolesStore.roles;
+    }
 };
-
 onMounted(async () => {
-  await rolesStore.getRoles();
-})
-const roles = computed(() => rolesStore.roles);
+    await fetchRoles(); // Call the fetchRoles function
+    console.log(roles.value);  // Check if roles are populated
+});
 
-console.log('roles', roles)
+
+// const roles = ref([]);
+
+// onMounted(async () => {
+//   const response = await rolesStore.getRoles();
+//   console.log(response)
+//   // if (response.data) {
+//   //   roles.value = response.data
+//   // }
+// })
+
+// console.log('roles', roles)
 
 
 </script>
