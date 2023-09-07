@@ -39,8 +39,6 @@ async function handleLogin() {
 
     errorMessage.value = null;
 
-    console.log("error", error);
-
     if (error.value) {
       errorMessage.value = error.value.data.message;
     } else {

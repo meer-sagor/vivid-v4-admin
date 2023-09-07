@@ -12,12 +12,13 @@ export function useApiFetch<T> (path: string, options: UseFetchOptions<T> = {}) 
 
   if (token.value) {
     headers['X-XSRF-TOKEN'] = token.value as string;
+    // headers['Authentication'] = 'Bearer ' + token.value as string
   }
 
   if (process.server) {
     headers = {
       ...headers,
-      ...useRequestHeaders(["cookie"])
+      ...useRequestHeaders(["referer", "cookie"])
     }
   }
 
