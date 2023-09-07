@@ -113,6 +113,41 @@ const model = ref([
           },
         ],
       },
+      {
+        label: "Fabrics",
+        icon: "pi pi-fw pi-id-card",
+        to: "/fabrics",
+      },
+      {
+        label: "Brands ",
+        icon: "pi pi-fw pi-id-card",
+        to: "/brands",
+      },
+      {
+        label: "Sizes",
+        icon: "pi pi-fw pi-id-card",
+        to: "/sizes",
+      },
+      {
+        label: "Tags",
+        icon: "pi pi-fw pi-id-card",
+        to: "/tags",
+      },
+      {
+        label: "Colors",
+        icon: "pi pi-fw pi-id-card",
+        to: "/colors",
+      },
+      {
+        label: "Categories",
+        icon: "pi pi-fw pi-id-card",
+        to: "/categories",
+      },
+      {
+        label: "Subcategories",
+        icon: "pi pi-fw pi-id-card",
+        to: "/subcategories",
+      },
     ],
   },
   {
