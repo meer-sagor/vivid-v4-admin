@@ -168,7 +168,7 @@ const deleteSelectedProducts = () => {
                                     <i class="pi pi-search" />
                                     <InputText v-model="filters['global'].value" placeholder="Search..." />
                                 </span>
-                                <Button label="New" icon="pi pi-plus" class="p-button-success mr-2" @click="openNew" />
+                                <Button label="New" icon="pi pi-plus" class="p-button-primary mr-2" @click="openNew" />
                             </div>
                         </div>
                     </template>
@@ -194,8 +194,8 @@ const deleteSelectedProducts = () => {
                     </Column>
                     <Column class="text-right">
                         <template #body="slotProps">
-                            <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" @click="editProduct(slotProps.data)" />
-                            <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2" @click="confirmDeleteProduct(slotProps.data)" />
+                            <Button icon="pi pi-pencil" class="p-button-rounded p-button-primary mr-2" @click="editProduct(slotProps.data)" />
+                            <Button icon="pi pi-trash" class="p-button-rounded p-button-primary mt-2" @click="confirmDeleteProduct(slotProps.data)" />
                         </template>
                     </Column>
                 </DataTable>
