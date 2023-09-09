@@ -1,8 +1,15 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRolesStore } from "@/stores/useRolesStore";
+import { useApiFetch } from "@/composables/useApiFetch";
 const rolesStore = useRolesStore();
 const search = ref(null);
+const productDialog = ref(false);
+const deleteProductDialog = ref(false);
+const product = ref({});
+const id = ref(null);
+const errorMessage = ref("");
+const mode = ref("add");
 const customers = ref([
   {
     id: 1,
@@ -22,8 +29,82 @@ onMounted(async () => {
     await fetchRoles(); // Call the fetchRoles function
     console.log(roles.value);  // Check if roles are populated
 });
-
-
+const showProductDialog = () => {
+  productDialog.value = true;
+  mode.value = "add";
+}
+const showEditDialog = (data) => {
+  mode.value = "edit";
+  id.value = data.id;
+  product.value.name = data.name;
+  productDialog.value = true;
+}
+const showDeleteDialog = (data) => {
+  id.value = data.id;
+  product.value.name = data.name;
+  deleteProductDialog.value = true;
+}
+const deleteProduct = async () => {
+  const { data, error } = await useApiFetch("/api/roles/" + id.value, {
+      method: "DELETE",
+    });
+    errorMessage.value = null;
+    if (error.value) {
+      errorMessage.value = error.value.data.message;
+    }
+    if (data.value) {
+      toast.add({
+        severity: "info",
+        summary: "Success",
+        detail: data.value.message,
+        life: 3000,
+      });
+    }
+}
+const saveProduct = async () => {
+  productDialog.value = true;
+  product.value.guard_name = 'api';
+  if (mode.value == "add") {
+    const { data, error } = await useApiFetch("/api/roles", {
+      method: "POST",
+      body: product.value,
+    });
+    errorMessage.value = null;
+    if (error.value) {
+      errorMessage.value = error.value.data.message;
+    }
+    if (data.value) {
+      toast.add({
+        severity: "info",
+        summary: "Success",
+        detail: data.value.message,
+        life: 3000,
+      });
+    }
+  } else {
+    console.log('edit');
+    const { data, error } = await useApiFetch("/api/roles/" + id.value, {
+      method: "PUT",
+      body: product.value,
+    });
+    errorMessage.value = null;
+    if (error.value) {
+      errorMessage.value = error.value.data.message;
+    }
+    if (data.value) {
+      toast.add({
+        severity: "info",
+        summary: "Success",
+        detail: data.value.message,
+        life: 3000,
+      });
+    }
+  }
+  
+}
+const hideDialog = () => {
+  productDialog.value = false;
+}
 // const roles = ref([]);
 
 // onMounted(async () => {
@@ -44,7 +125,7 @@ onMounted(async () => {
       <div class="card">
         {{ roles }}
         <DataTable
-            :value="customers"
+            :value="roles.roles"
             paginator
             :rows="5"
             :rowsPerPageOptions="[5, 10, 20, 50]"
@@ -66,6 +147,7 @@ onMounted(async () => {
                     icon="pi pi-plus"
                     label="Add New"
                     class="p-button-outlined mb-2"
+                    @click="showProductDialog()"
                 />
               </div>
               <div class="col-4">
@@ -86,18 +168,89 @@ onMounted(async () => {
           <Column :exportable="false" style="min-width: 8rem">
             <template #body="slotProps">
               <Button
-                  icon="pi pi-pencil"
-                  outlined
-                  rounded
-                  class="mr-2" />
+                icon="pi pi-pencil"
+                outlined
+                rounded
+                class="mr-2" 
+                @click="showEditDialog(slotProps.data)"
+              />
               <Button
                   icon="pi pi-trash"
                   outlined
                   rounded
-                  severity="danger"  />
+                  severity="danger" 
+                  @click="showDeleteDialog(slotProps.data)"
+              />
             </template>
           </Column>
         </DataTable>
+        <Dialog
+          v-model:visible="productDialog"
+          :style="{ width: '450px' }"
+          header="Role Manage"
+          :modal="true"
+          class="p-fluid"
+        >
+          <!-- <img
+            v-if="product.image"
+            :src="`https://primefaces.org/cdn/primevue/images/product/${product.image}`"
+            :alt="product.image"
+            class="block m-auto pb-3"
+          /> -->
+          <div class="field">
+            <label for="name">Name</label>
+            <InputText
+              id="name"
+              v-model.trim="product.name"
+              required="true"
+              autofocus
+             
+            />
+            <!-- <small class="p-error" v-if="submitted && !product.name"
+              >Name is required.</small
+            > -->
+          </div>
+          <template #footer>
+            <Button
+              label="Cancel"
+              icon="pi pi-times"
+              text
+              @click="hideDialog"
+            />
+            <Button label="Save" icon="pi pi-check" text @click="saveProduct" />
+          </template>
+        </Dialog>
+        <Dialog
+          v-model:visible="deleteProductDialog"
+          :style="{ width: '450px' }"
+          header="Confirm"
+          :modal="true"
+        >
+          <div class="confirmation-content">
+            <i
+              class="pi pi-exclamation-triangle mr-3"
+              style="font-size: 2rem"
+            />
+            <span v-if="product"
+              >Are you sure you want to delete <b>{{ product.name }}</b
+              >?</span
+            >
+          </div>
+          <template #footer>
+            <Button
+              label="No"
+              icon="pi pi-times"
+              text
+              @click="deleteProductDialog = false"
+            />
+            <Button
+              label="Yes"
+              icon="pi pi-check"
+              text
+              @click="deleteProduct"
+            />
+          </template>
+        </Dialog>
       </div>
     </div>
   </div>
