@@ -1,9 +1,13 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted  } from "vue";
 import { useRolesStore } from "@/stores/useRolesStore";
 import { useApiFetch } from "@/composables/useApiFetch";
+import { useToast } from "primevue/usetoast";
+const toast = useToast();
 const rolesStore = useRolesStore();
 const search = ref(null);
+const page = ref(1);
+const totalData = ref(null);
 const productDialog = ref(false);
 const deleteProductDialog = ref(false);
 const product = ref({});
@@ -19,15 +23,21 @@ const customers = ref([
   },
 ]);
 const roles = ref([]);
+// const publishedBooksMessage = computed(() => {
+//   return author.books.length > 0 ? 'Yes' : 'No'
+// })
 const fetchRoles = async () => {
     await rolesStore.getRoles();
     if (rolesStore.roles) {
         roles.value = rolesStore.roles;
     }
 };
+
 onMounted(async () => {
-    await fetchRoles(); // Call the fetchRoles function
-    console.log(roles.value);  // Check if roles are populated
+  console.log('calling');
+    // await fetchRoles(); // Call the fetchRoles function
+    // console.log(roles.value);  // Check if roles are populated
+    await initialize();
 });
 const showProductDialog = () => {
   productDialog.value = true;
@@ -43,6 +53,24 @@ const showDeleteDialog = (data) => {
   id.value = data.id;
   product.value.name = data.name;
   deleteProductDialog.value = true;
+}
+const initialize = async () => {
+  const { data, error } = await useApiFetch("/api/roles?page="+page.value, {
+    method: "GET",
+  });
+  console.log(data,'calling');
+    errorMessage.value = null;
+    if (error.value) {
+      errorMessage.value = error.value.data.message;
+    }
+    if (data.value) {
+      console.log(data.value);
+      roles.value = data.value.roles.data;
+      totalData.value  = data.value.roles.total
+    }
+}
+const onPaginate = (event) => {
+  console.log(event);
 }
 const deleteProduct = async () => {
   const { data, error } = await useApiFetch("/api/roles/" + id.value, {
@@ -125,15 +153,17 @@ const hideDialog = () => {
       <div class="card">
         {{ roles }}
         <DataTable
-            :value="roles.roles"
+            :value="roles"
             paginator
             :rows="5"
+            @page="onPaginate"
+            :totalRecords="totalData"
             :rowsPerPageOptions="[5, 10, 20, 50]"
             tableStyle="min-width: 50rem"
             paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
             currentPageReportTemplate="{first} to {last} of {totalRecords}">
           <template #paginatorstart>
-            <Button type="button" icon="pi pi-refresh" text @click="fetchRoles" />
+            <Button type="button" icon="pi pi-refresh" text @click="initialize" />
           </template>
           <template #paginatorend>
             <Button type="button" icon="pi pi-download" text />
@@ -162,6 +192,7 @@ const hideDialog = () => {
               </div>
             </div>
           </template>
+          
           <Column field="id" header="ID" style="width: 25%"></Column>
           <Column field="name" header="Name" style="width: 25%"></Column>
           <Column field="status" header="Status" style="width: 25%"></Column>
@@ -183,6 +214,10 @@ const hideDialog = () => {
               />
             </template>
           </Column>
+          <!-- <Paginator
+            
+            @page="onPaginate"
+          /> -->
         </DataTable>
         <Dialog
           v-model:visible="productDialog"
