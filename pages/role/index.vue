@@ -154,7 +154,8 @@ const hideDialog = () => {
         {{ roles }}
         <DataTable
             :value="roles"
-            paginator
+            data-key="id"
+            :paginator="true"
             :rows="5"
             @page="onPaginate"
             :totalRecords="totalData"

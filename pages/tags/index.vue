@@ -6,6 +6,7 @@ import { onMounted, ref } from 'vue';
 
 const toast = useToast();
 
+const tags = ref([]);
 const products = ref(null);
 const productDialog = ref(false);
 const deleteProductDialog = ref(false);
@@ -22,10 +23,25 @@ const statuses = ref([
     { label: 'Disable', value: 'disable' },
 ]);
 
-onMounted(() => {
-    ProductService.getProducts().then((data) => (products.value = data));
+onMounted( async () => {
+    // ProductService.getProducts().then((data) => (products.value = data));
+    await initialize();
 });
-
+const initialize = async () => {
+  const { data, error } = await useApiFetch("/api/tags/", {
+    method: "GET",
+  });
+  console.log(data,'calling');
+    // errorMessage.value = null;
+    // if (error.value) {
+    //   errorMessage.value = error.value.data.message;
+    // }
+    if (data.value) {
+    //   console.log(data.value.brands);
+      tags.value = data.value.tags;
+    //   totalData.value  = data.value.roles.total
+    }
+}
 const formatCurrency = (value) => {
     return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 };
@@ -41,31 +57,60 @@ const hideDialog = () => {
     submitted.value = false;
 };
 
-const saveProduct = () => {
+const saveProduct = async () => {
     submitted.value = true;
-
-    if (product.value.name && product.value.name.trim() && product.value.price) {
+    console.log(product.value);
+    if (product.value.name && product.value.name.trim()) {
+        product.value.status = product.value.status.value ? product.value.status.value : product.value.status;
         if (product.value.id) {
-            product.value.inventoryStatus = product.value.inventoryStatus.value ? product.value.inventoryStatus.value : product.value.inventoryStatus;
+            // product.value.status = product.value.status.value ? product.value.status.value : product.value.status;
+            const { data, error } = await useApiFetch("/api/tags/" + product.value.id, {
+                method: "PUT",
+                body: product.value,
+            });
+            // errorMessage.value = null;
+            // if (error.value) {
+            // errorMessage.value = error.value.data.message;
+            // }
+            if (data.value) {
+                toast.add({
+                    severity: "info",
+                    summary: "Success",
+                    detail: data.value.message,
+                    life: 3000,
+                });
+            }
             products.value[findIndexById(product.value.id)] = product.value;
-            toast.add({
-                severity: 'success',
-                summary: 'Successful',
-                detail: 'Product Updated',
-                life: 3000
-            });
+            // toast.add({
+            //     severity: 'success',
+            //     summary: 'Successful',
+            //     detail: 'Product Updated',
+            //     life: 3000
+            // });
         } else {
-            product.value.id = createId();
-            product.value.code = createId();
-            product.value.image = 'product-placeholder.svg';
-            product.value.inventoryStatus = product.value.inventoryStatus ? product.value.inventoryStatus.value : 'Enable';
-            products.value.push(product.value);
-            toast.add({
-                severity: 'success',
-                summary: 'Successful',
-                detail: 'Product Created',
-                life: 3000
+            const { data, error } = await useApiFetch("/api/tags", {
+                method: "POST",
+                body: product.value,
             });
+            if (data.value) {
+                toast.add({
+                    severity: "info",
+                    summary: "Success",
+                    detail: data.value.message,
+                    life: 3000,
+                });
+            }
+            // product.value.id = createId();
+            // product.value.code = createId();
+            // product.value.image = 'product-placeholder.svg';
+            // product.value.inventoryStatus = product.value.inventoryStatus ? product.value.inventoryStatus.value : 'Enable';
+            products.value.push(product.value);
+            // toast.add({
+            //     severity: 'success',
+            //     summary: 'Successful',
+            //     detail: 'Product Created',
+            //     life: 3000
+            // });
         }
 
         productDialog.value = false;
@@ -85,16 +130,31 @@ const confirmDeleteProduct = (editProduct) => {
     deleteProductDialog.value = true;
 };
 
-const deleteProduct = () => {
+const deleteProduct = async () => {
+    const { data, error } = await useApiFetch("/api/tags/" + product.value.id, {
+      method: "DELETE",
+    });
+    // errorMessage.value = null;
+    // if (error.value) {
+    //   errorMessage.value = error.value.data.message;
+    // }
+    if (data.value) {
+      toast.add({
+        severity: "success",
+        summary: "Product Deleted",
+        detail: data.value.message,
+        life: 3000,
+      });
+    }
     products.value = products.value.filter((val) => val.id !== product.value.id);
     deleteProductDialog.value = false;
     product.value = {};
-    toast.add({
-        severity: 'success',
-        summary: 'Successful',
-        detail: 'Product Deleted',
-        life: 3000
-    });
+    // toast.add({
+    //     severity: 'success',
+    //     summary: 'Successful',
+    //     detail: 'Product Deleted',
+    //     life: 3000
+    // });
 };
 
 const findIndexById = (id) => {
@@ -150,7 +210,7 @@ const deleteSelectedProducts = () => {
                 <DataTable
                     ref="dt"
                     v-model:selection="selectedProducts"
-                    :value="products"
+                    :value="tags"
                     dataKey="id"
                     :paginator="true"
                     :rows="10"
@@ -160,6 +220,12 @@ const deleteSelectedProducts = () => {
                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
                     responsiveLayout="scroll"
                 >
+                    <template #paginatorstart>
+                        <Button type="button" icon="pi pi-refresh" text @click="initialize" />
+                    </template>
+                    <template #paginatorend>
+                        <Button type="button" icon="pi pi-download" text />
+                    </template>
                     <template #header>
                         <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
                             <h3 class="m-0">Tags</h3>
@@ -183,7 +249,7 @@ const deleteSelectedProducts = () => {
                     <Column field="inventoryStatus" header="Status" :sortable="true">
                         <template #body="slotProps">
                             <span class="p-column-title">Status</span>
-                            <span :class="'product-badge status-' + (slotProps.data.inventoryStatus ? slotProps.data.inventoryStatus.toLowerCase() : '')">{{ slotProps.data.inventoryStatus }}</span>
+                            <span :class="'product-badge status-' + (slotProps.data.status ? slotProps.data.status.toLowerCase() : '')">{{ slotProps.data.status }}</span>
                         </template>
                     </Column>
                     <Column field="updated_at" header="Updated_at" :sortable="true">
@@ -209,7 +275,7 @@ const deleteSelectedProducts = () => {
 
                     <div class="field">
                         <label for="inventoryStatus" class="mb-3">Status</label>
-                        <Dropdown id="inventoryStatus" v-model="product.inventoryStatus" :options="statuses" optionLabel="label" placeholder="Select a Status">
+                        <Dropdown id="inventoryStatus" v-model="product.status" :options="statuses" optionLabel="label" placeholder="Select a Status">
                             <template #value="slotProps">
                                 <div v-if="slotProps.value && slotProps.value.value">
                                     <span :class="'product-badge status-' + slotProps.value.value">{{ slotProps.value.label }}</span>
