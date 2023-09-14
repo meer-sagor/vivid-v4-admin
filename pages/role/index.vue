@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted  } from "vue";
+import { ref, onMounted } from "vue";
 import { useRolesStore } from "@/stores/useRolesStore";
 import { useApiFetch } from "@/composables/useApiFetch";
 import { useToast } from "primevue/usetoast";
@@ -27,71 +27,71 @@ const roles = ref([]);
 //   return author.books.length > 0 ? 'Yes' : 'No'
 // })
 const fetchRoles = async () => {
-    await rolesStore.getRoles();
-    if (rolesStore.roles) {
-        roles.value = rolesStore.roles;
-    }
+  await rolesStore.getRoles();
+  if (rolesStore.roles) {
+    roles.value = rolesStore.roles;
+  }
 };
 
 onMounted(async () => {
-  console.log('calling');
-    // await fetchRoles(); // Call the fetchRoles function
-    // console.log(roles.value);  // Check if roles are populated
-    await initialize();
+  console.log("calling");
+  // await fetchRoles(); // Call the fetchRoles function
+  // console.log(roles.value);  // Check if roles are populated
+  await initialize();
 });
 const showProductDialog = () => {
   productDialog.value = true;
   mode.value = "add";
-}
+};
 const showEditDialog = (data) => {
   mode.value = "edit";
   id.value = data.id;
   product.value.name = data.name;
   productDialog.value = true;
-}
+};
 const showDeleteDialog = (data) => {
   id.value = data.id;
   product.value.name = data.name;
   deleteProductDialog.value = true;
-}
+};
 const initialize = async () => {
-  const { data, error } = await useApiFetch("/api/roles?page="+page.value, {
+  const { data, error } = await useApiFetch("/api/roles?page=" + page.value, {
     method: "GET",
   });
-  console.log(data,'calling');
-    errorMessage.value = null;
-    if (error.value) {
-      errorMessage.value = error.value.data.message;
-    }
-    if (data.value) {
-      console.log(data.value);
-      roles.value = data.value.roles.data;
-      totalData.value  = data.value.roles.total
-    }
-}
+  console.log(data, "calling");
+  errorMessage.value = null;
+  if (error.value) {
+    errorMessage.value = error.value.data.message;
+  }
+  if (data.value) {
+    console.log(data.value);
+    roles.value = data.value.roles.data;
+    totalData.value = data.value.roles.total;
+  }
+};
 const onPaginate = (event) => {
   console.log(event);
-}
+};
 const deleteProduct = async () => {
   const { data, error } = await useApiFetch("/api/roles/" + id.value, {
-      method: "DELETE",
+    method: "DELETE",
+  });
+  errorMessage.value = null;
+  if (error.value) {
+    errorMessage.value = error.value.data.message;
+  }
+  if (data.value) {
+    toast.add({
+      severity: "info",
+      summary: "Success",
+      detail: data.value.message,
+      life: 3000,
     });
-    errorMessage.value = null;
-    if (error.value) {
-      errorMessage.value = error.value.data.message;
-    }
-    if (data.value) {
-      toast.add({
-        severity: "info",
-        summary: "Success",
-        detail: data.value.message,
-        life: 3000,
-      });
-    }
-}
+  }
+};
 const saveProduct = async () => {
   productDialog.value = true;
-  product.value.guard_name = 'api';
+  product.value.guard_name = "api";
   if (mode.value == "add") {
     const { data, error } = await useApiFetch("/api/roles", {
       method: "POST",
@@ -110,7 +110,7 @@ const saveProduct = async () => {
       });
     }
   } else {
-    console.log('edit');
+    console.log("edit");
     const { data, error } = await useApiFetch("/api/roles/" + id.value, {
       method: "PUT",
       body: product.value,
@@ -128,11 +128,10 @@ const saveProduct = async () => {
       });
     }
   }
-  
-}
+};
 const hideDialog = () => {
   productDialog.value = false;
-}
+};
 // const roles = ref([]);
 
 // onMounted(async () => {
@@ -144,56 +143,58 @@ const hideDialog = () => {
 // })
 
 // console.log('roles', roles)
-
-
 </script>
 <template>
   <div class="grid p-fluid">
     <div class="col-12">
       <div class="card">
-        {{ roles }}
+        <!-- {{ roles }} -->
         <DataTable
-            :value="roles"
-            data-key="id"
-            :paginator="true"
-            :rows="5"
-            @page="onPaginate"
-            :totalRecords="totalData"
-            :rowsPerPageOptions="[5, 10, 20, 50]"
-            tableStyle="min-width: 50rem"
-            paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
-            currentPageReportTemplate="{first} to {last} of {totalRecords}">
+          :value="roles"
+          data-key="id"
+          :paginator="true"
+          :rows="5"
+          @page="onPaginate"
+          :totalRecords="totalData"
+          :rowsPerPageOptions="[5, 10, 20, 50]"
+          tableStyle="min-width: 50rem"
+          paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
+          currentPageReportTemplate="{first} to {last} of {totalRecords}"
+        >
           <template #paginatorstart>
-            <Button type="button" icon="pi pi-refresh" text @click="initialize" />
+            <Button
+              type="button"
+              icon="pi pi-refresh"
+              text
+              @click="initialize"
+            />
           </template>
           <template #paginatorend>
             <Button type="button" icon="pi pi-download" text />
           </template>
 
           <template #header>
-            <div class="flex justify-content-between flex-column sm:flex-row">
-              <div class="col-2">
-                <Button
-                    type="button"
-                    icon="pi pi-plus"
-                    label="Add New"
-                    class="p-button-outlined mb-2"
-                    @click="showProductDialog()"
-                />
-              </div>
-              <div class="col-4">
-                <span class="p-input-icon-left mb-2">
+            <div
+              class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
+            >
+              <h3 class="m-0">Brands</h3>
+              <div
+                class="flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3"
+              >
+                <span class="block mt-2 md:mt-0 p-input-icon-left">
                   <i class="pi pi-search" />
-                  <InputText
-                      v-model="search"
-                      placeholder="Keyword Search"
-                      style="width: 100%"
-                  />
+                  <InputText v-model="search" placeholder="Search..." />
                 </span>
+                <Button
+                  label="New"
+                  icon="pi pi-plus"
+                  class="p-button-primary mr-2"
+                  @click="showProductDialog()"
+                />
               </div>
             </div>
           </template>
-          
+
           <Column field="id" header="ID" style="width: 25%"></Column>
           <Column field="name" header="Name" style="width: 25%"></Column>
           <Column field="status" header="Status" style="width: 25%"></Column>
@@ -203,15 +204,15 @@ const hideDialog = () => {
                 icon="pi pi-pencil"
                 outlined
                 rounded
-                class="mr-2" 
+                class="mr-2"
                 @click="showEditDialog(slotProps.data)"
               />
               <Button
-                  icon="pi pi-trash"
-                  outlined
-                  rounded
-                  severity="danger" 
-                  @click="showDeleteDialog(slotProps.data)"
+                icon="pi pi-trash"
+                outlined
+                rounded
+                severity="danger"
+                @click="showDeleteDialog(slotProps.data)"
               />
             </template>
           </Column>
@@ -240,7 +241,6 @@ const hideDialog = () => {
               v-model.trim="product.name"
               required="true"
               autofocus
-             
             />
             <!-- <small class="p-error" v-if="submitted && !product.name"
               >Name is required.</small

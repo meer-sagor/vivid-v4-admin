@@ -4,8 +4,11 @@ import AppMenuItem from "./AppMenuItem.vue";
 const model = ref([
   {
     label: "General",
+    items: [{ label: "Dashboard", icon: "pi pi-fw pi-home", to: "/" }],
+  },
+  {
+    label: "Sales & Marketing",
     items: [
-      { label: "Dashboard", icon: "pi pi-fw pi-home", to: "/" },
       {
         label: "Sales",
         icon: "pi pi-fw pi-wallet",
@@ -17,14 +20,9 @@ const model = ref([
         to: "/general/ship-station-orders",
       },
       {
-        label: "Department",
-        icon: "pi pi-fw pi-sitemap",
-        to: "/general/departments",
-      },
-      {
         label: "Promo Code",
         icon: "pi pi-fw pi-tag",
-        to: "/general/promo-code",
+        to: "/marketing/promo-code",
       },
     ],
   },
@@ -32,29 +30,9 @@ const model = ref([
     label: "Home Section",
     items: [
       {
-        label: "Home Categories",
+        label: "Manage Sections",
         icon: "pi pi-fw pi-id-card",
-        to: "/home/categories",
-      },
-      {
-        label: "Top Categories",
-        icon: "pi pi-fw pi-id-card",
-        to: "/home/top-categories",
-      },
-      {
-        label: "Home Products",
-        icon: "pi pi-fw pi-id-card",
-        to: "/home/products",
-      },
-      {
-        label: "Custom Printing",
-        icon: "pi pi-fw pi-id-card",
-        to: "/home/custom-printing",
-      },
-      {
-        label: "Embroidery",
-        icon: "pi pi-fw pi-id-card",
-        to: "/home/embroidery",
+        to: "/home/sections",
       },
     ],
   },
@@ -62,56 +40,24 @@ const model = ref([
     label: "Products Section",
     items: [
       {
-        label: "Manage Products",
+        label: "Products",
         icon: "pi pi-fw pi-id-card",
         to: "/product",
       },
       {
         label: "Categories",
         icon: "pi pi-fw pi-id-card",
-        to: "/dummy",
+        to: "/categories",
+      },
+      {
+        label: "Subcategories",
+        icon: "pi pi-fw pi-id-card",
+        to: "/subcategories",
       },
       {
         label: "Brands",
         icon: "pi pi-fw pi-id-card",
-        to: "/product/brands",
-      },
-      {
-        label: "Colors",
-        icon: "pi pi-fw pi-id-card",
-        to: "/dummy",
-      },
-      {
-        label: "Sizes",
-        icon: "pi pi-fw pi-id-card",
-        to: "/dummy",
-      },
-      {
-        label: "Print Sides",
-        icon: "pi pi-fw pi-id-card",
-        to: "/dummy",
-      },
-      {
-        label: "Printing Price",
-        icon: "pi pi-fw pi-id-card",
-        to: "/dummy",
-        items: [
-          {
-            label: "Price Table",
-            icon: "pi pi-fw pi-id-card",
-            to: "/dummy",
-          },
-          {
-            label: "Price Dscount Table",
-            icon: "pi pi-fw pi-id-card",
-            to: "/dummy",
-          },
-          {
-            label: "Pricing Personalize Table",
-            icon: "pi pi-fw pi-id-card",
-            to: "/dummy",
-          },
-        ],
+        to: "/brands",
       },
       {
         label: "Fabrics",
@@ -119,9 +65,9 @@ const model = ref([
         to: "/fabrics",
       },
       {
-        label: "Brands ",
+        label: "Colors",
         icon: "pi pi-fw pi-id-card",
-        to: "/brands",
+        to: "/colors",
       },
       {
         label: "Sizes",
@@ -134,19 +80,14 @@ const model = ref([
         to: "/tags",
       },
       {
-        label: "Colors",
+        label: "Sides",
         icon: "pi pi-fw pi-id-card",
-        to: "/colors",
+        to: "/dummy",
       },
       {
-        label: "Categories",
+        label: "Price Table",
         icon: "pi pi-fw pi-id-card",
-        to: "/categories",
-      },
-      {
-        label: "Subcategories",
-        icon: "pi pi-fw pi-id-card",
-        to: "/subcategories",
+        to: "/dummy",
       },
     ],
   },
@@ -224,7 +165,7 @@ const model = ref([
       {
         label: "Manage Roles",
         icon: "pi pi-fw pi-desktop",
-        to: "/dummy",
+        to: "/role",
       },
     ],
   },
@@ -243,28 +184,7 @@ const model = ref([
         to: "/dummy",
       },
       {
-        label: "Post",
-        icon: "pi pi-fw pi-circle-off",
-        to: "/dummy",
-      },
-      {
         label: "Comments",
-        icon: "pi pi-fw pi-exclamation-circle",
-        to: "/dummy",
-      },
-    ],
-  },
-  {
-    label: "Manage Media",
-    icon: "pi pi-fw pi-briefcase",
-    items: [
-      {
-        label: "Gallery",
-        icon: "pi pi-fw pi-calendar",
-        to: "/dummy",
-      },
-      {
-        label: "Media",
         icon: "pi pi-fw pi-exclamation-circle",
         to: "/dummy",
       },
@@ -275,28 +195,13 @@ const model = ref([
     icon: "pi pi-fw pi-briefcase",
     items: [
       {
-        label: "Newsletters",
-        icon: "pi pi-fw pi-globe",
-        to: "/dummy",
-      },
-      {
-        label: "Store Designs",
-        icon: "pi pi-fw pi-user",
-        to: "/dummy",
-      },
-      {
-        label: "History Record",
-        icon: "pi pi-fw pi-pencil",
-        to: "/dummy",
-      },
-      {
-        label: "Reserved Words",
-        icon: "pi pi-fw pi-calendar",
-        to: "/dummy",
-      },
-      {
-        label: "Appearance",
+        label: "Media",
         icon: "pi pi-fw pi-exclamation-circle",
+        to: "/dummy",
+      },
+      {
+        label: "Analytics",
+        icon: "pi pi-fw pi-circle-off",
         to: "/dummy",
       },
       {
