@@ -51,21 +51,6 @@ const getTags = async (event) => {
     totalRecords.value = data.value.tags.total
   }
 };
-const loadTags = async (event) => {
-  const page = event.first / event.rows + 1;
-  console.log(page)
-
-  const { data, error } = await useApiFetch("/api/tags/?page=" + page, {
-    method: "GET",
-  });
-  if (data.value) {
-    tags.value = data.value.tags.data;
-    //For demo pagination
-    first.value = data.value.tags.from
-    last.value = data.value.tags.to
-    totalRecords.value = data.value.tags.total
-  }
-};
 
 const openNew = () => {
   product.value = {};
