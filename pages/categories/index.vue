@@ -7,6 +7,9 @@ import { onMounted, ref } from "vue";
 const toast = useToast();
 
 const products = ref(null);
+const fileInput = ref(null);
+const files = ref();
+const categories = ref([]);
 const productDialog = ref(false);
 const deleteProductDialog = ref(false);
 const deleteProductsDialog = ref(false);
@@ -21,11 +24,35 @@ const statuses = ref([
   { label: "Enable", value: "enable" },
   { label: "Disable", value: "disable" },
 ]);
-
-onMounted(() => {
-  ProductService.getProducts().then((data) => (products.value = data));
+const types = ref([
+  { label: "Product", value: "product" },
+  { label: "Product Design", value: "product_design" },
+  { label: "Embroidery Design", value: "embroidery_design" },
+]);
+const onPhotoSelect = ($event) => {
+  product.value.image_id == null
+  files.value = fileInput.value?.files;
+  console.log(files.value[0].objectURL);
+};
+onMounted( async () => {
+  // ProductService.getProducts().then((data) => (products.value = data));
+  await initialize();
 });
-
+const initialize = async () => {
+  const { data, error } = await useApiFetch("/api/categories/", {
+    method: "GET",
+  });
+  console.log(data, "calling");
+  // errorMessage.value = null;
+  // if (error.value) {
+  //   errorMessage.value = error.value.data.message;
+  // }
+  if (data.value) {
+    //   console.log(data.value.brands);
+    categories.value = data.value.categories;
+    //   totalData.value  = data.value.roles.total
+  }
+};
 const formatCurrency = (value) => {
   return value.toLocaleString("en-US", { style: "currency", currency: "USD" });
 };
@@ -41,42 +68,103 @@ const hideDialog = () => {
   submitted.value = false;
 };
 
-const saveProduct = () => {
+const saveProduct = async () => {
+  if (product.value.image_id == null && product.value.image_id == undefined) {
+    console.log(product.value.image_id);
+    await uploadHandler();
+  }
   submitted.value = true;
-
-  if (product.value.name && product.value.name.trim() && product.value.price) {
+  console.log(product.value);
+  if (product.value.name && product.value.name.trim()) {
+    product.value.status = product.value.status.value
+      ? product.value.status.value
+      : product.value.status;
+      product.value.type = product.value.type.value
+      ? product.value.type.value.toUpperCase()
+      : product.value.type.toUpperCase();
     if (product.value.id) {
-      product.value.inventoryStatus = product.value.inventoryStatus.value
-        ? product.value.inventoryStatus.value
-        : product.value.inventoryStatus;
+      // product.value.status = product.value.status.value ? product.value.status.value : product.value.status;
+      const { data, error } = await useApiFetch(
+        "/api/categories/" + product.value.id,
+        {
+          method: "PUT",
+          body: product.value,
+        }
+      );
+      // errorMessage.value = null;
+      // if (error.value) {
+      // errorMessage.value = error.value.data.message;
+      // }
+      if (data.value) {
+        toast.add({
+          severity: "info",
+          summary: "Success",
+          detail: data.value.message,
+          life: 3000,
+        });
+      }
       products.value[findIndexById(product.value.id)] = product.value;
-      toast.add({
-        severity: "success",
-        summary: "Successful",
-        detail: "Product Updated",
-        life: 3000,
-      });
+      // toast.add({
+      //     severity: 'success',
+      //     summary: 'Successful',
+      //     detail: 'Product Updated',
+      //     life: 3000
+      // });
     } else {
-      product.value.id = createId();
-      product.value.code = createId();
-      product.value.image = "product-placeholder.svg";
-      product.value.inventoryStatus = product.value.inventoryStatus
-        ? product.value.inventoryStatus.value
-        : "Enable";
-      products.value.push(product.value);
-      toast.add({
-        severity: "success",
-        summary: "Successful",
-        detail: "Product Created",
-        life: 3000,
+      const { data, error } = await useApiFetch("/api/categories", {
+        method: "POST",
+        body: product.value,
       });
+      if (data.value) {
+        toast.add({
+          severity: "info",
+          summary: "Success",
+          detail: data.value.message,
+          life: 3000,
+        });
+      }
+      // product.value.id = createId();
+      // product.value.code = createId();
+      // product.value.image = 'product-placeholder.svg';
+      // product.value.inventoryStatus = product.value.inventoryStatus ? product.value.inventoryStatus.value : 'Enable';
+      products.value.push(product.value);
+      // toast.add({
+      //     severity: 'success',
+      //     summary: 'Successful',
+      //     detail: 'Product Created',
+      //     life: 3000
+      // });
     }
 
     productDialog.value = false;
     product.value = {};
   }
 };
+const uploadHandler = async () => {
+  console.log( files.value );
+  // uploading.value = true;
+  const fileUp = files.value[0];
+  const body = new FormData();
+  body.append("image", fileUp);
+  body.append("type", "CATEGORY");
 
+  const { data } = await useApiFetch("/api/image", {
+    method: "POST",
+    body: body,
+  });
+  // console.log(data);
+  if (data.value) {
+    product.value.image_id = data.value.media.id
+    // await auth.fetchUser();
+    // uploading.value = false;
+    // toast.add({
+    //   severity: "info",
+    //   summary: "Success",
+    //   detail: "File Uploaded",
+    //   life: 3000,
+    // });
+  }
+};
 const editProduct = (editProduct) => {
   product.value = { ...editProduct };
   console.log(product);
@@ -88,16 +176,31 @@ const confirmDeleteProduct = (editProduct) => {
   deleteProductDialog.value = true;
 };
 
-const deleteProduct = () => {
+const deleteProduct = async () => {
+  const { data, error } = await useApiFetch("/api/categories/" + product.value.id, {
+    method: "DELETE",
+  });
+  // errorMessage.value = null;
+  // if (error.value) {
+  //   errorMessage.value = error.value.data.message;
+  // }
+  if (data.value) {
+    toast.add({
+      severity: "success",
+      summary: "Product Deleted",
+      detail: data.value.message,
+      life: 3000,
+    });
+  }
   products.value = products.value.filter((val) => val.id !== product.value.id);
   deleteProductDialog.value = false;
   product.value = {};
-  toast.add({
-    severity: "success",
-    summary: "Successful",
-    detail: "Product Deleted",
-    life: 3000,
-  });
+  // toast.add({
+  //   severity: "success",
+  //   summary: "Successful",
+  //   detail: "Product Deleted",
+  //   life: 3000,
+  // });
 };
 
 const findIndexById = (id) => {
@@ -165,7 +268,7 @@ const onUpload = () => {
         <DataTable
           ref="dt"
           v-model:selection="selectedProducts"
-          :value="products"
+          :value="categories"
           dataKey="id"
           :paginator="true"
           :rows="10"
@@ -175,6 +278,17 @@ const onUpload = () => {
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
           responsiveLayout="scroll"
         >
+          <template #paginatorstart>
+            <Button
+              type="button"
+              icon="pi pi-refresh"
+              text
+              @click="initialize"
+            />
+          </template>
+          <template #paginatorend>
+            <Button type="button" icon="pi pi-download" text />
+          </template>
           <template #header>
             <div
               class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
@@ -308,7 +422,7 @@ const onUpload = () => {
           <Column field="description" header="Type" :sortable="true">
             <template #body="slotProps">
               <span class="p-column-title">Type</span>
-              {{ slotProps.data.description }}
+              {{ slotProps.data.type }}
             </template>
           </Column>
           <Column field="inventoryStatus" header="Status" :sortable="true">
@@ -317,11 +431,11 @@ const onUpload = () => {
               <span
                 :class="
                   'product-badge status-' +
-                  (slotProps.data.inventoryStatus
-                    ? slotProps.data.inventoryStatus.toLowerCase()
+                  (slotProps.data.status
+                    ? slotProps.data.status.toLowerCase()
                     : '')
                 "
-                >{{ slotProps.data.inventoryStatus }}</span
+                >{{ slotProps.data.status }}</span
               >
             </template>
           </Column>
@@ -359,15 +473,15 @@ const onUpload = () => {
             <label for="name">Order</label>
             <InputText
               id="name"
-              v-model.trim="product.name"
+              v-model.trim="product.order"
               required="true"
               type="number"
               value="0"
               autofocus
-              :class="{ 'p-invalid': submitted && !product.name }"
+              :class="{ 'p-invalid': submitted && !product.order }"
             />
-            <small v-if="submitted && !product.name" class="p-invalid"
-              >Name is required.</small
+            <small v-if="submitted && !product.order" class="p-invalid"
+              >Order is required.</small
             >
           </div>
 
@@ -398,13 +512,23 @@ const onUpload = () => {
 
           <div class="field">
             <label for="name">Image</label>
-            <FileUpload
+            <!-- <FileUpload
               name="demo[]"
               @uploader="onUpload"
               :multiple="true"
               accept="image/*"
               :maxFileSize="1000000"
               customUpload
+            /> -->
+            <FileUpload ref="fileInput" mode="basic" name="demo[]" url="/api/upload" accept="image/*" customUpload @select="onPhotoSelect($event)" />
+            <br>
+            <img
+              v-if="files"
+              :src="files[0].objectURL"
+              :alt="files[0].objectURL"
+              class="shadow-2"
+              width="100"
+              height="50"
             />
           </div>
 
@@ -412,8 +536,8 @@ const onUpload = () => {
             <label for="inventoryStatus" class="mb-3">Type</label>
             <Dropdown
               id="inventoryStatus"
-              v-model="product.inventoryStatus"
-              :options="statuses"
+              v-model="product.type"
+              :options="types"
               optionLabel="label"
               placeholder="Select a Type"
             >
@@ -443,7 +567,7 @@ const onUpload = () => {
             <label for="inventoryStatus" class="mb-3">Status</label>
             <Dropdown
               id="inventoryStatus"
-              v-model="product.inventoryStatus"
+              v-model="product.status"
               :options="statuses"
               optionLabel="label"
               placeholder="Select a Status"
