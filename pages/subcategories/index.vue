@@ -5,8 +5,11 @@ import { useToast } from "primevue/usetoast";
 import { onMounted, ref } from "vue";
 
 const toast = useToast();
-
+const categories = ref([]);
+const subCategories = ref([]);
 const products = ref(null);
+const fileInput = ref(null);
+const files = ref();
 const productDialog = ref(false);
 const deleteProductDialog = ref(false);
 const deleteProductsDialog = ref(false);
@@ -21,11 +24,44 @@ const statuses = ref([
   { label: "Enable", value: "enable" },
   { label: "Disable", value: "disable" },
 ]);
-
-onMounted(() => {
-  ProductService.getProducts().then((data) => (products.value = data));
+const types = ref([
+  { label: "Product", value: "product" },
+  { label: "Product Design", value: "product_design" },
+  { label: "Embroidery Design", value: "embroidery_design" },
+]);
+const onPhotoSelect = ($event) => {
+  product.value.image_id == null
+  files.value = fileInput.value?.files;
+  console.log(files.value[0].objectURL);
+};
+onMounted(async () => {
+  // ProductService.getProducts().then((data) => (products.value = data));
+  await initialize();
+  await categoryData();
 });
-
+const initialize = async () => {
+  const { data, error } = await useApiFetch("/api/sub-categories/", {
+    method: "GET",
+  });
+  console.log(data, "calling");
+  // errorMessage.value = null;
+  // if (error.value) {
+  //   errorMessage.value = error.value.data.message;
+  // }
+  if (data.value) {
+    //   console.log(data.value.brands);
+    subCategories.value = data.value.sub_categories;
+    //   totalData.value  = data.value.roles.total
+  }
+};
+const categoryData = async () => {
+  const { data, error } = await useApiFetch("/api/categories/", {
+    method: "GET",
+  });
+  if (data.value) {
+    categories.value = data.value.categories;
+  }
+};
 const formatCurrency = (value) => {
   return value.toLocaleString("en-US", { style: "currency", currency: "USD" });
 };
@@ -41,39 +77,101 @@ const hideDialog = () => {
   submitted.value = false;
 };
 
-const saveProduct = () => {
+const saveProduct = async () => {
+  if (product.value.image_id == null && product.value.image_id == undefined) {
+    console.log(product.value.image_id);
+    await uploadHandler();
+  }
   submitted.value = true;
-
-  if (product.value.name && product.value.name.trim() && product.value.price) {
+  console.log(product.value);
+  if (product.value.name && product.value.name.trim()) {
+    product.value.status = product.value.status.value
+      ? product.value.status.value
+      : product.value.status;
+      // product.value.type = product.value.type.value
+      // ? product.value.type.value.toUpperCase()
+      // : product.value.type.toUpperCase();
     if (product.value.id) {
-      product.value.inventoryStatus = product.value.inventoryStatus.value
-        ? product.value.inventoryStatus.value
-        : product.value.inventoryStatus;
+      // product.value.status = product.value.status.value ? product.value.status.value : product.value.status;
+      const { data, error } = await useApiFetch(
+        "/api/sub-categories/" + product.value.id,
+        {
+          method: "PUT",
+          body: product.value,
+        }
+      );
+      // errorMessage.value = null;
+      // if (error.value) {
+      // errorMessage.value = error.value.data.message;
+      // }
+      if (data.value) {
+        toast.add({
+          severity: "info",
+          summary: "Success",
+          detail: data.value.message,
+          life: 3000,
+        });
+      }
       products.value[findIndexById(product.value.id)] = product.value;
-      toast.add({
-        severity: "success",
-        summary: "Successful",
-        detail: "Product Updated",
-        life: 3000,
-      });
+      // toast.add({
+      //     severity: 'success',
+      //     summary: 'Successful',
+      //     detail: 'Product Updated',
+      //     life: 3000
+      // });
     } else {
-      product.value.id = createId();
-      product.value.code = createId();
-      product.value.image = "product-placeholder.svg";
-      product.value.inventoryStatus = product.value.inventoryStatus
-        ? product.value.inventoryStatus.value
-        : "Enable";
-      products.value.push(product.value);
-      toast.add({
-        severity: "success",
-        summary: "Successful",
-        detail: "Product Created",
-        life: 3000,
+      const { data, error } = await useApiFetch("/api/sub-categories", {
+        method: "POST",
+        body: product.value,
       });
+      if (data.value) {
+        toast.add({
+          severity: "info",
+          summary: "Success",
+          detail: data.value.message,
+          life: 3000,
+        });
+      }
+      // product.value.id = createId();
+      // product.value.code = createId();
+      // product.value.image = 'product-placeholder.svg';
+      // product.value.inventoryStatus = product.value.inventoryStatus ? product.value.inventoryStatus.value : 'Enable';
+      products.value.push(product.value);
+      // toast.add({
+      //     severity: 'success',
+      //     summary: 'Successful',
+      //     detail: 'Product Created',
+      //     life: 3000
+      // });
     }
 
     productDialog.value = false;
     product.value = {};
+  }
+};
+const uploadHandler = async () => {
+  console.log( files.value );
+  // uploading.value = true;
+  const fileUp = files.value[0];
+  const body = new FormData();
+  body.append("image", fileUp);
+  body.append("type", "CATEGORY");
+
+  const { data } = await useApiFetch("/api/image", {
+    method: "POST",
+    body: body,
+  });
+  // console.log(data);
+  if (data.value) {
+    product.value.image_id = data.value.media.id
+    // await auth.fetchUser();
+    // uploading.value = false;
+    // toast.add({
+    //   severity: "info",
+    //   summary: "Success",
+    //   detail: "File Uploaded",
+    //   life: 3000,
+    // });
   }
 };
 
@@ -88,16 +186,31 @@ const confirmDeleteProduct = (editProduct) => {
   deleteProductDialog.value = true;
 };
 
-const deleteProduct = () => {
+const deleteProduct = async () => {
+  const { data, error } = await useApiFetch("/api/sub-categories/" + product.value.id, {
+    method: "DELETE",
+  });
+  // errorMessage.value = null;
+  // if (error.value) {
+  //   errorMessage.value = error.value.data.message;
+  // }
+  if (data.value) {
+    toast.add({
+      severity: "success",
+      summary: "Product Deleted",
+      detail: data.value.message,
+      life: 3000,
+    });
+  }
   products.value = products.value.filter((val) => val.id !== product.value.id);
   deleteProductDialog.value = false;
   product.value = {};
-  toast.add({
-    severity: "success",
-    summary: "Successful",
-    detail: "Product Deleted",
-    life: 3000,
-  });
+  // toast.add({
+  //   severity: "success",
+  //   summary: "Successful",
+  //   detail: "Product Deleted",
+  //   life: 3000,
+  // });
 };
 
 const findIndexById = (id) => {
@@ -165,7 +278,7 @@ const onUpload = () => {
         <DataTable
           ref="dt"
           v-model:selection="selectedProducts"
-          :value="products"
+          :value="subCategories"
           dataKey="id"
           :paginator="true"
           :rows="10"
@@ -175,11 +288,22 @@ const onUpload = () => {
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
           responsiveLayout="scroll"
         >
+        <template #paginatorstart>
+            <Button
+              type="button"
+              icon="pi pi-refresh"
+              text
+              @click="initialize"
+            />
+          </template>
+          <template #paginatorend>
+            <Button type="button" icon="pi pi-download" text />
+          </template>
           <template #header>
             <div
               class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
             >
-              <h3 class="m-0">Subcategories</h3>
+              <h4 class="m-0">Subcategories</h4>
               <div
                 class="flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3"
               >
@@ -317,11 +441,11 @@ const onUpload = () => {
               <span
                 :class="
                   'product-badge status-' +
-                  (slotProps.data.inventoryStatus
-                    ? slotProps.data.inventoryStatus.toLowerCase()
+                  (slotProps.data.status
+                    ? slotProps.data.status.toLowerCase()
                     : '')
                 "
-                >{{ slotProps.data.inventoryStatus }}</span
+                >{{ slotProps.data.status }}</span
               >
             </template>
           </Column>
@@ -357,8 +481,8 @@ const onUpload = () => {
           <div class="field">
             <label for="name">Order</label>
             <InputText
-              id="name"
-              v-model.trim="product.name"
+              id="order"
+              v-model.trim="product.order"
               required="true"
               type="number"
               value="0"
@@ -366,16 +490,19 @@ const onUpload = () => {
               :class="{ 'p-invalid': submitted && !product.name }"
             />
             <small v-if="submitted && !product.name" class="p-invalid"
-              >Name is required.</small
+              >Order is required.</small
             >
           </div>
 
           <div class="field">
-            <label for="inventoryStatus" class="mb-3">Category</label>
-            <Dropdown
-              id="inventoryStatus"
-              v-model="product.inventoryStatus"
-              :options="statuses"
+            <label for="category" class="mb-3">Category</label>
+            <Dropdown v-model="product.category_id" :options="categories" optionLabel="name" optionValue="id" placeholder="Select a Category" ></Dropdown>
+            
+
+            <!-- <Dropdown
+              id="category"
+              v-model="product.category_id"
+              :options="categories"
               optionLabel="label"
               placeholder="Select a Type"
             >
@@ -383,7 +510,7 @@ const onUpload = () => {
                 <div v-if="slotProps.value && slotProps.value.value">
                   <span
                     :class="'product-badge status-' + slotProps.value.value"
-                    >{{ slotProps.value.label }}</span
+                    >{{ slotProps.value.name }}</span
                   >
                 </div>
                 <div v-else-if="slotProps.value && !slotProps.value.value">
@@ -398,7 +525,7 @@ const onUpload = () => {
                   {{ slotProps.placeholder }}
                 </span>
               </template>
-            </Dropdown>
+            </Dropdown> -->
           </div>
 
           <div class="field">
@@ -428,22 +555,32 @@ const onUpload = () => {
 
           <div class="field">
             <label for="name">Image</label>
-            <FileUpload
+            <!-- <FileUpload
               name="demo[]"
               @uploader="onUpload"
               :multiple="true"
               accept="image/*"
               :maxFileSize="1000000"
               customUpload
+            /> -->
+            <FileUpload ref="fileInput" mode="basic" name="demo[]" url="/api/upload" accept="image/*" customUpload @select="onPhotoSelect($event)" />
+            <br>
+            <img
+              v-if="files"
+              :src="files[0].objectURL"
+              :alt="files[0].objectURL"
+              class="shadow-2"
+              width="100"
+              height="50"
             />
           </div>
 
-          <div class="field">
-            <label for="inventoryStatus" class="mb-3">Type</label>
+          <!-- <div class="field">
+            <label for="type" class="mb-3">Type</label>
             <Dropdown
-              id="inventoryStatus"
-              v-model="product.inventoryStatus"
-              :options="statuses"
+              id="type"
+              v-model="product.type"
+              :options="types"
               optionLabel="label"
               placeholder="Select a Type"
             >
@@ -467,13 +604,13 @@ const onUpload = () => {
                 </span>
               </template>
             </Dropdown>
-          </div>
+          </div> -->
 
           <div class="field">
-            <label for="inventoryStatus" class="mb-3">Status</label>
+            <label for="status" class="mb-3">Status</label>
             <Dropdown
-              id="inventoryStatus"
-              v-model="product.inventoryStatus"
+              id="status"
+              v-model="product.status"
               :options="statuses"
               optionLabel="label"
               placeholder="Select a Status"
