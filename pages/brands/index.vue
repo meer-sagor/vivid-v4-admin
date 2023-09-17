@@ -2,12 +2,14 @@
 import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
-import { onMounted, ref } from "vue";
+import { onMounted, ref , nextTick} from "vue";
 
 const toast = useToast();
 
 const products = ref(null);
 const brands = ref([]);
+const rowsPerPage = ref(0)
+const totalRecords = ref(0)
 const productDialog = ref(false);
 const deleteProductDialog = ref(false);
 const deleteProductsDialog = ref(false);
@@ -19,16 +21,20 @@ const filters = ref({
 });
 const submitted = ref(false);
 const statuses = ref([
-  { label: "Enable", value: "enable" },
-  { label: "Disable", value: "disable" },
+  { label: "Enable", value: "ENABLE" },
+  { label: "Disable", value: "DISABLE" },
 ]);
 
 onMounted(async () => {
-  // ProductService.getProducts().then((data) => (products.value = data));
+  await nextTick();
   await initialize();
 });
-const initialize = async () => {
-  const { data, error } = await useApiFetch("/api/brands/", {
+const initialize = async (event) => {
+  let page = 1
+  if (event?.first){
+    page = event.first / event.rows + 1;
+  }
+  const { data, error } = await useApiFetch("/api/brands/?page=" + page, {
     method: "GET",
   });
   console.log(data, "calling");
@@ -38,7 +44,9 @@ const initialize = async () => {
   // }
   if (data.value) {
     console.log(data.value.brands);
-    brands.value = data.value.brands;
+    brands.value = data.value.brands.data;
+    rowsPerPage.value = data.value.brands.per_page
+    totalRecords.value = data.value.brands.total
     //   totalData.value  = data.value.roles.total
   }
 };
@@ -85,7 +93,7 @@ const saveProduct = async () => {
           life: 3000,
         });
       }
-      products.value[findIndexById(product.value.id)] = product.value;
+      brands.value[findIndexById(product.value.id)] = product.value;
       // toast.add({
       //     severity: 'success',
       //     summary: 'Successful',
@@ -105,11 +113,12 @@ const saveProduct = async () => {
           life: 3000,
         });
       }
+      await initialize();
       // product.value.id = createId();
       // product.value.code = createId();
       // product.value.image = 'product-placeholder.svg';
       // product.value.inventoryStatus = product.value.inventoryStatus ? product.value.inventoryStatus.value : 'Enable';
-      products.value.push(product.value);
+      // products.value.push(product.value);
       // toast.add({
       //     severity: 'success',
       //     summary: 'Successful',
@@ -164,8 +173,8 @@ const deleteProduct = async () => {
 const findIndexById = (id) => {
   let index = -1;
 
-  for (let i = 0; i < products.value.length; i++) {
-    if (products.value[i].id === id) {
+  for (let i = 0; i < brands.value.length; i++) {
+    if (brands.value[i].id === id) {
       index = i;
       break;
     }
@@ -218,13 +227,16 @@ const deleteSelectedProducts = () => {
           ref="dt"
           v-model:selection="selectedProducts"
           :value="brands"
+          :lazy="true"
           dataKey="id"
           :paginator="true"
-          :rows="10"
+          :rows="rowsPerPage"
+          :totalRecords="totalRecords"
+          :first="first"
+          @page="initialize"
           :filters="filters"
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-          :rowsPerPageOptions="[5, 10, 25]"
-          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+          currentPageReportTemplate="Total {totalRecords} brands"
           responsiveLayout="scroll"
         >
           <template #paginatorstart>
@@ -316,7 +328,7 @@ const deleteSelectedProducts = () => {
         <Dialog
           v-model:visible="productDialog"
           :style="{ width: '450px' }"
-          header="Edit Details"
+          header="Brand info"
           :modal="true"
           class="p-fluid"
         >

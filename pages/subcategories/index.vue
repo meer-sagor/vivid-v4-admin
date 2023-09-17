@@ -2,11 +2,13 @@
 import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
-import { onMounted, ref } from "vue";
+import { onMounted, ref ,nextTick} from "vue";
 
 const toast = useToast();
 const categories = ref([]);
 const subCategories = ref([]);
+const rowsPerPage = ref(0)
+const totalRecords = ref(0)
 const products = ref(null);
 const fileInput = ref(null);
 const files = ref();
@@ -21,8 +23,8 @@ const filters = ref({
 });
 const submitted = ref(false);
 const statuses = ref([
-  { label: "Enable", value: "enable" },
-  { label: "Disable", value: "disable" },
+  { label: "Enable", value: "ENABLE" },
+  { label: "Disable", value: "DISABLE" },
 ]);
 const types = ref([
   { label: "Product", value: "product" },
@@ -35,12 +37,16 @@ const onPhotoSelect = ($event) => {
   console.log(files.value[0].objectURL);
 };
 onMounted(async () => {
-  // ProductService.getProducts().then((data) => (products.value = data));
+  await nextTick();
   await initialize();
   await categoryData();
 });
-const initialize = async () => {
-  const { data, error } = await useApiFetch("/api/sub-categories/", {
+const initialize = async (event) => {
+  let page = 1
+  if (event?.first){
+    page = event.first / event.rows + 1;
+  }
+  const { data, error } = await useApiFetch("/api/sub-categories/?page=" + page, {
     method: "GET",
   });
   console.log(data, "calling");
@@ -50,7 +56,10 @@ const initialize = async () => {
   // }
   if (data.value) {
     //   console.log(data.value.brands);
-    subCategories.value = data.value.sub_categories;
+    subCategories.value = data.value.sub_categories.data;
+    rowsPerPage.value = data.value.sub_categories.per_page
+    totalRecords.value = data.value.sub_categories.total
+    
     //   totalData.value  = data.value.roles.total
   }
 };
@@ -59,7 +68,7 @@ const categoryData = async () => {
     method: "GET",
   });
   if (data.value) {
-    categories.value = data.value.categories;
+    categories.value = data.value.categories.data;
   }
 };
 const formatCurrency = (value) => {
@@ -112,7 +121,7 @@ const saveProduct = async () => {
           life: 3000,
         });
       }
-      products.value[findIndexById(product.value.id)] = product.value;
+      subCategories.value[findIndexById(product.value.id)] = product.value;
       // toast.add({
       //     severity: 'success',
       //     summary: 'Successful',
@@ -132,11 +141,12 @@ const saveProduct = async () => {
           life: 3000,
         });
       }
+      await initialize();
       // product.value.id = createId();
       // product.value.code = createId();
       // product.value.image = 'product-placeholder.svg';
       // product.value.inventoryStatus = product.value.inventoryStatus ? product.value.inventoryStatus.value : 'Enable';
-      products.value.push(product.value);
+      // products.value.push(product.value);
       // toast.add({
       //     severity: 'success',
       //     summary: 'Successful',
@@ -202,7 +212,7 @@ const deleteProduct = async () => {
       life: 3000,
     });
   }
-  products.value = products.value.filter((val) => val.id !== product.value.id);
+  subCategories.value = subCategories.value.filter((val) => val.id !== product.value.id);
   deleteProductDialog.value = false;
   product.value = {};
   // toast.add({
@@ -216,8 +226,8 @@ const deleteProduct = async () => {
 const findIndexById = (id) => {
   let index = -1;
 
-  for (let i = 0; i < products.value.length; i++) {
-    if (products.value[i].id === id) {
+  for (let i = 0; i < subCategories.value.length; i++) {
+    if (subCategories.value[i].id === id) {
       index = i;
       break;
     }
@@ -276,16 +286,19 @@ const onUpload = () => {
       <div class="card">
         <Toast />
         <DataTable
-          ref="dt"
+        ref="dt"
           v-model:selection="selectedProducts"
           :value="subCategories"
+          :lazy="true"
           dataKey="id"
           :paginator="true"
-          :rows="10"
+          :rows="rowsPerPage"
+          :totalRecords="totalRecords"
+          :first="first"
+          @page="initialize"
           :filters="filters"
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-          :rowsPerPageOptions="[5, 10, 25]"
-          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+          currentPageReportTemplate="Total {totalRecords} sub-categories"
           responsiveLayout="scroll"
         >
         <template #paginatorstart>
@@ -428,8 +441,8 @@ const onUpload = () => {
             <template #body="slotProps">
               <span class="p-column-title">Image</span>
               <img
-                :src="'/demo/images/product/' + slotProps.data.image"
-                :alt="slotProps.data.image"
+                :src="slotProps.data.media.url"
+                :alt="slotProps.data.media.url"
                 class="shadow-2"
                 width="100"
               />
