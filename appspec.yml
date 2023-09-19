@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /var/www/vividcustoms/admin-panel
+    destination: /projects/vivid-v4-admin
     overwrite: true
 file_exists_behavior: OVERWRITE
 hooks:

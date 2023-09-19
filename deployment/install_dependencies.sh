@@ -4,7 +4,7 @@
 # source ~/.bashrc
 # nvm install 16
 
-cd /var/www/vividcustoms/admin-panel
+cd /projects/vivid-v4-admin
 
 # npm install -g pm2
 if [ -d "node_modules" ]; then rm -Rf node_modules; fi
