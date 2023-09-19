@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import {ref, onMounted, nextTick} from "vue";
 import { useRolesStore } from "@/stores/useRolesStore";
 import { useApiFetch } from "@/composables/useApiFetch";
 import { useToast } from "primevue/usetoast";
@@ -14,18 +14,8 @@ const product = ref({});
 const id = ref(null);
 const errorMessage = ref("");
 const mode = ref("add");
-const customers = ref([
-  {
-    id: 1,
-    name: "James Butt",
-    status: "Enabled",
-    created_at: null,
-  },
-]);
 const roles = ref([]);
-// const publishedBooksMessage = computed(() => {
-//   return author.books.length > 0 ? 'Yes' : 'No'
-// })
+
 const fetchRoles = async () => {
   await rolesStore.getRoles();
   if (rolesStore.roles) {
@@ -34,10 +24,8 @@ const fetchRoles = async () => {
 };
 
 onMounted(async () => {
-  console.log("calling");
-  // await fetchRoles(); // Call the fetchRoles function
-  // console.log(roles.value);  // Check if roles are populated
-  await initialize();
+  await nextTick();
+  await fetchRoles();
 });
 const showProductDialog = () => {
   productDialog.value = true;
@@ -53,24 +41,6 @@ const showDeleteDialog = (data) => {
   id.value = data.id;
   product.value.name = data.name;
   deleteProductDialog.value = true;
-};
-const initialize = async () => {
-  const { data, error } = await useApiFetch("/api/roles?page=" + page.value, {
-    method: "GET",
-  });
-  console.log(data, "calling");
-  errorMessage.value = null;
-  if (error.value) {
-    errorMessage.value = error.value.data.message;
-  }
-  if (data.value) {
-    console.log(data.value);
-    roles.value = data.value.roles.data;
-    totalData.value = data.value.roles.total;
-  }
-};
-const onPaginate = (event) => {
-  console.log(event);
 };
 const deleteProduct = async () => {
   const { data, error } = await useApiFetch("/api/roles/" + id.value, {
@@ -132,17 +102,7 @@ const saveProduct = async () => {
 const hideDialog = () => {
   productDialog.value = false;
 };
-// const roles = ref([]);
 
-// onMounted(async () => {
-//   const response = await rolesStore.getRoles();
-//   console.log(response)
-//   // if (response.data) {
-//   //   roles.value = response.data
-//   // }
-// })
-
-// console.log('roles', roles)
 </script>
 <template>
   <div class="grid p-fluid">
@@ -152,21 +112,14 @@ const hideDialog = () => {
         <DataTable
           :value="roles"
           data-key="id"
-          :paginator="true"
-          :rows="5"
-          @page="onPaginate"
-          :totalRecords="totalData"
-          :rowsPerPageOptions="[5, 10, 20, 50]"
           tableStyle="min-width: 50rem"
-          paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
-          currentPageReportTemplate="{first} to {last} of {totalRecords}"
         >
           <template #paginatorstart>
             <Button
               type="button"
               icon="pi pi-refresh"
               text
-              @click="initialize"
+              @click="fetchRoles"
             />
           </template>
           <template #paginatorend>
@@ -177,7 +130,7 @@ const hideDialog = () => {
             <div
               class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
             >
-              <h3 class="m-0">Brands</h3>
+              <h3 class="m-0">Roles</h3>
               <div
                 class="flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3"
               >
