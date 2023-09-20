@@ -510,35 +510,6 @@ const onUpload = () => {
           <div class="field">
             <label for="category" class="mb-3">Category</label>
             <Dropdown v-model="product.category_id" :options="categories" optionLabel="name" optionValue="id" placeholder="Select a Category" ></Dropdown>
-            
-
-            <!-- <Dropdown
-              id="category"
-              v-model="product.category_id"
-              :options="categories"
-              optionLabel="label"
-              placeholder="Select a Type"
-            >
-              <template #value="slotProps">
-                <div v-if="slotProps.value && slotProps.value.value">
-                  <span
-                    :class="'product-badge status-' + slotProps.value.value"
-                    >{{ slotProps.value.name }}</span
-                  >
-                </div>
-                <div v-else-if="slotProps.value && !slotProps.value.value">
-                  <span
-                    :class="
-                      'product-badge status-' + slotProps.value.toLowerCase()
-                    "
-                    >{{ slotProps.value }}</span
-                  >
-                </div>
-                <span v-else>
-                  {{ slotProps.placeholder }}
-                </span>
-              </template>
-            </Dropdown> -->
           </div>
 
           <div class="field">

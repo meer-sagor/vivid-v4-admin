@@ -2,11 +2,17 @@
 import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
-import { onMounted, ref } from "vue";
+import { onMounted, ref,nextTick } from "vue";
 
 const toast = useToast();
 
 const products = ref(null);
+const fileInput = ref(null);
+const files = ref();
+const colors = ref([]);
+const colorFamilies = ref([]);
+const rowsPerPage = ref(0)
+const totalRecords = ref(0)
 const productDialog = ref(false);
 const deleteProductDialog = ref(false);
 const deleteProductsDialog = ref(false);
@@ -18,14 +24,49 @@ const filters = ref({
 });
 const submitted = ref(false);
 const statuses = ref([
-  { label: "Enable", value: "enable" },
-  { label: "Disable", value: "disable" },
+  { label: "Enable", value: "ENABLE" },
+  { label: "Disable", value: "DISABLE" },
 ]);
-
-onMounted(() => {
-  ProductService.getProducts().then((data) => (products.value = data));
+const onPhotoSelect = ($event) => {
+  product.value.image_id == null
+  files.value = fileInput.value?.files;
+  console.log(files.value[0].objectURL);
+};
+onMounted(async () => {
+  // ProductService.getProducts().then((data) => (products.value = data));
+  await nextTick();
+  await initialize();
+  await colorFamilyData();
 });
-
+const initialize = async (event) => {
+  let page = 1
+  if (event?.first){
+    page = event.first / event.rows + 1;
+  }
+  const { data, error } = await useApiFetch("/api/colors/?page=" + page, {
+    method: "GET",
+  });
+  console.log(data, "calling");
+  // errorMessage.value = null;
+  // if (error.value) {
+  //   errorMessage.value = error.value.data.message;
+  // }
+  if (data.value) {
+    //   console.log(data.value.brands);
+    colors.value = data.value.colors.data;
+    rowsPerPage.value = data.value.colors.per_page
+    totalRecords.value = data.value.colors.total
+    //   totalData.value  = data.value.roles.total
+  }
+};
+const colorFamilyData = async () => {
+  const { data, error } = await useApiFetch("/api/color-families/", {
+    method: "GET",
+  });
+  if (data.value) {
+    colorFamilies.value = data.value.color_families.data;
+  }
+};
 const formatCurrency = (value) => {
   return value.toLocaleString("en-US", { style: "currency", currency: "USD" });
 };
@@ -41,42 +82,108 @@ const hideDialog = () => {
   submitted.value = false;
 };
 
-const saveProduct = () => {
+const saveProduct = async () => {
+  if (product.value.image_id == null && product.value.image_id == undefined) {
+    console.log(product.value.image_id);
+    await uploadHandler();
+  }
   submitted.value = true;
 
-  if (product.value.name && product.value.name.trim() && product.value.price) {
+  if (product.value.name && product.value.name.trim()) {
+    product.value.status = product.value.status.value
+      ? product.value.status.value.toUpperCase()
+      : product.value.status;
     if (product.value.id) {
-      product.value.inventoryStatus = product.value.inventoryStatus.value
-        ? product.value.inventoryStatus.value
-        : product.value.inventoryStatus;
-      products.value[findIndexById(product.value.id)] = product.value;
-      toast.add({
-        severity: "success",
-        summary: "Successful",
-        detail: "Product Updated",
-        life: 3000,
-      });
+      product.value.status = product.value.status.toUpperCase()
+      console.log(product.value.status);
+      const { data, error } = await useApiFetch(
+        "/api/colors/" + product.value.id,
+        {
+          method: "PUT",
+          body: product.value,
+        }
+      );
+      // errorMessage.value = null;
+      // if (error.value) {
+      // errorMessage.value = error.value.data.message;
+      // }
+      if (data.value) {
+        toast.add({
+          severity: "info",
+          summary: "Success",
+          detail: data.value.message,
+          life: 3000,
+        });
+      }
+      colors.value[findIndexById(product.value.id)] = product.value;
+      // product.value.inventoryStatus = product.value.inventoryStatus.value
+      //   ? product.value.inventoryStatus.value
+      //   : product.value.inventoryStatus;
+      // products.value[findIndexById(product.value.id)] = product.value;
+      // toast.add({
+      //   severity: "success",
+      //   summary: "Successful",
+      //   detail: "Product Updated",
+      //   life: 3000,
+      // });
     } else {
-      product.value.id = createId();
-      product.value.code = createId();
-      product.value.image = "product-placeholder.svg";
-      product.value.inventoryStatus = product.value.inventoryStatus
-        ? product.value.inventoryStatus.value
-        : "Enable";
-      products.value.push(product.value);
-      toast.add({
-        severity: "success",
-        summary: "Successful",
-        detail: "Product Created",
-        life: 3000,
+      const { data, error } = await useApiFetch("/api/colors", {
+        method: "POST",
+        body: product.value,
       });
+      if (data.value) {
+        toast.add({
+          severity: "info",
+          summary: "Success",
+          detail: data.value.message,
+          life: 3000,
+        });
+      }
+      await initialize();
+      // product.value.id = createId();
+      // product.value.code = createId();
+      // product.value.image = "product-placeholder.svg";
+      // product.value.inventoryStatus = product.value.inventoryStatus
+      //   ? product.value.inventoryStatus.value
+      //   : "Enable";
+      // products.value.push(product.value);
+      // toast.add({
+      //   severity: "success",
+      //   summary: "Successful",
+      //   detail: "Product Created",
+      //   life: 3000,
+      // });
     }
 
     productDialog.value = false;
     product.value = {};
   }
 };
+const uploadHandler = async () => {
+  console.log( files.value );
+  // uploading.value = true;
+  const fileUp = files.value[0];
+  const body = new FormData();
+  body.append("image", fileUp);
+  body.append("type", "CATEGORY");
 
+  const { data } = await useApiFetch("/api/image", {
+    method: "POST",
+    body: body,
+  });
+  // console.log(data);
+  if (data.value) {
+    product.value.image_id = data.value.media.id
+    // await auth.fetchUser();
+    // uploading.value = false;
+    // toast.add({
+    //   severity: "info",
+    //   summary: "Success",
+    //   detail: "File Uploaded",
+    //   life: 3000,
+    // });
+  }
+};
 const editProduct = (editProduct) => {
   product.value = { ...editProduct };
   console.log(product);
@@ -88,23 +195,38 @@ const confirmDeleteProduct = (editProduct) => {
   deleteProductDialog.value = true;
 };
 
-const deleteProduct = () => {
-  products.value = products.value.filter((val) => val.id !== product.value.id);
+const deleteProduct = async () => {
+  const { data, error } = await useApiFetch("/api/colors/" + product.value.id, {
+    method: "DELETE",
+  });
+  // errorMessage.value = null;
+  // if (error.value) {
+  //   errorMessage.value = error.value.data.message;
+  // }
+  if (data.value) {
+    toast.add({
+      severity: "success",
+      summary: "Product Deleted",
+      detail: data.value.message,
+      life: 3000,
+    });
+  }
+  colors.value = colors.value.filter((val) => val.id !== product.value.id);
   deleteProductDialog.value = false;
   product.value = {};
-  toast.add({
-    severity: "success",
-    summary: "Successful",
-    detail: "Product Deleted",
-    life: 3000,
-  });
+  // toast.add({
+  //   severity: "success",
+  //   summary: "Successful",
+  //   detail: "Product Deleted",
+  //   life: 3000,
+  // });
 };
 
 const findIndexById = (id) => {
   let index = -1;
 
-  for (let i = 0; i < products.value.length; i++) {
-    if (products.value[i].id === id) {
+  for (let i = 0; i < colors.value.length; i++) {
+    if (colors.value[i].id === id) {
       index = i;
       break;
     }
@@ -165,7 +287,7 @@ const onUpload = () => {
         <DataTable
           ref="dt"
           v-model:selection="selectedProducts"
-          :value="products"
+          :value="colors"
           dataKey="id"
           :paginator="true"
           :rows="10"
@@ -217,8 +339,8 @@ const onUpload = () => {
             <template #body="slotProps">
               <span class="p-column-title">Image</span>
               <img
-                :src="'/demo/images/product/' + slotProps.data.image"
-                :alt="slotProps.data.image"
+                :src="slotProps.data.media.url"
+                :alt="slotProps.data.media.url"
                 class="shadow-2"
                 width="100"
               />
@@ -230,11 +352,11 @@ const onUpload = () => {
               <span
                 :class="
                   'product-badge status-' +
-                  (slotProps.data.inventoryStatus
-                    ? slotProps.data.inventoryStatus.toLowerCase()
+                  (slotProps.data.status
+                    ? slotProps.data.status.toLowerCase()
                     : '')
                 "
-                >{{ slotProps.data.inventoryStatus }}</span
+                >{{ slotProps.data.status }}</span
               >
             </template>
           </Column>
@@ -286,25 +408,38 @@ const onUpload = () => {
             <label for="name">Hex</label>
             <InputText
               id="name"
-              v-model.trim="product.name"
+              v-model.trim="product.hex"
               required="true"
               autofocus
-              :class="{ 'p-invalid': submitted && !product.name }"
+              :class="{ 'p-invalid': submitted && !product.hex }"
             />
-            <small v-if="submitted && !product.name" class="p-invalid"
+            <small v-if="submitted && !product.hex" class="p-invalid"
               >Name is required.</small
             >
           </div>
-
+          <div class="field">
+            <label for="category" class="mb-3">Category</label>
+            <Dropdown v-model="product.color_family_id" :options="colorFamilies" optionLabel="name" optionValue="id" placeholder="Select a color family" ></Dropdown>
+          </div>
           <div class="field">
             <label for="name">Image</label>
-            <FileUpload
+            <!-- <FileUpload
               name="demo[]"
               @uploader="onUpload"
               :multiple="true"
               accept="image/*"
               :maxFileSize="1000000"
               customUpload
+            /> -->
+            <FileUpload ref="fileInput" mode="basic" name="demo[]" url="/api/upload" accept="image/*" customUpload @select="onPhotoSelect($event)" />
+            <br>
+            <img
+              v-if="files"
+              :src="files[0].objectURL"
+              :alt="files[0].objectURL"
+              class="shadow-2"
+              width="100"
+              height="50"
             />
           </div>
 
@@ -312,7 +447,7 @@ const onUpload = () => {
             <label for="inventoryStatus" class="mb-3">Status</label>
             <Dropdown
               id="inventoryStatus"
-              v-model="product.inventoryStatus"
+              v-model="product.status"
               :options="statuses"
               optionLabel="label"
               placeholder="Select a Status"
