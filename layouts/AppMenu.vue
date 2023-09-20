@@ -160,12 +160,12 @@ const model = ref([
       {
         label: "Manage Associates",
         icon: "pi pi-fw pi-desktop",
-        to: "/dummy",
+        to: "/associates",
       },
       {
         label: "Manage Roles",
         icon: "pi pi-fw pi-desktop",
-        to: "/role",
+        to: "/roles",
       },
     ],
   },
