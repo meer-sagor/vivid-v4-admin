@@ -98,10 +98,7 @@ watch(selectedProfile, (value) => {
   } else {
     isProfile.value = false;
   }
-  console.log(value.id);
 });
-
-// console.log(selectedProfile.value);
 
 definePageMeta({
   middleware: ["auth"],
