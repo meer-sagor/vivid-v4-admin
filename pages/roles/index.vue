@@ -8,9 +8,10 @@ const rolesStore = useRolesStore();
 const search = ref(null);
 const page = ref(1);
 const totalData = ref(null);
-const productDialog = ref(false);
-const deleteProductDialog = ref(false);
-const product = ref({});
+const submitted = ref(false);
+const roleDialog = ref(false);
+const deleteRoleDialog = ref(false);
+const role = ref({});
 const id = ref(null);
 const errorMessage = ref("");
 const mode = ref("add");
@@ -27,22 +28,22 @@ onMounted(async () => {
   await nextTick();
   await fetchRoles();
 });
-const showProductDialog = () => {
-  productDialog.value = true;
+const showRoleDialog = () => {
+  roleDialog.value = true;
   mode.value = "add";
 };
 const showEditDialog = (data) => {
   mode.value = "edit";
   id.value = data.id;
-  product.value.name = data.name;
-  productDialog.value = true;
+  role.value.name = data.name;
+  roleDialog.value = true;
 };
 const showDeleteDialog = (data) => {
   id.value = data.id;
-  product.value.name = data.name;
-  deleteProductDialog.value = true;
+  role.value.name = data.name;
+  deleteRoleDialog.value = true;
 };
-const deleteProduct = async () => {
+const deleteRole = async () => {
   const { data, error } = await useApiFetch("/api/roles/" + id.value, {
     method: "DELETE",
   });
@@ -57,15 +58,18 @@ const deleteProduct = async () => {
       detail: data.value.message,
       life: 3000,
     });
+    deleteRoleDialog.value = false
+    await fetchRoles()
   }
 };
-const saveProduct = async () => {
-  productDialog.value = true;
-  product.value.guard_name = "api";
+const saveRole = async () => {
+  roleDialog.value = true;
+  submitted.value = true;
+  role.value.guard_name = "api";
   if (mode.value == "add") {
     const { data, error } = await useApiFetch("/api/roles", {
       method: "POST",
-      body: product.value,
+      body: role.value,
     });
     errorMessage.value = null;
     if (error.value) {
@@ -78,12 +82,15 @@ const saveProduct = async () => {
         detail: data.value.message,
         life: 3000,
       });
+      roleDialog.value = false;
+      submitted.value = false;
+      role.value.name = '';
+      await fetchRoles()
     }
   } else {
-    console.log("edit");
     const { data, error } = await useApiFetch("/api/roles/" + id.value, {
       method: "PUT",
-      body: product.value,
+      body: role.value,
     });
     errorMessage.value = null;
     if (error.value) {
@@ -96,11 +103,16 @@ const saveProduct = async () => {
         detail: data.value.message,
         life: 3000,
       });
+
+      roleDialog.value = false;
+      await fetchRoles()
     }
   }
 };
 const hideDialog = () => {
-  productDialog.value = false;
+  roleDialog.value = false;
+  submitted.value = false;
+  role.value = {};
 };
 
 </script>
@@ -139,10 +151,10 @@ const hideDialog = () => {
                   <InputText v-model="search" placeholder="Search..." />
                 </span>
                 <Button
-                  label="New"
+                  label="Add Role"
                   icon="pi pi-plus"
                   class="p-button-primary mr-2"
-                  @click="showProductDialog()"
+                  @click="showRoleDialog()"
                 />
               </div>
             </div>
@@ -175,68 +187,61 @@ const hideDialog = () => {
           /> -->
         </DataTable>
         <Dialog
-          v-model:visible="productDialog"
-          :style="{ width: '450px' }"
-          header="Role Manage"
-          :modal="true"
-          class="p-fluid"
+            v-model:visible="roleDialog"
+            :style="{ width: '450px' }"
+            header="Role info"
+            :modal="true"
+            class="p-fluid"
         >
-          <!-- <img
-            v-if="product.image"
-            :src="`https://primefaces.org/cdn/primevue/images/product/${product.image}`"
-            :alt="product.image"
-            class="block m-auto pb-3"
-          /> -->
           <div class="field">
             <label for="name">Name</label>
             <InputText
-              id="name"
-              v-model.trim="product.name"
-              required="true"
-              autofocus
+                id="name"
+                v-model.trim="role.name"
+                required="true"
+                autofocus
+                :class="{ 'p-invalid': submitted && !role.name }"
             />
-            <!-- <small class="p-error" v-if="submitted && !product.name"
-              >Name is required.</small
-            > -->
+            <small v-if="submitted && !role.name" class="p-invalid">Name is required.</small>
           </div>
+
           <template #footer>
             <Button
-              label="Cancel"
-              icon="pi pi-times"
-              text
-              @click="hideDialog"
+                label="Cancel"
+                icon="pi pi-times"
+                class="p-button-text"
+                @click="hideDialog"
             />
-            <Button label="Save" icon="pi pi-check" text @click="saveProduct" />
+            <Button
+                :label="mode == 'add' ? 'Save Role' : 'Update Role'"
+                icon="pi pi-check"
+                class="p-button-text"
+                @click="saveRole"
+            />
           </template>
         </Dialog>
+
         <Dialog
-          v-model:visible="deleteProductDialog"
-          :style="{ width: '450px' }"
-          header="Confirm"
-          :modal="true"
-        >
-          <div class="confirmation-content">
-            <i
-              class="pi pi-exclamation-triangle mr-3"
-              style="font-size: 2rem"
-            />
-            <span v-if="product"
-              >Are you sure you want to delete <b>{{ product.name }}</b
-              >?</span
-            >
+            v-model:visible="deleteRoleDialog"
+            :style="{ width: '450px' }"
+            header="Confirm"
+            :modal="true">
+          <div class="flex align-items-center justify-content-center">
+            <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"/>
+            <span v-if="role">Are you sure you want to delete <b>{{ role.name }}</b>?</span>
           </div>
           <template #footer>
             <Button
-              label="No"
-              icon="pi pi-times"
-              text
-              @click="deleteProductDialog = false"
+                label="No"
+                icon="pi pi-times"
+                class="p-button-text"
+                @click="deleteRoleDialog = false"
             />
             <Button
-              label="Yes"
-              icon="pi pi-check"
-              text
-              @click="deleteProduct"
+                label="Yes"
+                icon="pi pi-check"
+                class="p-button-text"
+                @click="deleteRole"
             />
           </template>
         </Dialog>
