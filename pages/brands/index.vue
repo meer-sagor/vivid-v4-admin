@@ -73,7 +73,7 @@ const saveProduct = async () => {
       ? product.value.status.value
       : product.value.status;
     if (product.value.id) {
-      // product.value.status = product.value.status.value ? product.value.status.value : product.value.status;
+      product.value.status = product.value.status.toUpperCase()
       const { data, error } = await useApiFetch(
         "/api/brands/" + product.value.id,
         {
@@ -82,9 +82,14 @@ const saveProduct = async () => {
         }
       );
       // errorMessage.value = null;
-      // if (error.value) {
-      // errorMessage.value = error.value.data.message;
-      // }
+      if (error.value) {
+        toast.add({
+          severity: "error",
+          summary: "Error",
+          detail: "Something Went worng",
+          life: 3000,
+        });
+      }
       if (data.value) {
         toast.add({
           severity: "info",
@@ -105,6 +110,14 @@ const saveProduct = async () => {
         method: "POST",
         body: product.value,
       });
+      if (error.value) {
+        toast.add({
+          severity: "error",
+          summary: "Error",
+          detail: "Something Went worng",
+          life: 3000,
+        });
+      }
       if (data.value) {
         toast.add({
           severity: "info",
@@ -147,10 +160,14 @@ const deleteProduct = async () => {
   const { data, error } = await useApiFetch("/api/brands/" + product.value.id, {
     method: "DELETE",
   });
-  // errorMessage.value = null;
-  // if (error.value) {
-  //   errorMessage.value = error.value.data.message;
-  // }
+  if (error.value) {
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Something Went worng",
+      life: 3000,
+    });
+  }
   if (data.value) {
     toast.add({
       severity: "success",

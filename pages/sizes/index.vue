@@ -74,7 +74,7 @@ const saveProduct = async () => {
       ? product.value.status.value
       : product.value.status;
     if (product.value.id) {
-      // product.value.status = product.value.status.value ? product.value.status.value : product.value.status;
+      product.value.status = product.value.status.toUpperCase()
       const { data, error } = await useApiFetch(
         "/api/sizes/" + product.value.id,
         {
@@ -82,10 +82,14 @@ const saveProduct = async () => {
           body: product.value,
         }
       );
-      // errorMessage.value = null;
-      // if (error.value) {
-      // errorMessage.value = error.value.data.message;
-      // }
+      if (error.value) {
+        toast.add({
+          severity: "error",
+          summary: "Error",
+          detail: "Something Went worng",
+          life: 3000,
+        });
+      }
       if (data.value) {
         toast.add({
           severity: "info",
@@ -94,19 +98,21 @@ const saveProduct = async () => {
           life: 3000,
         });
       }
-      fabrics.value[findIndexById(product.value.id)] = product.value;
-      // toast.add({
-      //     severity: 'success',
-      //     summary: 'Successful',
-      //     detail: 'Product Updated',
-      //     life: 3000
-      // });
+      sizes.value[findIndexById(product.value.id)] = product.value;
     } else {
       product.value.is_default = 0;
       const { data, error } = await useApiFetch("/api/sizes", {
         method: "POST",
         body: product.value,
       });
+      if (error.value) {
+        toast.add({
+          severity: "error",
+          summary: "Error",
+          detail: "Something Went worng",
+          life: 3000,
+        });
+      }
       if (data.value) {
         toast.add({
           severity: "info",
@@ -115,18 +121,7 @@ const saveProduct = async () => {
           life: 3000,
         });
       }
-      // product.value.id = createId();
-      // product.value.code = createId();
-      // product.value.image = 'product-placeholder.svg';
-      // product.value.inventoryStatus = product.value.inventoryStatus ? product.value.inventoryStatus.value : 'Enable';
       await initialize();
-      // products.value.push(product.value);
-      // toast.add({
-      //     severity: 'success',
-      //     summary: 'Successful',
-      //     detail: 'Product Created',
-      //     life: 3000
-      // });
     }
 
     productDialog.value = false;
@@ -150,9 +145,14 @@ const deleteProduct = async () => {
     method: "DELETE",
   });
   // errorMessage.value = null;
-  // if (error.value) {
-  //   errorMessage.value = error.value.data.message;
-  // }
+  if (error.value) {
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Something Went worng",
+      life: 3000,
+    });
+  }
   if (data.value) {
     toast.add({
       severity: "success",
@@ -160,16 +160,10 @@ const deleteProduct = async () => {
       detail: data.value.message,
       life: 3000,
     });
+    fabrics.value = fabrics.value.filter((val) => val.id !== product.value.id);
+    product.value = {};
   }
-  fabrics.value = fabrics.value.filter((val) => val.id !== product.value.id);
   deleteProductDialog.value = false;
-  product.value = {};
-  // toast.add({
-  //     severity: 'success',
-  //     summary: 'Successful',
-  //     detail: 'Product Deleted',
-  //     life: 3000
-  // });
 };
 
 const findIndexById = (id) => {
@@ -353,12 +347,13 @@ const deleteSelectedProducts = () => {
         >
           <div class="field">
             <label for="name">Order</label>
-            <InputText
+            <InputNumber
               id="name"
               v-model.trim="product.order"
+              mode="decimal"
               required="true"
-              type="number"
-              value="0"
+              showButtons 
+              :min="0"
               autofocus
               :class="{ 'p-invalid': submitted && !product.order }"
             />

@@ -12,6 +12,7 @@ const totalRecords = ref(0)
 const products = ref(null);
 const fileInput = ref(null);
 const files = ref();
+const fileData = ref();
 const productDialog = ref(false);
 const deleteProductDialog = ref(false);
 const deleteProductsDialog = ref(false);
@@ -51,9 +52,14 @@ const initialize = async (event) => {
   });
   console.log(data, "calling");
   // errorMessage.value = null;
-  // if (error.value) {
-  //   errorMessage.value = error.value.data.message;
-  // }
+  if (error.value) {
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Something Went worng",
+      life: 3000,
+    });
+  }
   if (data.value) {
     //   console.log(data.value.brands);
     subCategories.value = data.value.sub_categories.data;
@@ -67,6 +73,14 @@ const categoryData = async () => {
   const { data, error } = await useApiFetch("/api/categories/", {
     method: "GET",
   });
+  if (error.value) {
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Something Went worng",
+      life: 3000,
+    });
+  }
   if (data.value) {
     categories.value = data.value.categories.data;
   }
@@ -101,6 +115,7 @@ const saveProduct = async () => {
       // ? product.value.type.value.toUpperCase()
       // : product.value.type.toUpperCase();
     if (product.value.id) {
+      product.value.status = product.value.status.toUpperCase()
       // product.value.status = product.value.status.value ? product.value.status.value : product.value.status;
       const { data, error } = await useApiFetch(
         "/api/sub-categories/" + product.value.id,
@@ -113,6 +128,14 @@ const saveProduct = async () => {
       // if (error.value) {
       // errorMessage.value = error.value.data.message;
       // }
+      if (error.value) {
+        toast.add({
+          severity: "error",
+          summary: "Error",
+          detail: "Something Went worng",
+          life: 3000,
+        });
+      }
       if (data.value) {
         toast.add({
           severity: "info",
@@ -133,6 +156,14 @@ const saveProduct = async () => {
         method: "POST",
         body: product.value,
       });
+      if (error.value) {
+        toast.add({
+          severity: "error",
+          summary: "Error",
+          detail: "Something Went worng",
+          life: 3000,
+        });
+      }
       if (data.value) {
         toast.add({
           severity: "info",
@@ -188,6 +219,7 @@ const uploadHandler = async () => {
 const editProduct = (editProduct) => {
   product.value = { ...editProduct };
   console.log(product);
+  fileData.value =  product.value.media.url
   productDialog.value = true;
 };
 
@@ -201,9 +233,14 @@ const deleteProduct = async () => {
     method: "DELETE",
   });
   // errorMessage.value = null;
-  // if (error.value) {
-  //   errorMessage.value = error.value.data.message;
-  // }
+  if (error.value) {
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Something Went worng",
+      life: 3000,
+    });
+  }
   if (data.value) {
     toast.add({
       severity: "success",
@@ -493,14 +530,15 @@ const onUpload = () => {
         >
           <div class="field">
             <label for="name">Order</label>
-            <InputText
-              id="order"
+            <InputNumber
+              id="name"
               v-model.trim="product.order"
+              mode="decimal"
               required="true"
-              type="number"
-              value="0"
+              showButtons 
+              :min="0"
               autofocus
-              :class="{ 'p-invalid': submitted && !product.name }"
+              :class="{ 'p-invalid': submitted && !product.order }"
             />
             <small v-if="submitted && !product.name" class="p-invalid"
               >Order is required.</small
@@ -553,6 +591,14 @@ const onUpload = () => {
               v-if="files"
               :src="files[0].objectURL"
               :alt="files[0].objectURL"
+              class="shadow-2"
+              width="100"
+              height="50"
+            />
+            <img
+              v-else
+              :src="fileData"
+              :alt="fileData"
               class="shadow-2"
               width="100"
               height="50"

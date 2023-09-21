@@ -40,9 +40,14 @@ const getTags = async (event) => {
     method: "GET",
   });
   // errorMessage.value = null;
-  // if (error.value) {
-  //   errorMessage.value = error.value.data.message;
-  // }
+  if (error.value) {
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Something Went worng",
+      life: 3000,
+    });
+  }
   if (data.value) {
     tags.value = data.value.tags.data;
 
@@ -71,7 +76,8 @@ const saveTag = async () => {
       ? product.value.status.value
       : product.value.status;
     if (product.value.id) {
-      // product.value.status = product.value.status.value ? product.value.status.value : product.value.status;
+      console.log(product.value.status);
+      product.value.status = product.value.status.toUpperCase()
       const { data, error } = await useApiFetch(
         "/api/tags/" + product.value.id,
         {
@@ -80,9 +86,14 @@ const saveTag = async () => {
         }
       );
       // errorMessage.value = null;
-      // if (error.value) {
-      // errorMessage.value = error.value.data.message;
-      // }
+      if (error.value) {
+        toast.add({
+          severity: "error",
+          summary: "Error",
+          detail: "Something Went worng",
+          life: 3000,
+        });
+      }
       if (data.value) {
         toast.add({
           severity: "info",
@@ -103,7 +114,16 @@ const saveTag = async () => {
         method: "POST",
         body: product.value,
       });
+      if (error.value) {
+        toast.add({
+          severity: "error",
+          summary: "Error",
+          detail: "Something Went worng",
+          life: 3000,
+        });
+      }
       if (data.value) {
+        await getTags();
         toast.add({
           severity: "info",
           summary: "Success",
@@ -111,7 +131,6 @@ const saveTag = async () => {
           life: 3000,
         });
       }
-
       tags.value.push(product.value);
       // toast.add({
       //     severity: 'success',
@@ -128,7 +147,7 @@ const saveTag = async () => {
 
 const editTag = (editTag) => {
   product.value = { ...editTag };
-  console.log(product);
+  console.log(product.value);
   tagDialog.value = true;
 };
 
@@ -142,9 +161,14 @@ const deleteProduct = async () => {
     method: "DELETE",
   });
   // errorMessage.value = null;
-  // if (error.value) {
-  //   errorMessage.value = error.value.data.message;
-  // }
+  if (error.value) {
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Something Went worng",
+      life: 3000,
+    });
+  }
   if (data.value) {
     toast.add({
       severity: "success",
@@ -152,16 +176,10 @@ const deleteProduct = async () => {
       detail: data.value.message,
       life: 3000,
     });
+    tags.value = tags.value.filter((val) => val.id !== product.value.id);
+    product.value = {};
   }
-  tags.value = tags.value.filter((val) => val.id !== product.value.id);
   deleteProductDialog.value = false;
-  product.value = {};
-  // toast.add({
-  //     severity: 'success',
-  //     summary: 'Successful',
-  //     detail: 'Product Deleted',
-  //     life: 3000
-  // });
 };
 
 const findIndexById = (id) => {
