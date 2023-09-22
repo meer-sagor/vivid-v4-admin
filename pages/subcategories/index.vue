@@ -56,7 +56,7 @@ const initialize = async (event) => {
   if (event?.first){
     page = event.first / event.rows + 1;
   }
-  const { data, error } = await useApiFetch("/api/sub-categories/?page=" + page, {
+  const { data, error } = await useApiFetch("/api/sub-categories/?page=" + page + searchTerm.value, {
     method: "GET",
   });
   console.log(data, "calling");
@@ -439,7 +439,7 @@ const onUpload = () => {
                 <span class="block mt-2 md:mt-0 p-input-icon-left">
                   <i class="pi pi-search" />
                   <InputText
-                    v-model="filters['global'].value"
+                    v-model="search"
                     placeholder="Search..."
                   />
                 </span>

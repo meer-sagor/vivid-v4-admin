@@ -2,11 +2,12 @@
 import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
-import { onMounted, ref,nextTick } from "vue";
+import { onMounted, ref,nextTick,watch, computed } from "vue";
 
 const toast = useToast();
 
 const products = ref(null);
+const search = ref(null);
 const fileInput = ref(null);
 const files = ref();
 const fileData = ref();
@@ -37,6 +38,14 @@ const onPhotoSelect = ($event) => {
   files.value = fileInput.value?.files;
   console.log(files.value[0].objectURL);
 };
+// wathcer 
+watch(search, (newValue, oldValue) => {
+  initialize();
+});
+// Computed
+const searchTerm = computed(() => {
+  return search.value ? '&name=' + search.value : ''
+})
 onMounted( async () => {
   await nextTick();
   await initialize();
@@ -46,7 +55,7 @@ const initialize = async (event) => {
   if (event?.first){
     page = event.first / event.rows + 1;
   }
-  const { data, error } = await useApiFetch("/api/categories/?page=" + page, {
+  const { data, error } = await useApiFetch("/api/categories/?page=" + page + searchTerm.value, {
     method: "GET",
   });
   console.log(data, "calling");
@@ -400,7 +409,7 @@ const onUpload = () => {
                 <span class="block mt-2 md:mt-0 p-input-icon-left">
                   <i class="pi pi-search" />
                   <InputText
-                    v-model="filters['global'].value"
+                    v-model="search"
                     placeholder="Search..."
                   />
                 </span>

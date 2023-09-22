@@ -48,9 +48,14 @@ const initialize = async (event) => {
   });
   console.log(data, "calling");
   // errorMessage.value = null;
-  // if (error.value) {
-  //   errorMessage.value = error.value.data.message;
-  // }
+  if (error.value) {
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Something Went worng",
+      life: 3000,
+    });
+  }
   if (data.value) {
     //   console.log(data.value.brands);
     fabrics.value = data.value.fabrics.data;
@@ -90,10 +95,14 @@ const saveProduct = async () => {
           body: product.value,
         }
       );
-      // errorMessage.value = null;
-      // if (error.value) {
-      // errorMessage.value = error.value.data.message;
-      // }
+      if (error.value) {
+        toast.add({
+          severity: "error",
+          summary: "Error",
+          detail: "Something Went worng",
+          life: 3000,
+        });
+      }
       if (data.value) {
         toast.add({
           severity: "info",
@@ -114,6 +123,14 @@ const saveProduct = async () => {
         method: "POST",
         body: product.value,
       });
+      if (error.value) {
+        toast.add({
+          severity: "error",
+          summary: "Error",
+          detail: "Something Went worng",
+          life: 3000,
+        });
+      }
       if (data.value) {
         toast.add({
           severity: "info",
@@ -122,18 +139,7 @@ const saveProduct = async () => {
           life: 3000,
         });
       }
-      // product.value.id = createId();
-      // product.value.code = createId();
-      // product.value.image = 'product-placeholder.svg';
-      // product.value.inventoryStatus = product.value.inventoryStatus ? product.value.inventoryStatus.value : 'Enable';
       await initialize();
-      // products.value.push(product.value);
-      // toast.add({
-      //     severity: 'success',
-      //     summary: 'Successful',
-      //     detail: 'Product Created',
-      //     life: 3000
-      // });
     }
 
     productDialog.value = false;
@@ -157,9 +163,14 @@ const deleteProduct = async () => {
     method: "DELETE",
   });
   // errorMessage.value = null;
-  // if (error.value) {
-  //   errorMessage.value = error.value.data.message;
-  // }
+  if (error.value) {
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Something Went worng",
+      life: 3000,
+    });
+  }
   if (data.value) {
     toast.add({
       severity: "success",
