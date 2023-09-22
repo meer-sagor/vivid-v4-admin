@@ -2,11 +2,12 @@
 import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
-import { onMounted, ref,nextTick } from "vue";
+import { onMounted, ref,nextTick,watch, computed } from "vue";
 
 const toast = useToast();
 
 const products = ref(null);
+const search = ref(null);
 const fabrics = ref([]);
 const rowsPerPage = ref(0)
 const totalRecords = ref(0)
@@ -24,7 +25,14 @@ const statuses = ref([
   { label: "Enable", value: "ENABLE" },
   { label: "Disable", value: "DISABLE" },
 ]);
-
+// wathcer 
+watch(search, (newValue, oldValue) => {
+  initialize();
+});
+// Computed
+const searchTerm = computed(() => {
+  return search.value ? '&name=' + search.value : ''
+})
 onMounted(async () => {
   // ProductService.getProducts().then((data) => (products.value = data));
   await nextTick();
@@ -35,7 +43,7 @@ const initialize = async (event) => {
   if (event?.first){
     page = event.first / event.rows + 1;
   }
-  const { data, error } = await useApiFetch("/api/fabrics/?page=" + page, {
+  const { data, error } = await useApiFetch("/api/fabrics/?page=" + page + searchTerm.value, {
     method: "GET",
   });
   console.log(data, "calling");
@@ -262,7 +270,7 @@ const deleteSelectedProducts = () => {
                 <span class="block mt-2 md:mt-0 p-input-icon-left">
                   <i class="pi pi-search" />
                   <InputText
-                    v-model="filters['global'].value"
+                    v-model="search"
                     placeholder="Search..."
                   />
                 </span>

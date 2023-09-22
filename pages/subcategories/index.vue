@@ -2,7 +2,7 @@
 import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
-import { onMounted, ref ,nextTick} from "vue";
+import { onMounted, ref ,nextTick,watch, computed} from "vue";
 
 const toast = useToast();
 const categories = ref([]);
@@ -10,6 +10,7 @@ const subCategories = ref([]);
 const rowsPerPage = ref(0)
 const totalRecords = ref(0)
 const products = ref(null);
+const search = ref(null);
 const fileInput = ref(null);
 const files = ref();
 const fileData = ref();
@@ -37,6 +38,14 @@ const onPhotoSelect = ($event) => {
   files.value = fileInput.value?.files;
   console.log(files.value[0].objectURL);
 };
+// wathcer 
+watch(search, (newValue, oldValue) => {
+  initialize();
+});
+// Computed
+const searchTerm = computed(() => {
+  return search.value ? '&name=' + search.value : ''
+})
 onMounted(async () => {
   await nextTick();
   await initialize();

@@ -2,7 +2,7 @@
 import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
-import { onMounted, ref, nextTick } from "vue";
+import { onMounted, ref, nextTick ,watch, computed} from "vue";
 
 const toast = useToast();
 
@@ -11,6 +11,7 @@ const tagDialog = ref(false);
 const deleteProductDialog = ref(false);
 const deleteProductsDialog = ref(false);
 const product = ref({});
+const search = ref(null);
 const selectedTags = ref(null);
 const dt = ref(null);
 const filters = ref({
@@ -25,7 +26,14 @@ const statuses = ref([
 
 const rowsPerPage = ref(0)
 const totalRecords = ref(0)
-
+// wathcer 
+watch(search, (newValue, oldValue) => {
+  getTags();
+});
+// Computed
+const searchTerm = computed(() => {
+  return search.value ? '&name=' + search.value : ''
+})
 onMounted(async () => {
   await nextTick();
   await getTags();
@@ -36,7 +44,7 @@ const getTags = async (event) => {
     page = event.first / event.rows + 1;
   }
 
-  const { data, error } = await useApiFetch("/api/tags/?page=" + page, {
+  const { data, error } = await useApiFetch("/api/tags/?page=" + page + searchTerm.value, {
     method: "GET",
   });
   // errorMessage.value = null;
@@ -256,7 +264,7 @@ const deleteSelectedTag = () => {
               <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3">
                 <span class="block mt-2 md:mt-0 p-input-icon-left">
                   <i class="pi pi-search" />
-                  <InputText v-model="filters['global'].value" placeholder="Search..."/>
+                  <InputText v-model="search" placeholder="Search..."/>
                 </span>
                 <Button label="New" icon="pi pi-plus" class="p-button-outlined mr-2" @click="openNew"/>
               </div>
