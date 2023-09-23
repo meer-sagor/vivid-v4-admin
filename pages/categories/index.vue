@@ -2,13 +2,15 @@
 import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
-import { onMounted, ref,nextTick } from "vue";
+import { onMounted, ref,nextTick,watch, computed } from "vue";
 
 const toast = useToast();
 
 const products = ref(null);
+const search = ref(null);
 const fileInput = ref(null);
 const files = ref();
+const fileData = ref();
 const categories = ref([]);
 const rowsPerPage = ref(0)
 const totalRecords = ref(0)
@@ -36,6 +38,14 @@ const onPhotoSelect = ($event) => {
   files.value = fileInput.value?.files;
   console.log(files.value[0].objectURL);
 };
+// wathcer 
+watch(search, (newValue, oldValue) => {
+  initialize();
+});
+// Computed
+const searchTerm = computed(() => {
+  return search.value ? '&name=' + search.value : ''
+})
 onMounted( async () => {
   await nextTick();
   await initialize();
@@ -45,14 +55,19 @@ const initialize = async (event) => {
   if (event?.first){
     page = event.first / event.rows + 1;
   }
-  const { data, error } = await useApiFetch("/api/categories/?page=" + page, {
+  const { data, error } = await useApiFetch("/api/categories/?page=" + page + searchTerm.value, {
     method: "GET",
   });
   console.log(data, "calling");
   // errorMessage.value = null;
-  // if (error.value) {
-  //   errorMessage.value = error.value.data.message;
-  // }
+  if (error.value) {
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Something Went worng",
+      life: 3000,
+    });
+  }
   if (data.value) {
     //   console.log(data.value.brands);
     categories.value = data.value.categories.data;
@@ -91,6 +106,7 @@ const saveProduct = async () => {
       ? product.value.type.value.toUpperCase()
       : product.value.type.toUpperCase();
     if (product.value.id) {
+      product.value.status = product.value.status.toUpperCase()
       // product.value.status = product.value.status.value ? product.value.status.value : product.value.status;
       const { data, error } = await useApiFetch(
         "/api/categories/" + product.value.id,
@@ -100,9 +116,14 @@ const saveProduct = async () => {
         }
       );
       // errorMessage.value = null;
-      // if (error.value) {
-      // errorMessage.value = error.value.data.message;
-      // }
+      if (error.value) {
+        toast.add({
+          severity: "error",
+          summary: "Error",
+          detail: "Something Went worng",
+          life: 3000,
+        });
+      }
       if (data.value) {
         toast.add({
           severity: "info",
@@ -123,6 +144,14 @@ const saveProduct = async () => {
         method: "POST",
         body: product.value,
       });
+      if (error.value) {
+        toast.add({
+          severity: "error",
+          summary: "Error",
+          detail: "Something Went worng",
+          life: 3000,
+        });
+      }
       if (data.value) {
         toast.add({
           severity: "info",
@@ -176,7 +205,7 @@ const uploadHandler = async () => {
 };
 const editProduct = (editProduct) => {
   product.value = { ...editProduct };
-  console.log(product);
+  fileData.value =  product.value.media.url
   productDialog.value = true;
 };
 
@@ -189,10 +218,14 @@ const deleteProduct = async () => {
   const { data, error } = await useApiFetch("/api/categories/" + product.value.id, {
     method: "DELETE",
   });
-  // errorMessage.value = null;
-  // if (error.value) {
-  //   errorMessage.value = error.value.data.message;
-  // }
+  if (error.value) {
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Something Went worng",
+      life: 3000,
+    });
+  }
   if (data.value) {
     toast.add({
       severity: "success",
@@ -200,16 +233,10 @@ const deleteProduct = async () => {
       detail: data.value.message,
       life: 3000,
     });
+    categories.value = categories.value.filter((val) => val.id !== product.value.id);
+    product.value = {};
   }
-  categories.value = categories.value.filter((val) => val.id !== product.value.id);
   deleteProductDialog.value = false;
-  product.value = {};
-  // toast.add({
-  //   severity: "success",
-  //   summary: "Successful",
-  //   detail: "Product Deleted",
-  //   life: 3000,
-  // });
 };
 
 const findIndexById = (id) => {
@@ -382,7 +409,7 @@ const onUpload = () => {
                 <span class="block mt-2 md:mt-0 p-input-icon-left">
                   <i class="pi pi-search" />
                   <InputText
-                    v-model="filters['global'].value"
+                    v-model="search"
                     placeholder="Search..."
                   />
                 </span>
@@ -424,8 +451,8 @@ const onUpload = () => {
             <template #body="slotProps">
               <span class="p-column-title">Image</span>
               <img
-                :src="slotProps.data.image"
-                :alt="slotProps.data.image"
+                :src="slotProps.data.media.url"
+                :alt="slotProps.data.media.url"
                 class="shadow-2"
                 width="100"
               />
@@ -483,12 +510,13 @@ const onUpload = () => {
         >
           <div class="field">
             <label for="name">Order</label>
-            <InputText
+            <InputNumber
               id="name"
               v-model.trim="product.order"
+              mode="decimal"
               required="true"
-              type="number"
-              value="0"
+              showButtons 
+              :min="0"
               autofocus
               :class="{ 'p-invalid': submitted && !product.order }"
             />
@@ -538,6 +566,14 @@ const onUpload = () => {
               v-if="files"
               :src="files[0].objectURL"
               :alt="files[0].objectURL"
+              class="shadow-2"
+              width="100"
+              height="50"
+            />
+            <img
+              v-else
+              :src="fileData"
+              :alt="fileData"
               class="shadow-2"
               width="100"
               height="50"

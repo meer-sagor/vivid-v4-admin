@@ -2,11 +2,12 @@
 import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
-import { onMounted, ref , nextTick} from "vue";
+import { onMounted, ref , nextTick,watch, computed} from "vue";
 
 const toast = useToast();
 
 const products = ref(null);
+const search = ref(null);
 const brands = ref([]);
 const rowsPerPage = ref(0)
 const totalRecords = ref(0)
@@ -24,17 +25,25 @@ const statuses = ref([
   { label: "Enable", value: "ENABLE" },
   { label: "Disable", value: "DISABLE" },
 ]);
-
+// wathcer 
+watch(search, (newValue, oldValue) => {
+  initialize();
+});
+// Computed
+const searchTerm = computed(() => {
+  return search.value ? '&name=' + search.value : ''
+})
 onMounted(async () => {
   await nextTick();
   await initialize();
 });
 const initialize = async (event) => {
+  // console.log(searchTerm.value);
   let page = 1
   if (event?.first){
     page = event.first / event.rows + 1;
   }
-  const { data, error } = await useApiFetch("/api/brands/?page=" + page, {
+  const { data, error } = await useApiFetch("/api/brands/?page=" + page + searchTerm.value, {
     method: "GET",
   });
   console.log(data, "calling");
@@ -73,7 +82,7 @@ const saveProduct = async () => {
       ? product.value.status.value
       : product.value.status;
     if (product.value.id) {
-      // product.value.status = product.value.status.value ? product.value.status.value : product.value.status;
+      product.value.status = product.value.status.toUpperCase()
       const { data, error } = await useApiFetch(
         "/api/brands/" + product.value.id,
         {
@@ -82,9 +91,14 @@ const saveProduct = async () => {
         }
       );
       // errorMessage.value = null;
-      // if (error.value) {
-      // errorMessage.value = error.value.data.message;
-      // }
+      if (error.value) {
+        toast.add({
+          severity: "error",
+          summary: "Error",
+          detail: "Something Went worng",
+          life: 3000,
+        });
+      }
       if (data.value) {
         toast.add({
           severity: "info",
@@ -105,6 +119,14 @@ const saveProduct = async () => {
         method: "POST",
         body: product.value,
       });
+      if (error.value) {
+        toast.add({
+          severity: "error",
+          summary: "Error",
+          detail: "Something Went worng",
+          life: 3000,
+        });
+      }
       if (data.value) {
         toast.add({
           severity: "info",
@@ -147,10 +169,14 @@ const deleteProduct = async () => {
   const { data, error } = await useApiFetch("/api/brands/" + product.value.id, {
     method: "DELETE",
   });
-  // errorMessage.value = null;
-  // if (error.value) {
-  //   errorMessage.value = error.value.data.message;
-  // }
+  if (error.value) {
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Something Went worng",
+      life: 3000,
+    });
+  }
   if (data.value) {
     toast.add({
       severity: "success",
@@ -261,7 +287,7 @@ const deleteSelectedProducts = () => {
                 <span class="block mt-2 md:mt-0 p-input-icon-left">
                   <i class="pi pi-search" />
                   <InputText
-                    v-model="filters['global'].value"
+                    v-model="search"
                     placeholder="Search..."
                   />
                 </span>
