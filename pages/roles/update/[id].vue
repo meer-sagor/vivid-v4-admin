@@ -39,7 +39,7 @@ import {Field, Form, useField, useForm} from 'vee-validate';
 import {ref, defineComponent, nextTick, onMounted} from "vue";
 import * as Yup from "yup";
 import {useApiFetch} from "~/composables/useApiFetch";
-import {useRoute} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 
 export default defineComponent({
   components: {Form, Field},
@@ -51,6 +51,7 @@ export default defineComponent({
     const spinner = ref(false);
     const permissions = ref([]);
     const route = useRoute();
+    const router = useRouter();
 
     const role = ref({
       name: "",
@@ -116,7 +117,7 @@ export default defineComponent({
           detail: message,
           life: 3000,
         });
-
+        await router.push({ path: "/roles" });
         resetModal();
         resetForm()
       }

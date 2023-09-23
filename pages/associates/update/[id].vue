@@ -19,7 +19,7 @@
           <small class="p-error" id="associate-email-error">{{ errors.email || '&nbsp;' }}</small>
         </div>
         <div class="flex flex-column gap-2 mb-1">
-          <label for="associates">Role</label>
+          <label for="roles">Role</label>
           <Field name="roles" v-slot="{ field }">
             <Dropdown
                 v-bind="field"
@@ -51,7 +51,7 @@ import {ref, defineComponent, nextTick, onMounted} from "vue";
 import * as Yup from "yup";
 import {useApiFetch} from "~/composables/useApiFetch";
 import {useImageUpload} from "@/components/image/useImageUpload.js";
-import {useRoute} from "vue-router";
+import {useRoute,useRouter} from "vue-router";
 
 export default defineComponent({
   components: {Form, Field},
@@ -64,6 +64,7 @@ export default defineComponent({
     const userRoles = ref([]);
     const files = ref();
     const route = useRoute();
+    const router = useRouter();
 
     const associate = ref({
       first_name: "",
@@ -140,6 +141,7 @@ export default defineComponent({
           detail: message,
           life: 3000,
         });
+        await router.push({ path: "/associates" });
 
         resetModal();
         resetForm()

@@ -1,7 +1,7 @@
 import { defineStore } from "pinia"
 import { useApiFetch } from "@/composables/useApiFetch";
 
-export const useAssociatesStore = defineStore('roles', () => {
+export const useAssociatesStore = defineStore('associates', () => {
     const associates = ref([]);
     const success = ref();
     const error = ref();
