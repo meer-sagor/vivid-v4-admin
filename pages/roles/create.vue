@@ -52,7 +52,7 @@ export default defineComponent({
 
     const role = ref({
       name: "",
-      guard_name: "api",
+      guard_name: "web",
       permissions: []
     });
 

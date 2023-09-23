@@ -140,13 +140,14 @@ const deleteAssociate = async () => {
           </Column>
           <Column :exportable="false" style="min-width: 8rem">
             <template #body="slotProps">
-              <Button
-                icon="pi pi-pencil"
-                outlined
-                rounded
-                class="mr-2"
-                @click="showEditDialog(slotProps.data)"
-              />
+              <NuxtLink
+                  type="button"
+                  icon="pi pi-plus"
+                  class="p-button p-component p-button-icon-only p-button-primary p-button-rounded p-button-outlined mr-2"
+                  :to="{ path: '/associates/update/' + slotProps.data.id }"
+              >
+                <span class="p-button-icon p-button-icon-left pi pi-pencil" data-pc-section="icon"></span>
+              </NuxtLink>
               <Button
                 icon="pi pi-trash"
                 outlined

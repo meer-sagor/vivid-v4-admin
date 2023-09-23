@@ -51,11 +51,10 @@ export default defineComponent({
     const spinner = ref(false);
     const permissions = ref([]);
     const route = useRoute();
-    console.log(route.params)
 
     const role = ref({
       name: "",
-      guard_name: "api",
+      guard_name: "web",
       permissions: []
     });
 

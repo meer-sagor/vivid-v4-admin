@@ -19,11 +19,6 @@
           <small class="p-error" id="associate-email-error">{{ errors.email || '&nbsp;' }}</small>
         </div>
         <div class="flex flex-column gap-2 mb-1">
-          <label for="password">Password</label>
-          <Field v-model="associate.password" id="password" name="password" :class="{ 'p-invalid': errors.password }" class="p-inputtext p-component" aria-describedby="associate-password-error" placeholder="Password"/>
-          <small class="p-error" id="associate-password-error">{{ errors.password || '&nbsp;' }}</small>
-        </div>
-        <div class="flex flex-column gap-2 mb-1">
           <label for="associates">Role</label>
           <Field name="roles" v-slot="{ field }">
             <Dropdown
@@ -39,11 +34,6 @@
             ></Dropdown>
           </Field>
           <small class="p-error" id="associate-roles-error">{{ errors.roles || '&nbsp;' }}</small>
-        </div>
-        <div class="flex flex-column gap-2 mb-3">
-          <label for="image">Image</label>
-          <Field type="file" id="image" name="image" @change="handleImageSelected" class="form-control" :class="{ 'p-invalid': errors.image }" aria-describedby="associate-image-error" placeholder="Select image"/>
-          <small class="p-error" id="associate-image-error">{{ errors.image || '&nbsp;' }}</small>
         </div>
         <Button class="" type="submit" label="Submit" :loading="loading" icon="pi pi-check"/>
       </Form>
@@ -61,6 +51,7 @@ import {ref, defineComponent, nextTick, onMounted} from "vue";
 import * as Yup from "yup";
 import {useApiFetch} from "~/composables/useApiFetch";
 import {useImageUpload} from "@/components/image/useImageUpload.js";
+import {useRoute} from "vue-router";
 
 export default defineComponent({
   components: {Form, Field},
@@ -72,33 +63,28 @@ export default defineComponent({
     const spinner = ref(false);
     const userRoles = ref([]);
     const files = ref();
+    const route = useRoute();
 
     const associate = ref({
       first_name: "",
       last_name: "",
       email: "",
-      password: "",
-      image: "",
       roles: ''
     });
 
     let {imageFile, imageUrl, handleImageSelected} = useImageUpload();
 
-    const SUPPORTED_FORMATS = ['image/jpg', 'image/jpeg', 'image/png'];
     const schema = Yup.object().shape({
       first_name: Yup.string().required().min(2).max(100).label("First name"),
       last_name: Yup.string().required().min(2).max(100).label("Last name"),
       email: Yup.string().email().required().min(2).max(100).label("Email"),
-      password: Yup.string().required().min(6).max(10).label("Password"),
       roles: Yup.mixed().required().label("Role"),
-      image: Yup.mixed().required().label("Image"),
-    }, [
-      ['image', 'image'],
-    ]);
+    });
 
     onMounted(async () => {
       await nextTick();
       await fetchRoles();
+      await fetchAssociates();
     });
 
     const fetchRoles = async () => {
@@ -114,18 +100,26 @@ export default defineComponent({
       }
     };
 
+    const fetchAssociates = async () => {
+      const {data, error} = await useApiFetch("/api/associates/" + route.params.id + '/edit', {
+        method: "GET",
+      });
+      if (data.value) {
+        const getUsers = JSON.parse(JSON.stringify(computed(() => data.value).value))
+        associate.value = getUsers.user;
+      }
+    };
+
     const onSubmit = async (values: any, actions: { setErrors: (arg0: any) => void; }) => {
       loading.value = true
       const body = new FormData();
       body.append("first_name", associate.value.first_name);
       body.append("last_name", associate.value.last_name);
       body.append("email", associate.value.email);
-      body.append("password", associate.value.password);
       body.append("roles",  associate.value.roles);
-      body.append("image", imageFile.value);
 
 
-      const {data, error} = await useApiFetch("/api/associates/store", {
+      const {data, error} = await useApiFetch("/api/associates/update/" + route.params.id, {
         method: "POST",
         body: body,
       });
@@ -139,8 +133,8 @@ export default defineComponent({
       }
 
       if (data.value) {
-       const message = JSON.parse(JSON.stringify(computed(() => data_obj.message).value));
-       toast.add({
+        const message = JSON.parse(JSON.stringify(computed(() => data_obj.message).value));
+        toast.add({
           severity: "info",
           summary: "Success",
           detail: message,
@@ -186,34 +180,34 @@ export default defineComponent({
   cursor: pointer;
 }
 
- .form-control[type=file] {
-   overflow: hidden;
- }
- .form-control {
-   color: #92929f;
-   background-color: #1e1e2d;
-   border: 1px solid #323248;
-   box-shadow: none !important;
- }
- .form-control {
-   display: block;
-   width: 100%;
-   padding: 0.75rem 0.75rem;;
-   font-size: 1.1rem;
-   font-weight: 500;
-   line-height: 1.5;
-   color: #5E6278;
-   background-color: #ffffff;
-   background-clip: padding-box;
-   border: 1px solid #ced4da;
-   -webkit-appearance: none;
-   -moz-appearance: none;
-   appearance: none;
-   border-radius: 0.475rem;
-   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075);
-   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
- }
- .form-control.p-invalid {
+.form-control[type=file] {
+  overflow: hidden;
+}
+.form-control {
+  color: #92929f;
+  background-color: #1e1e2d;
+  border: 1px solid #323248;
+  box-shadow: none !important;
+}
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 0.75rem;;
+  font-size: 1.1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #5E6278;
+  background-color: #ffffff;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 0.475rem;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075);
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+.form-control.p-invalid {
   border-color: #f1416c;
   padding-right: calc(1.5em + 1.55rem);
   background-repeat: no-repeat;
