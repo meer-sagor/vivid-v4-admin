@@ -14,9 +14,8 @@ export const useRolesStore = defineStore('roles', () => {
         try {
             const { data, error } = await useApiFetch("/api/roles");
             const getRoles = JSON.parse(JSON.stringify(computed(() => data.value).value))
-            roles.value = getRoles.roles.data;
+            roles.value = getRoles.roles;
             success.value = JSON.parse(JSON.stringify(computed(() => getRoles.success).value));
-            error.value = JSON.parse(JSON.stringify(computed(() => getRoles.error).value));
         } catch (error) {
             console.log(error);
         }

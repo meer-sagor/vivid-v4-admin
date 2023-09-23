@@ -12,23 +12,13 @@ const filters = ref({
 });
 const page = ref(1);
 const totalData = ref(null);
-const submitted = ref(false);
-const associateDialog = ref(false);
 const deleteAssociateDialog = ref(false);
 const associate = ref({});
 const id = ref(null);
 const errorMessage = ref("");
-const mode = ref("add");
 const associates = ref([]);
 const rowsPerPage = ref(0)
 const totalRecords = ref(0)
-const userRoles = ref([]);
-const fileInput = ref(null);
-const files = ref();
-const uploading = ref(false);
-const onPhotoSelect = (event) => {
-  files.value = event.files[0];
-};
 const fetchAssociates = async (event) => {
   let page = 1
   if (event?.first){
@@ -43,31 +33,11 @@ const fetchAssociates = async (event) => {
     totalRecords.value = data.value.users.total
   }
 };
-const fetchRoles = async (event) => {
-  const { data, error } = await useApiFetch("/api/associate/getRoles", {
-    method: "GET",
-  });
-  if (data.value) {
-    userRoles.value = data.value.roles;
-  }
-};
 
 onMounted(async () => {
   await nextTick();
   await fetchAssociates();
-  await fetchRoles();
 });
-const showAssociateDialog = () => {
-  associateDialog.value = true;
-  mode.value = "add";
-};
-const showEditDialog = (data) => {
-  mode.value = "edit";
-  id.value = data.id;
-  associate.value = data;
-  associate.value.selected_roles = data.roles.map(role => role.id);
-  associateDialog.value = true;
-};
 const showDeleteDialog = (data) => {
   id.value = data.id;
   associate.value.name = data.name;
@@ -92,70 +62,6 @@ const deleteAssociate = async () => {
     await fetchAssociates()
   }
 };
-const saveAssociate = async () => {
-  associateDialog.value = true;
-  submitted.value = true;
-  uploading.value = true;
-
-  const body = new FormData();
-  body.append("first_name", associate.value.first_name);
-  body.append("last_name", associate.value.last_name);
-  body.append("email", associate.value.email);
-  body.append("password", associate.value.password);
-  body.append("roles",  JSON.stringify(associate.value.roles));
-  body.append("image", files.value);
-
-  if (mode.value == "add") {
-    const { data, error } = await useApiFetch("/api/associates/store", {
-      method: "POST",
-      body: body,
-    });
-    errorMessage.value = null;
-    if (error.value) {
-      errorMessage.value = error.value.data.message;
-    }
-    if (data.value) {
-      uploading.value = false;
-      toast.add({
-        severity: "info",
-        summary: "Success",
-        detail: data.value.message,
-        life: 3000,
-      });
-      associateDialog.value = false;
-      submitted.value = false;
-      associate.value = '';
-      await fetchAssociates()
-    }
-  } else {
-    const { data, error } = await useApiFetch("/api/associates/update/" + id.value, {
-      method: "POST",
-      body: body,
-    });
-    errorMessage.value = null;
-    if (error.value) {
-      errorMessage.value = error.value.data.message;
-    }
-    if (data.value) {
-      uploading.value = false;
-      toast.add({
-        severity: "info",
-        summary: "Success",
-        detail: data.value.message,
-        life: 3000,
-      });
-
-      associateDialog.value = false;
-      await fetchAssociates()
-    }
-  }
-};
-const hideDialog = () => {
-  associateDialog.value = false;
-  submitted.value = false;
-  associate.value = '';
-};
-
 </script>
 <template>
   <div class="grid p-fluid">
@@ -198,12 +104,15 @@ const hideDialog = () => {
                   <i class="pi pi-search" />
                   <InputText v-model="filters['global'].value" placeholder="Search..." />
                 </span>
-                <Button
-                  label="Add Associate"
-                  icon="pi pi-plus"
-                  class="p-button-primary mr-2"
-                  @click="showAssociateDialog()"
-                />
+                <NuxtLink
+                    type="button"
+                    icon="pi pi-plus"
+                    class="p-button p-component p-button-primary mr-2"
+                    :to="{ path: '/associates/create' }"
+                >
+                  <span class="p-button-icon p-button-icon-left pi pi-plus" data-pc-section="icon"></span>
+                  Add Associate
+                </NuxtLink>
               </div>
             </div>
           </template>
@@ -218,7 +127,7 @@ const hideDialog = () => {
           <Column field="email" header="Email" style="width: 20%"></Column>
           <Column field="roles" header="Roles" style="width: 20%">
             <template #body="slotProps">
-              <span v-for="(role, index) in slotProps.data.roles">
+              <span v-for="(role, index) in slotProps.data.roles" :key="index">
                 <Badge :value="role.name"></Badge>
               </span>
             </template>
@@ -248,118 +157,6 @@ const hideDialog = () => {
             </template>
           </Column>
         </DataTable>
-        <Dialog
-            v-model:visible="associateDialog"
-            :style="{ width: '450px' }"
-            :header="mode == 'add' ? 'Add Associate info' : 'Update Associate info'"
-            :modal="true"
-            class="p-fluid"
-        >
-          <div class="field">
-            <label for="first_name">First Name</label>
-            <span class="p-input-icon-left">
-              <i class="pi pi-user" />
-            <InputText
-                id="name"
-                v-model.trim="associate.first_name"
-                required="true"
-                autofocus
-                placeholder="Enter first name"
-                :class="{ 'p-invalid': submitted && !associate.first_name }"
-            />
-            </span>
-            <small v-if="submitted && !associate.first_name" class="p-invalid">First name is required.</small>
-          </div>
-          <div class="field">
-            <label for="last_name">Last Name</label>
-            <span class="p-input-icon-left">
-              <i class="pi pi-user" />
-            <InputText
-                id="name"
-                v-model.trim="associate.last_name"
-                required="true"
-                autofocus
-                placeholder="Enter last name"
-                :class="{ 'p-invalid': submitted && !associate.last_name }"
-            />
-            </span>
-            <small v-if="submitted && !associate.last_name" class="p-invalid">Last name is required.</small>
-          </div>
-          <div class="field">
-            <label for="email">Email</label>
-            <span class="p-input-icon-left">
-              <i class="pi pi-envelope" />
-            <InputText
-                id="name"
-                v-model.trim="associate.email"
-                required="true"
-                autofocus
-                placeholder="Enter email address"
-                :class="{ 'p-invalid': submitted && !associate.email }"
-            />
-            </span>
-            <small v-if="submitted && !associate.email" class="p-invalid">Email is required.</small>
-          </div>
-          <div class="field" v-if="mode == 'add'">
-            <label for="password">Password</label>
-            <span class="p-input-icon-left">
-              <i class="pi pi-key" />
-            <InputText
-                type="password"
-                id="password"
-                v-model.trim="associate.password"
-                required="true"
-                autofocus
-                placeholder="Enter password"
-                :class="{ 'p-invalid': submitted && !associate.password }"
-            />
-            </span>
-            <small v-if="submitted && !associate.password" class="p-invalid">Password is required.</small>
-          </div>
-          <div class="field">
-            <label for="roles">Roles</label>
-            <MultiSelect
-                    v-model="associate.selected_roles"
-                    :options="userRoles"
-                    optionLabel="name"
-                    optionValue="id"
-                    placeholder="Select multiple roles"
-                    display="chip"
-                    :class="{ 'p-invalid': submitted && !associate.roles }"
-            ></MultiSelect>
-            <small v-if="submitted && !associate.roles" class="p-invalid">Roles is required.</small>
-          </div>
-          <div class="field" v-if="mode == 'add'">
-            <label for="image">Image</label>
-            <FileUpload
-                ref="fileInput"
-                mode="basic"
-                accept="image/*"
-                :maxFileSize="1000000"
-                name="image"
-                @select="onPhotoSelect($event)"
-            />
-           </div>
-
-          <template #footer>
-            <Button
-                label="Cancel"
-                icon="pi pi-times"
-                class="p-button-text"
-                @click="hideDialog"
-            />
-            <Button
-                :label="mode == 'add' ? 'Save Associate' : 'Update Associate'"
-                icon="pi pi-check"
-                class="p-button-text"
-                @click="saveAssociate"
-            />
-            <ProgressSpinner
-                v-if="uploading"
-                style="width: 30px; height: 30px"
-            ></ProgressSpinner>
-          </template>
-        </Dialog>
         <Dialog
             v-model:visible="deleteAssociateDialog"
             :style="{ width: '450px' }"
