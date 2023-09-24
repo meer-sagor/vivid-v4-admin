@@ -2,15 +2,18 @@
 import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
-import { onMounted, ref } from "vue";
+import { onMounted, ref ,nextTick,watch, computed} from "vue";
 
 const toast = useToast();
-
+const sizes = ref([]);
+const rowsPerPage = ref(0)
+const totalRecords = ref(0)
 const products = ref(null);
 const productDialog = ref(false);
 const deleteProductDialog = ref(false);
 const deleteProductsDialog = ref(false);
 const product = ref({});
+const search = ref(null);
 const selectedProducts = ref(null);
 const dt = ref(null);
 const filters = ref({
@@ -18,14 +21,44 @@ const filters = ref({
 });
 const submitted = ref(false);
 const statuses = ref([
-  { label: "Enable", value: "enable" },
-  { label: "Disable", value: "disable" },
+  { label: "Enable", value: "ENABLE" },
+  { label: "Disable", value: "DISABLE" },
 ]);
-
-onMounted(() => {
-  ProductService.getProducts().then((data) => (products.value = data));
+// wathcer 
+watch(search, (newValue, oldValue) => {
+  initialize();
 });
-
+// Computed
+const searchTerm = computed(() => {
+  return search.value ? '&name=' + search.value : ''
+})
+onMounted(async () => {
+  // ProductService.getProducts().then((data) => (products.value = data));
+  await nextTick();
+  await initialize();
+});
+const initialize = async (event) => {
+  let page = 1
+  if (event?.first){
+    page = event.first / event.rows + 1;
+  }
+  const { data, error } = await useApiFetch("/api/sizes/?page=" + page + searchTerm.value, {
+    method: "GET",
+  });
+  // console.log(data, "calling");
+  // errorMessage.value = null;
+  // if (error.value) {
+  //   errorMessage.value = error.value.data.message;
+  // }
+  if (data.value) {
+    //   console.log(data.value.brands);
+    sizes.value = data.value.sizes.data;
+    console.log(data.value.sizes);
+    rowsPerPage.value = data.value.sizes.per_page
+    totalRecords.value = data.value.sizes.total
+    //   totalData.value  = data.value.roles.total
+  }
+};
 const formatCurrency = (value) => {
   return value.toLocaleString("en-US", { style: "currency", currency: "USD" });
 };
@@ -41,35 +74,62 @@ const hideDialog = () => {
   submitted.value = false;
 };
 
-const saveProduct = () => {
+const saveProduct = async () => {
   submitted.value = true;
-
-  if (product.value.name && product.value.name.trim() && product.value.price) {
+  console.log(product.value);
+  if (product.value.name && product.value.name.trim()) {
+    product.value.status = product.value.status.value
+      ? product.value.status.value
+      : product.value.status;
     if (product.value.id) {
-      product.value.inventoryStatus = product.value.inventoryStatus.value
-        ? product.value.inventoryStatus.value
-        : product.value.inventoryStatus;
-      products.value[findIndexById(product.value.id)] = product.value;
-      toast.add({
-        severity: "success",
-        summary: "Successful",
-        detail: "Product Updated",
-        life: 3000,
-      });
+      product.value.status = product.value.status.toUpperCase()
+      const { data, error } = await useApiFetch(
+        "/api/sizes/" + product.value.id,
+        {
+          method: "PUT",
+          body: product.value,
+        }
+      );
+      if (error.value) {
+        toast.add({
+          severity: "error",
+          summary: "Error",
+          detail: "Something Went worng",
+          life: 3000,
+        });
+      }
+      if (data.value) {
+        toast.add({
+          severity: "info",
+          summary: "Success",
+          detail: data.value.message,
+          life: 3000,
+        });
+      }
+      sizes.value[findIndexById(product.value.id)] = product.value;
     } else {
-      product.value.id = createId();
-      product.value.order = createId();
-      product.value.image = "product-placeholder.svg";
-      product.value.inventoryStatus = product.value.inventoryStatus
-        ? product.value.inventoryStatus.value
-        : "Enable";
-      products.value.push(product.value);
-      toast.add({
-        severity: "success",
-        summary: "Successful",
-        detail: "Product Created",
-        life: 3000,
+      product.value.is_default = 0;
+      const { data, error } = await useApiFetch("/api/sizes", {
+        method: "POST",
+        body: product.value,
       });
+      if (error.value) {
+        toast.add({
+          severity: "error",
+          summary: "Error",
+          detail: "Something Went worng",
+          life: 3000,
+        });
+      }
+      if (data.value) {
+        toast.add({
+          severity: "info",
+          summary: "Success",
+          detail: data.value.message,
+          life: 3000,
+        });
+      }
+      await initialize();
     }
 
     productDialog.value = false;
@@ -88,23 +148,37 @@ const confirmDeleteProduct = (editProduct) => {
   deleteProductDialog.value = true;
 };
 
-const deleteProduct = () => {
-  products.value = products.value.filter((val) => val.id !== product.value.id);
-  deleteProductDialog.value = false;
-  product.value = {};
-  toast.add({
-    severity: "success",
-    summary: "Successful",
-    detail: "Product Deleted",
-    life: 3000,
+const deleteProduct = async () => {
+  const { data, error } = await useApiFetch("/api/sizes/" + product.value.id, {
+    method: "DELETE",
   });
+  // errorMessage.value = null;
+  if (error.value) {
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Something Went worng",
+      life: 3000,
+    });
+  }
+  if (data.value) {
+    toast.add({
+      severity: "success",
+      summary: "Product Deleted",
+      detail: data.value.message,
+      life: 3000,
+    });
+    fabrics.value = fabrics.value.filter((val) => val.id !== product.value.id);
+    product.value = {};
+  }
+  deleteProductDialog.value = false;
 };
 
 const findIndexById = (id) => {
   let index = -1;
 
-  for (let i = 0; i < products.value.length; i++) {
-    if (products.value[i].id === id) {
+  for (let i = 0; i < sizes.value.length; i++) {
+    if (sizes.value[i].id === id) {
       index = i;
       break;
     }
@@ -156,16 +230,30 @@ const deleteSelectedProducts = () => {
         <DataTable
           ref="dt"
           v-model:selection="selectedProducts"
-          :value="products"
+          :value="sizes"
+          :lazy="true"
           dataKey="id"
           :paginator="true"
-          :rows="10"
+          :rows="rowsPerPage"
+          :totalRecords="totalRecords"
+          :first="first"
+          @page="initialize"
           :filters="filters"
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-          :rowsPerPageOptions="[5, 10, 25]"
-          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+          currentPageReportTemplate="Total {totalRecords} brands"
           responsiveLayout="scroll"
         >
+          <template #paginatorstart>
+            <Button
+              type="button"
+              icon="pi pi-refresh"
+              text
+              @click="initialize"
+            />
+          </template>
+          <template #paginatorend>
+            <Button type="button" icon="pi pi-download" text />
+          </template>
           <template #header>
             <div
               class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
@@ -177,7 +265,7 @@ const deleteSelectedProducts = () => {
                 <span class="block mt-2 md:mt-0 p-input-icon-left">
                   <i class="pi pi-search" />
                   <InputText
-                    v-model="filters['global'].value"
+                    v-model="search"
                     placeholder="Search..."
                   />
                 </span>
@@ -212,13 +300,13 @@ const deleteSelectedProducts = () => {
           <Column field="description" header="Width" :sortable="true">
             <template #body="slotProps">
               <span class="p-column-title">Width</span>
-              {{ slotProps.data.description }}
+              {{ slotProps.data.width }}
             </template>
           </Column>
           <Column field="description" header="Length" :sortable="true">
             <template #body="slotProps">
               <span class="p-column-title">Length</span>
-              {{ slotProps.data.description }}
+              {{ slotProps.data.length }}
             </template>
           </Column>
           <Column field="inventoryStatus" header="Status" :sortable="true">
@@ -227,11 +315,11 @@ const deleteSelectedProducts = () => {
               <span
                 :class="
                   'product-badge status-' +
-                  (slotProps.data.inventoryStatus
-                    ? slotProps.data.inventoryStatus.toLowerCase()
+                  (slotProps.data.status
+                    ? slotProps.data.status.toLowerCase()
                     : '')
                 "
-                >{{ slotProps.data.inventoryStatus }}</span
+                >{{ slotProps.data.status }}</span
               >
             </template>
           </Column>
@@ -267,17 +355,18 @@ const deleteSelectedProducts = () => {
         >
           <div class="field">
             <label for="name">Order</label>
-            <InputText
+            <InputNumber
               id="name"
-              v-model.trim="product.name"
+              v-model.trim="product.order"
+              mode="decimal"
               required="true"
-              type="number"
-              value="0"
+              showButtons 
+              :min="0"
               autofocus
-              :class="{ 'p-invalid': submitted && !product.name }"
+              :class="{ 'p-invalid': submitted && !product.order }"
             />
-            <small v-if="submitted && !product.name" class="p-invalid"
-              >Name is required.</small
+            <small v-if="submitted && !product.order" class="p-invalid"
+              >order is required.</small
             >
           </div>
 
@@ -300,19 +389,19 @@ const deleteSelectedProducts = () => {
               <label for="price">Width</label>
               <InputNumber
                 id="price"
-                v-model="product.price"
-                :class="{ 'p-invalid': submitted && !product.price }"
+                v-model="product.width"
+                :class="{ 'p-invalid': submitted && !product.width }"
                 :required="true"
               />
-              <small v-if="submitted && !product.price" class="p-invalid"
-                >Price is required.</small
+              <small v-if="submitted && !product.width" class="p-invalid"
+                >Width is required.</small
               >
             </div>
             <div class="field col">
               <label for="quantity">Length</label>
               <InputNumber
                 id="quantity"
-                v-model="product.quantity"
+                v-model="product.length"
                 integeronly
               />
             </div>
@@ -322,7 +411,7 @@ const deleteSelectedProducts = () => {
             <label for="inventoryStatus" class="mb-3">Status</label>
             <Dropdown
               id="inventoryStatus"
-              v-model="product.inventoryStatus"
+              v-model="product.status"
               :options="statuses"
               optionLabel="label"
               placeholder="Select a Status"

@@ -22,7 +22,7 @@ const model = ref([
       {
         label: "Promo Code",
         icon: "pi pi-fw pi-tag",
-        to: "/marketing/promo-code",
+        to: "/marketing/promo-codes",
       },
     ],
   },
@@ -160,12 +160,12 @@ const model = ref([
       {
         label: "Manage Associates",
         icon: "pi pi-fw pi-desktop",
-        to: "/dummy",
+        to: "/associates",
       },
       {
         label: "Manage Roles",
         icon: "pi pi-fw pi-desktop",
-        to: "/role",
+        to: "/roles",
       },
     ],
   },
