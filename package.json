@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@pinia/nuxt": "^0.4.11",
+    "@tiptap/vue-3": "^2.1.11",
     "chart.js": "^4.3.3",
     "pinia": "^2.1.6",
     "primeflex": "^3.3.1",
