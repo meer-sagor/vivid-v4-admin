@@ -281,28 +281,6 @@ const onUpload = () => {
             </template>
           </Dropdown>
         </div>
-
-        <div class="col-12">
-          <div
-            class="card p-fluid flex flex-column md:flex-row md:justify-content-between md:align-items-center"
-          >
-            <div class="field">
-              <Button
-                style="min-width: 150px"
-                label="Cancel"
-                class="p-button-text"
-                @click="hideDialog"
-              />
-            </div>
-            <div class="field">
-              <Button
-                style="min-width: 150px"
-                label="Save"
-                @click="saveProduct"
-              />
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -455,6 +433,23 @@ const onUpload = () => {
               <InputSwitch v-model="defaultEmbroidery" />
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div
+        class="card p-fluid flex flex-column md:flex-row md:justify-content-between md:align-items-center"
+      >
+        <div class="field">
+          <Button
+            style="min-width: 150px"
+            label="Cancel"
+            class="p-button-text"
+          />
+        </div>
+        <div class="field">
+          <Button style="min-width: 150px" label="Save" @click="saveProduct" />
         </div>
       </div>
     </div>
