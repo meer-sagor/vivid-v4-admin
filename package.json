@@ -29,6 +29,7 @@
     "@pinia/nuxt": "^0.4.11",
     "@tiptap/extension-highlight": "^2.1.11",
     "@tiptap/extension-text-align": "^2.1.11",
+    "@tiptap/pm": "^2.1.11",
     "@tiptap/starter-kit": "^2.1.11",
     "@tiptap/vue-3": "^2.1.11",
     "@vee-validate/rules": "^4.8.2",

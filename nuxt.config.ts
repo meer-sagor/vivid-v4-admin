@@ -1,8 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import {environment} from "./config/environment"
+import { environment, baseURL } from "./config/environment"
 
 export default defineNuxtConfig({
-    devtools: {enabled: environment == 'dev' ? true : false},
+    devtools: { enabled: environment === 'dev' ? true : false },
     app: {
         head: {
             title: 'Vividcustoms - Admin Panel',
@@ -18,6 +18,13 @@ export default defineNuxtConfig({
     },
     build: {
         transpile: ['primevue']
+    },
+    nitro: {
+        baseURL: baseURL,
+        prerender: {
+          crawlLinks: true,
+          failOnError: false, 
+        },
     },
     modules: [
         '@pinia/nuxt',
