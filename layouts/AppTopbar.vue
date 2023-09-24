@@ -13,7 +13,9 @@ const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
 const router = useRouter();
 const auth = useAuthStore();
-const userName = ref(auth.user ? auth.user.name : null);
+const user = ref(auth.user ? auth.user : null);
+
+console.log("auth.user", auth.user);
 
 onMounted(() => {
   bindOutsideClickListener();
@@ -163,7 +165,9 @@ const onSettingsClick = () => {
           align-items: center;
         "
       >
-        {{ greeting }}&nbsp;<strong> {{ userName }}! </strong>
+        {{ greeting }}&nbsp;<strong>
+          {{ user.first_name + " " + user.last_name }}!
+        </strong>
       </div>
       <button @click="onSettingsClick()" class="p-link layout-topbar-button">
         <i class="pi pi-cog"></i>
