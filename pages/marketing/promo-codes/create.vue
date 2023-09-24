@@ -152,6 +152,17 @@ export default defineComponent({
       description: Yup.string().required().min(2).max(100).label("Description"),
       discount_type: Yup.string().required().min(2).max(100).label("Discount type"),
       discount_amount: Yup.number().typeError('Discount amount is required field').required().min(2).max(100).label("Discount amount"),
+      // min_spend: Yup.number()
+      //     .nullable()
+      //     .test('is-min_spend-valid', 'Address must be at least 3 characters long and not exceed 100 characters', (value) => {
+      //       if (!value) {
+      //         // If address is null or undefined, it's considered valid
+      //         return true;
+      //       }
+      //
+      //       // Check the length of the address
+      //       return value.length >= 3 && value.length <= 100;
+      //     }),
       min_spend: Yup.number().typeError('Min spend is number field').nullable().label("Min spend"),
       max_spend: Yup.number().typeError('Max spend is number field').nullable().label("Max spend"),
       per_coupon_limit: Yup.number().typeError('Per coupon limit is number field').nullable().label("Per coupon limit"),
