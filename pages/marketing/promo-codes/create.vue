@@ -120,34 +120,13 @@
         </div>
         <div class="flex flex-column gap-2 mb-1">
           <label for="remaining_coupon">Remaining Coupon</label>
-          <Field
-            v-model="promo_code.remaining_coupon"
-            id="remaining_coupon"
-            name="remaining_coupon"
-            :class="{ 'p-invalid': errors.remaining_coupon }"
-            class="p-inputtext p-component"
-            aria-describedby="promo-code-remaining-coupon-error"
-            placeholder="Enter remaining coupon"
-          />
-          <small class="p-error" id="promo-code-remaining-coupon-error">{{
-            errors.remaining_coupon || "&nbsp;"
-          }}</small>
+          <Field v-model="promo_code.remaining_coupon" id="remaining_coupon" name="remaining_coupon" :class="{ 'p-invalid': errors.remaining_coupon }" class="p-inputtext p-component" aria-describedby="promo-code-remaining-coupon-error" placeholder="Enter remaining coupon"/>
+          <small class="p-error" id="promo-remaining-coupon-error">{{ errors.remaining_coupon || '&nbsp;' }}</small>
         </div>
         <div class="flex flex-column gap-2 mb-1">
           <label for="per_user_limit">Per User Limit</label>
-          <Field
-            v-model="promo_code.per_user_limit"
-            id="per_user_limit"
-            name="per_user_limit"
-            :class="{ 'p-invalid': errors.per_user_limit }"
-            class="p-inputtext p-component"
-            aria-describedby="promo-code-per-user-limit-error"
-            placeholder="Enter
-          per user limit"
-          />
-          <small class="p-error" id="promo-code-per-user-limit-error">{{
-            errors.per_user_limit || "&nbsp;"
-          }}</small>
+          <Field v-model="promo_code.per_user_limit" id="per_user_limit" name="per_user_limit" :class="{ 'p-invalid': errors.per_user_limit }" class="p-inputtext p-component" aria-describedby="promo-code-per-user-limit-error" placeholder="Enter per user limit"/>
+          <small class="p-error" id="promo-per-user-limit-error">{{ errors.per_user_limit || '&nbsp;' }}</small>
         </div>
         <div class="flex flex-column gap-2 mb-3">
           <label for="status">Status</label>
@@ -251,21 +230,13 @@ export default defineComponent({
     const schema = Yup.object().shape({
       name: Yup.string().required().min(2).max(100).label("Name"),
       description: Yup.string().required().min(2).max(100).label("Description"),
-      discount_type: Yup.string()
-        .required()
-        .min(2)
-        .max(100)
-        .label("Discount type"),
-      discount_amount: Yup.number()
-        .required()
-        .min(2)
-        .max(100)
-        .label("Discount amount"),
-      min_spend: Yup.number().notRequired().label("Min spend"),
-      max_spend: Yup.number().notRequired().label("Max spend"),
-      per_coupon_limit: Yup.number().notRequired().label("Per coupon limit"),
-      remaining_coupon: Yup.number().notRequired().label("Remaining coupon"),
-      per_user_limit: Yup.number().notRequired().label("Per user limit"),
+      discount_type: Yup.string().required().min(2).max(100).label("Discount type"),
+      discount_amount: Yup.number().typeError('Discount amount is required field').required().min(2).max(100).label("Discount amount"),
+      min_spend: Yup.number().typeError('Min spend is number field').nullable().label("Min spend"),
+      max_spend: Yup.number().typeError('Max spend is number field').nullable().label("Max spend"),
+      per_coupon_limit: Yup.number().typeError('Per coupon limit is number field').nullable().label("Per coupon limit"),
+      remaining_coupon: Yup.number().typeError('Remaining coupon is number field').nullable().label("Remaining coupon"),
+      per_user_limit: Yup.number().typeError('Per user limit is number field').nullable().label("Per user limit"),
       status: Yup.mixed().required().label("Status"),
     });
 
