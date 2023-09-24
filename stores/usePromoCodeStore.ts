@@ -24,7 +24,7 @@ export const usePromoCodeStore = defineStore('promoCode', () => {
         try {
             const { data, error } = await useApiFetch("/api/promo-codes");
             const getPromoCodes = JSON.parse(JSON.stringify(computed(() => data.value).value))
-            promo_codes.value = getPromoCodes.home_sections;
+            promo_codes.value = getPromoCodes.promo_codes.data;
             success.value = JSON.parse(JSON.stringify(computed(() => getPromoCodes.success).value));
         } catch (error) {
             console.log(error);

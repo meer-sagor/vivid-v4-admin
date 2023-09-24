@@ -8,25 +8,17 @@ const toast = useToast();
 const auth = useAuthStore();
 
 const form = ref({
-  name: auth.user.name,
+  first_name: auth.user.first_name,
+  last_name: auth.user.last_name,
   old_email: auth.user.email,
   email: auth.user.email,
-  role: auth.user.role,
-  new_password: "",
-  confirm_password: "",
+  password: "",
+  password_confirmation: "",
 });
 
 const fileInput = ref(null);
 const files = ref();
 const uploading = ref(false);
-const userRole = ref("");
-const userRoles = ref([
-  { name: "Admin", code: "NY" },
-  { name: "Customer Care", code: "RM" },
-  { name: "Finance", code: "LDN" },
-  { name: "Accounts", code: "IST" },
-  { name: "Traffic Ops", code: "PRS" },
-]);
 const errorMessage = ref("");
 
 const onPhotoSelect = ($event) => {
@@ -37,7 +29,7 @@ const uploadHandler = async (event) => {
   uploading.value = true;
   const fileUp = event.files[0];
   const body = new FormData();
-  body.append("profile_img", fileUp);
+  body.append("image", fileUp);
 
   const { data } = await useApiFetch("/api/profile/img/update", {
     method: "POST",
@@ -77,6 +69,30 @@ const handleProfileUpdate = async () => {
   }
 };
 
+const handlePasswordUpdate = async () => {
+  const { data, error } = await useApiFetch("/api/profile/password/update", {
+    method: "POST",
+    body: form.value,
+  });
+
+  errorMessage.value = null;
+  if (error.value) {
+    errorMessage.value = error.value.data.message;
+  }
+
+  if (data.value) {
+    toast.add({
+      severity: "info",
+      summary: "Success",
+      detail: data.value.message,
+      life: 3000,
+    });
+
+    form.value.password = ''
+    form.value.password_confirmation = ''
+  }
+};
+
 const isProfile = ref(true);
 function onErrorClose() {
   errorMessage.value = null;
@@ -105,12 +121,6 @@ definePageMeta({
 });
 </script>
 <template>
-  <!-- <div class="grid p-fluid"> -->
-  <!-- <div class="flex justify-content-end">
-    <div class="col-12 mb-2 lg:col-4 lg:mb-0">
-      <Button outlined label="Add New" icon="pi pi-plus" />
-    </div>
-  </div> -->
   <div class="flex justify-content-center">
     <div class="col-7">
       <div class="card card-w-title float-right">
@@ -126,8 +136,8 @@ definePageMeta({
         <h5>Profile</h5>
         <div class="grid p-fluid">
           <div class="field col-12 md:col-12">
-            <template v-if="auth.user.profile_img_url">
-              <Image :src="auth.user.profile_img_url" alt="Image" width="250" />
+            <template v-if="auth.user.media?.url">
+              <Image :src="auth.user.media?.url" alt="Image" width="250" />
             </template>
             <template>
               <Image
@@ -148,10 +158,7 @@ definePageMeta({
                 @uploader="uploadHandler"
                 @select="onPhotoSelect($event)"
               />
-              <ProgressSpinner
-                v-if="uploading"
-                style="width: 30px; height: 30px"
-              ></ProgressSpinner>
+              <ProgressSpinner v-if="uploading" style="width: 30px; height: 30px"></ProgressSpinner>
             </span>
           </div>
         </div>
@@ -163,33 +170,20 @@ definePageMeta({
             </Message>
             <form @submit.prevent="handleProfileUpdate">
               <div class="field col-12 md:col-12">
-                <label for="state">Name</label>
-                <InputText v-model="form.name" type="text" placeholder="Name" />
+                <label for="first_name">First Name</label>
+                <InputText v-model="form.first_name" type="text" placeholder="First name" />
               </div>
-
               <div class="field col-12 md:col-12">
-                <label for="state">Email</label>
+                <label for="last_name">Last Name</label>
+                <InputText v-model="form.last_name" type="text" placeholder="Last name" />
+              </div>
+              <div class="field col-12 md:col-12">
+                <label for="email">Email</label>
                 <span class="p-input-icon-left">
                   <i class="pi pi-user" />
-                  <InputText
-                    v-model="form.email"
-                    type="email"
-                    placeholder="Email"
-                  />
+                  <InputText v-model="form.email" type="email" placeholder="Email"/>
                 </span>
               </div>
-
-              <div class="field col-12 md:col-12">
-                <label for="state">Roles</label>
-                <Dropdown
-                  id="state"
-                  v-model="form.role"
-                  :options="userRoles"
-                  optionLabel="name"
-                  placeholder="Select One"
-                ></Dropdown>
-              </div>
-
               <div class="field col-12 md:col-12">
                 <Button type="submit" label="Submit" class="mr-2 mb-2"></Button>
               </div>
@@ -203,23 +197,15 @@ definePageMeta({
             <Message severity="error" v-if="errorMessage" @close="onErrorClose">
               {{ errorMessage }}
             </Message>
-            <form @submit.prevent="handleProfileUpdate">
+            <form @submit.prevent="handlePasswordUpdate">
               <div class="field col-12 md:col-12">
-                <label for="state">New Password</label>
-                <InputText
-                  v-model="form.new_password"
-                  type="text"
-                  placeholder="New Password"
-                />
+                <label for="password">New Password</label>
+                <InputText v-model="form.password" type="password" placeholder="New Password"/>
               </div>
 
               <div class="field col-12 md:col-12">
-                <label for="state">Confirm Password</label>
-                <InputText
-                  v-model="form.confirm_password"
-                  type="text"
-                  placeholder="Confirm Password"
-                />
+                <label for="password_confirmation">Confirm Password</label>
+                <InputText v-model="form.password_confirmation" type="password" placeholder="Confirm Password"/>
               </div>
 
               <div class="field col-12 md:col-12">

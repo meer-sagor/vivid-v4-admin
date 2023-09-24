@@ -1,6 +1,6 @@
 <template>
   <div class="card">
-    <h5>Add Promo code</h5>
+    <h5>Update Promo code</h5>
     <template v-if="fetching">
       <Form
         id="add_promo_code_form"
@@ -126,7 +126,7 @@
           <small class="p-error" id="promo-per-user-limit-error">{{ errors.expiry_date || '&nbsp;' }}</small>
         </div>
         <div class="flex flex-column gap-2 mb-3">
-          <label for="status">Status</label>
+          <label for="status">Status {{ promo_code.status}}</label>
           <Field name="status" v-slot="{ field }">
             <Dropdown
               v-bind="field"
@@ -163,6 +163,7 @@ import { Field, Form, useField, useForm } from "vee-validate";
 import { ref, defineComponent, nextTick, onMounted } from "vue";
 import * as Yup from "yup";
 import { useApiFetch } from "~/composables/useApiFetch";
+import {useRoute, useRouter} from "vue-router";
 
 export default defineComponent({
   components: { Form, Field },
@@ -174,6 +175,8 @@ export default defineComponent({
     const spinner = ref(false);
     const status_enums = ref([]);
     const discount_type_enums = ref([]);
+    const route = useRoute();
+    const router = useRouter();
 
     const promo_code = ref({
       name: "",
@@ -191,6 +194,7 @@ export default defineComponent({
     onMounted(async () => {
       await nextTick();
       await fetchEnums();
+      await fetchPromoCodes();
     });
 
     const fetchEnums = async () => {
@@ -206,6 +210,16 @@ export default defineComponent({
         );
         status_enums.value = getEnums.statuses;
         discount_type_enums.value = getEnums.discount_types;
+      }
+    };
+
+    const fetchPromoCodes = async () => {
+      const {data, error} = await useApiFetch("/api/promo-codes/" + route.params.id + '/edit', {
+        method: "GET",
+      });
+      if (data.value) {
+        const getPromoCodes = JSON.parse(JSON.stringify(computed(() => data.value).value))
+        promo_code.value = getPromoCodes.promo_code;
       }
     };
 
@@ -261,9 +275,7 @@ export default defineComponent({
           life: 3000,
         });
 
-        promo_code.value.discount_type = "";
-        promo_code.value.status = "";
-        promo_code.value.expiry_date = "";
+        await router.push({ path: "/marketing/promo-codes" });
         resetModal();
         resetForm();
       }
