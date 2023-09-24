@@ -585,10 +585,10 @@ const onUpload = () => {
                   placeholder="Select a Category"
                   display="chip"
                   :class="{ 'p-invalid': errors.category }"
-                  aria-describedby="category-code-category-error"
+                  aria-describedby="category-category_field-error"
                 ></Dropdown>
               </Field>
-              <small class="p-error" id="category-code-category-error">{{
+              <small class="p-error" id="category-category_field-error">{{
                 errors.category || "&nbsp;"
               }}</small>
             </div>
@@ -652,10 +652,7 @@ const onUpload = () => {
                 errors.status || "&nbsp;"
               }}</small>
             </div>
-            <Button
-              class="" type="submit" label="Submit"
-              icon="pi pi-check"
-            />
+            <Button class="" type="submit" label="Submit"  icon="pi pi-check"/>
           </Form>
         </Dialog>
 
