@@ -9,16 +9,16 @@ const model = ref([
   {
     label: "Sales & Marketing",
     items: [
-      {
-        label: "Sales",
-        icon: "pi pi-fw pi-wallet",
-        to: "/general/sales",
-      },
-      {
-        label: "Ship Station Orders",
-        icon: "pi pi-fw pi-truck",
-        to: "/general/ship-station-orders",
-      },
+      // {
+      //   label: "Sales",
+      //   icon: "pi pi-fw pi-wallet",
+      //   to: "/general/sales",
+      // },
+      // {
+      //   label: "Ship Station Orders",
+      //   icon: "pi pi-fw pi-truck",
+      //   to: "/general/ship-station-orders",
+      // },
       {
         label: "Promo Code",
         icon: "pi pi-fw pi-tag",
@@ -79,84 +79,84 @@ const model = ref([
         icon: "pi pi-fw pi-id-card",
         to: "/tags",
       },
-      {
-        label: "Sides",
-        icon: "pi pi-fw pi-id-card",
-        to: "/dummy",
-      },
-      {
-        label: "Price Table",
-        icon: "pi pi-fw pi-id-card",
-        to: "/dummy",
-      },
+      // {
+      //   label: "Sides",
+      //   icon: "pi pi-fw pi-id-card",
+      //   to: "/dummy",
+      // },
+      // {
+      //   label: "Price Table",
+      //   icon: "pi pi-fw pi-id-card",
+      //   to: "/dummy",
+      // },
     ],
   },
-  {
-    label: "Design Studio",
-    items: [
-      {
-        label: "Manage Cliparts",
-        icon: "pi pi-fw pi-eye",
-        to: "/dummy",
-        badge: "NEW",
-      },
-      {
-        label: "Ink Colors",
-        icon: "pi pi-fw pi-globe",
-        url: "https://www.primefaces.org/primeblocks-vue",
-        target: "_blank",
-      },
-      {
-        label: "Fonts",
-        icon: "pi pi-fw pi-globe",
-        url: "https://www.primefaces.org/primeblocks-vue",
-        target: "_blank",
-      },
-      {
-        label: "Designs",
-        icon: "pi pi-fw pi-globe",
-        url: "https://www.primefaces.org/primeblocks-vue",
-        target: "_blank",
-      },
-      {
-        label: "Template Designs",
-        icon: "pi pi-fw pi-globe",
-        url: "https://www.primefaces.org/primeblocks-vue",
-        target: "_blank",
-      },
-    ],
-  },
-  {
-    label: "Embroidery Section",
-    items: [
-      {
-        label: "Cliparts",
-        icon: "pi pi-fw pi-eye",
-        to: "/dummy",
-        badge: "NEW",
-      },
-      {
-        label: "Templates",
-        icon: "pi pi-fw pi-globe",
-        url: "https://www.primefaces.org/primeblocks-vue",
-        target: "_blank",
-      },
-      {
-        label: "Printing Price",
-        icon: "pi pi-fw pi-globe",
-        url: "https://www.primefaces.org/primeblocks-vue",
-        target: "_blank",
-      },
-    ],
-  },
+  // {
+  //   label: "Design Studio",
+  //   items: [
+  //     {
+  //       label: "Manage Cliparts",
+  //       icon: "pi pi-fw pi-eye",
+  //       to: "/dummy",
+  //       badge: "NEW",
+  //     },
+  //     {
+  //       label: "Ink Colors",
+  //       icon: "pi pi-fw pi-globe",
+  //       url: "https://www.primefaces.org/primeblocks-vue",
+  //       target: "_blank",
+  //     },
+  //     {
+  //       label: "Fonts",
+  //       icon: "pi pi-fw pi-globe",
+  //       url: "https://www.primefaces.org/primeblocks-vue",
+  //       target: "_blank",
+  //     },
+  //     {
+  //       label: "Designs",
+  //       icon: "pi pi-fw pi-globe",
+  //       url: "https://www.primefaces.org/primeblocks-vue",
+  //       target: "_blank",
+  //     },
+  //     {
+  //       label: "Template Designs",
+  //       icon: "pi pi-fw pi-globe",
+  //       url: "https://www.primefaces.org/primeblocks-vue",
+  //       target: "_blank",
+  //     },
+  //   ],
+  // },
+  // {
+  //   label: "Embroidery Section",
+  //   items: [
+  //     {
+  //       label: "Cliparts",
+  //       icon: "pi pi-fw pi-eye",
+  //       to: "/dummy",
+  //       badge: "NEW",
+  //     },
+  //     {
+  //       label: "Templates",
+  //       icon: "pi pi-fw pi-globe",
+  //       url: "https://www.primefaces.org/primeblocks-vue",
+  //       target: "_blank",
+  //     },
+  //     {
+  //       label: "Printing Price",
+  //       icon: "pi pi-fw pi-globe",
+  //       url: "https://www.primefaces.org/primeblocks-vue",
+  //       target: "_blank",
+  //     },
+  //   ],
+  // },
   {
     label: "Associates & Users",
     items: [
-      {
-        label: "Manage Users",
-        icon: "pi pi-fw pi-prime",
-        to: "/dummy",
-      },
+      // {
+      //   label: "Manage Users",
+      //   icon: "pi pi-fw pi-prime",
+      //   to: "/dummy",
+      // },
       {
         label: "Manage Associates",
         icon: "pi pi-fw pi-desktop",
@@ -172,57 +172,57 @@ const model = ref([
   {
     label: "Manage Pages",
     icon: "pi pi-fw pi-briefcase",
-    items: [
-      {
-        label: "Pages",
-        icon: "pi pi-fw pi-circle-off",
-        to: "/dummy",
-      },
-      {
-        label: "Page Components",
-        icon: "pi pi-fw pi-circle-off",
-        to: "/dummy",
-      },
-      {
-        label: "Comments",
-        icon: "pi pi-fw pi-exclamation-circle",
-        to: "/dummy",
-      },
-    ],
+    // items: [
+    //   {
+    //     label: "Pages",
+    //     icon: "pi pi-fw pi-circle-off",
+    //     to: "/dummy",
+    //   },
+    //   {
+    //     label: "Page Components",
+    //     icon: "pi pi-fw pi-circle-off",
+    //     to: "/dummy",
+    //   },
+    //   {
+    //     label: "Comments",
+    //     icon: "pi pi-fw pi-exclamation-circle",
+    //     to: "/dummy",
+    //   },
+    // ],
   },
-  {
-    label: "Settings",
-    icon: "pi pi-fw pi-briefcase",
-    items: [
-      {
-        label: "Media",
-        icon: "pi pi-fw pi-exclamation-circle",
-        to: "/dummy",
-      },
-      {
-        label: "Analytics",
-        icon: "pi pi-fw pi-circle-off",
-        to: "/dummy",
-      },
-      {
-        label: "Settings",
-        icon: "pi pi-fw pi-circle-off",
-        to: "/dummy",
-      },
-    ],
-  },
-  {
-    label: "Documentation",
-    icon: "pi pi-fw pi-briefcase",
-    items: [
-      {
-        label: "API Documentation",
-        icon: "pi pi-fw pi-globe",
-        url: "http://localhost:8000/api/documentation#/default",
-        target: "_blank",
-      },
-    ],
-  },
+  // {
+  //   label: "Settings",
+  //   icon: "pi pi-fw pi-briefcase",
+  //   items: [
+  //     {
+  //       label: "Media",
+  //       icon: "pi pi-fw pi-exclamation-circle",
+  //       to: "/dummy",
+  //     },
+  //     {
+  //       label: "Analytics",
+  //       icon: "pi pi-fw pi-circle-off",
+  //       to: "/dummy",
+  //     },
+  //     {
+  //       label: "Settings",
+  //       icon: "pi pi-fw pi-circle-off",
+  //       to: "/dummy",
+  //     },
+  //   ],
+  // },
+  // {
+  //   label: "Documentation",
+  //   icon: "pi pi-fw pi-briefcase",
+  //   items: [
+  //     {
+  //       label: "API Documentation",
+  //       icon: "pi pi-fw pi-globe",
+  //       url: "http://localhost:8000/api/documentation#/default",
+  //       target: "_blank",
+  //     },
+  //   ],
+  // },
 ]);
 </script>
 

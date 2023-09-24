@@ -3,7 +3,9 @@ import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
 import { onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
+const router = useRouter();
 const toast = useToast();
 
 const products = ref(null);
@@ -79,9 +81,10 @@ const saveProduct = () => {
 };
 
 const editProduct = (editProduct) => {
-  product.value = { ...editProduct };
-  console.log(product);
-  productDialog.value = true;
+  // product.value = { ...editProduct };
+  // console.log(product);
+  // productDialog.value = true;
+  router.push({ path: "/product/create" });
 };
 
 const confirmDeleteProduct = (editProduct) => {
@@ -333,12 +336,14 @@ const onUpload = () => {
                     placeholder="Search..."
                   />
                 </span>
-                <Button
-                  label="New"
-                  icon="pi pi-plus"
-                  class="p-button-primary mr-2"
-                  @click="openNew"
-                />
+
+                <NuxtLink to="/product/create">
+                  <Button
+                    label="New"
+                    icon="pi pi-plus"
+                    class="p-button-primary mr-2"
+                  />
+                </NuxtLink>
               </div>
             </div>
           </template>
@@ -427,293 +432,6 @@ const onUpload = () => {
             </template>
           </Column>
         </DataTable>
-
-        <Dialog
-          v-model:visible="productDialog"
-          :style="{ width: '960px' }"
-          header="Edit Details"
-          :modal="true"
-          class="p-fluid"
-        >
-          <div class="field">
-            <label for="name">Name</label>
-            <InputText
-              id="name"
-              v-model.trim="product.name"
-              required="true"
-              autofocus
-              :class="{ 'p-invalid': submitted && !product.name }"
-            />
-            <small v-if="submitted && !product.name" class="p-invalid"
-              >Name is required.</small
-            >
-          </div>
-
-          <div class="field">
-            <label for="name">Image</label>
-            <FileUpload
-              name="demo[]"
-              @uploader="onUpload"
-              :multiple="true"
-              accept="image/*"
-              :maxFileSize="1000000"
-              customUpload
-            />
-          </div>
-
-          <div class="formgrid grid">
-            <div class="field col">
-              <label for="inventoryStatus" class="mb-3">URL Key</label>
-              <Dropdown
-                id="inventoryStatus"
-                v-model="product.inventoryStatus"
-                :options="statuses"
-                optionLabel="label"
-                placeholder="Select a URL Key"
-              >
-                <template #value="slotProps">
-                  <div v-if="slotProps.value && slotProps.value.value">
-                    <span
-                      :class="'product-badge status-' + slotProps.value.value"
-                      >{{ slotProps.value.label }}</span
-                    >
-                  </div>
-                  <div v-else-if="slotProps.value && !slotProps.value.value">
-                    <span
-                      :class="
-                        'product-badge status-' + slotProps.value.toLowerCase()
-                      "
-                      >{{ slotProps.value }}</span
-                    >
-                  </div>
-                  <span v-else>
-                    {{ slotProps.placeholder }}
-                  </span>
-                </template>
-              </Dropdown>
-            </div>
-            <div class="field col">
-              <label for="name" class="mb-3">Style Numer</label>
-              <InputText
-                id="name"
-                v-model.trim="product.name"
-                required="true"
-                autofocus
-                :class="{ 'p-invalid': submitted && !product.name }"
-              />
-              <small v-if="submitted && !product.name" class="p-invalid"
-                >Name is required.</small
-              >
-            </div>
-          </div>
-
-          <div class="formgrid grid md:align-items-center">
-            <div class="field col">
-              <label for="name" class="mb-3">Sku</label>
-              <InputText
-                id="name"
-                v-model.trim="product.name"
-                required="true"
-                autofocus
-                :class="{ 'p-invalid': submitted && !product.name }"
-              />
-              <small v-if="submitted && !product.name" class="p-invalid"
-                >Name is required.</small
-              >
-            </div>
-            <div class="field col">
-              <label for="name" class="mb-3">quantity</label>
-              <InputText
-                id="name"
-                type="number"
-                value="0"
-                v-model.trim="product.name"
-                required="true"
-                autofocus
-                :class="{ 'p-invalid': submitted && !product.name }"
-              />
-              <small v-if="submitted && !product.name" class="p-invalid"
-                >Name is required.</small
-              >
-            </div>
-          </div>
-
-          <div class="formgrid grid md:align-items-center">
-            <div class="field col">
-              <label for="name" class="flex mb-3">Default Printing</label>
-              <InputSwitch v-model="switchValue" />
-            </div>
-            <div class="field col">
-              <label for="name" class="flex mb-3">Default Embroidery</label>
-              <InputSwitch v-model="switchValue" />
-            </div>
-          </div>
-
-          <div class="formgrid grid md:align-items-center">
-            <div class="field col">
-              <label for="inventoryStatus" class="mb-3">Fabric</label>
-              <Dropdown
-                id="inventoryStatus"
-                v-model="product.inventoryStatus"
-                :options="statuses"
-                optionLabel="label"
-                placeholder="Select a Fabric"
-              >
-                <template #value="slotProps">
-                  <div v-if="slotProps.value && slotProps.value.value">
-                    <span
-                      :class="'product-badge status-' + slotProps.value.value"
-                      >{{ slotProps.value.label }}</span
-                    >
-                  </div>
-                  <div v-else-if="slotProps.value && !slotProps.value.value">
-                    <span
-                      :class="
-                        'product-badge status-' + slotProps.value.toLowerCase()
-                      "
-                      >{{ slotProps.value }}</span
-                    >
-                  </div>
-                  <span v-else>
-                    {{ slotProps.placeholder }}
-                  </span>
-                </template>
-              </Dropdown>
-            </div>
-
-            <div class="field col">
-              <label for="inventoryStatus" class="mb-3"
-                >Category > Subcategory</label
-              >
-              <Dropdown
-                id="inventoryStatus"
-                v-model="product.inventoryStatus"
-                :options="statuses"
-                optionLabel="label"
-                placeholder="Select a Category > Subcategory"
-              >
-                <template #value="slotProps">
-                  <div v-if="slotProps.value && slotProps.value.value">
-                    <span
-                      :class="'product-badge status-' + slotProps.value.value"
-                      >{{ slotProps.value.label }}</span
-                    >
-                  </div>
-                  <div v-else-if="slotProps.value && !slotProps.value.value">
-                    <span
-                      :class="
-                        'product-badge status-' + slotProps.value.toLowerCase()
-                      "
-                      >{{ slotProps.value }}</span
-                    >
-                  </div>
-                  <span v-else>
-                    {{ slotProps.placeholder }}
-                  </span>
-                </template>
-              </Dropdown>
-            </div>
-          </div>
-
-          <div class="field">
-            <label for="inventoryStatus" class="mb-3">Brand</label>
-            <Dropdown
-              id="inventoryStatus"
-              v-model="product.inventoryStatus"
-              :options="statuses"
-              optionLabel="label"
-              placeholder="Select a Brand"
-            >
-              <template #value="slotProps">
-                <div v-if="slotProps.value && slotProps.value.value">
-                  <span
-                    :class="'product-badge status-' + slotProps.value.value"
-                    >{{ slotProps.value.label }}</span
-                  >
-                </div>
-                <div v-else-if="slotProps.value && !slotProps.value.value">
-                  <span
-                    :class="
-                      'product-badge status-' + slotProps.value.toLowerCase()
-                    "
-                    >{{ slotProps.value }}</span
-                  >
-                </div>
-                <span v-else>
-                  {{ slotProps.placeholder }}
-                </span>
-              </template>
-            </Dropdown>
-          </div>
-
-          <div class="field">
-            <label for="description">Description</label>
-            <Textarea
-              id="description"
-              v-model="product.description"
-              required="true"
-              rows="3"
-              cols="20"
-            />
-          </div>
-
-          <div class="field">
-            <label for="description">Size Chart Description</label>
-            <Textarea
-              id="description"
-              v-model="product.description"
-              required="true"
-              rows="3"
-              cols="20"
-            />
-          </div>
-
-          <div class="field">
-            <label for="inventoryStatus" class="mb-3">Status</label>
-            <Dropdown
-              id="inventoryStatus"
-              v-model="product.inventoryStatus"
-              :options="statuses"
-              optionLabel="label"
-              placeholder="Select a Status"
-            >
-              <template #value="slotProps">
-                <div v-if="slotProps.value && slotProps.value.value">
-                  <span
-                    :class="'product-badge status-' + slotProps.value.value"
-                    >{{ slotProps.value.label }}</span
-                  >
-                </div>
-                <div v-else-if="slotProps.value && !slotProps.value.value">
-                  <span
-                    :class="
-                      'product-badge status-' + slotProps.value.toLowerCase()
-                    "
-                    >{{ slotProps.value }}</span
-                  >
-                </div>
-                <span v-else>
-                  {{ slotProps.placeholder }}
-                </span>
-              </template>
-            </Dropdown>
-          </div>
-
-          <template #footer>
-            <Button
-              label="Cancel"
-              icon="pi pi-times"
-              class="p-button-text"
-              @click="hideDialog"
-            />
-            <Button
-              label="Save"
-              icon="pi pi-check"
-              class="p-button-text"
-              @click="saveProduct"
-            />
-          </template>
-        </Dialog>
 
         <Dialog
           v-model:visible="deleteProductDialog"

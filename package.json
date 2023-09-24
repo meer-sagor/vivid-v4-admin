@@ -27,13 +27,18 @@
   },
   "dependencies": {
     "@pinia/nuxt": "^0.4.11",
+    "@tiptap/extension-highlight": "^2.1.11",
+    "@tiptap/extension-text-align": "^2.1.11",
+    "@tiptap/pm": "^2.1.11",
+    "@tiptap/starter-kit": "^2.1.11",
+    "@tiptap/vue-3": "^2.1.11",
+    "@vee-validate/rules": "^4.8.2",
     "chart.js": "^4.3.3",
     "pinia": "^2.1.6",
     "primeflex": "^3.3.1",
     "primeicons": "^6.0.1",
     "primevue": "^3.32.0",
-    "yup": "^1.2.0",
-    "@vee-validate/rules": "^4.8.2",
-    "vee-validate": "^4.8.2"
+    "vee-validate": "^4.8.2",
+    "yup": "^1.2.0"
   }
 }
