@@ -98,9 +98,9 @@ import VirtualScroller from 'primevue/virtualscroller';
 
 import BlockViewer from '@/components/BlockViewer.vue';
 import CodeHighlight from '@/components/CodeHighlight.vue';
-import Editor from 'primevue/editor';
-// import 'quill/dist/quill.snow.css';
 // import { Quill } from "quill"
+// import 'quill/dist/quill.snow.css';
+import Editor from 'primevue/editor';
 
 export default defineNuxtPlugin((nuxtApp) => {
     nuxtApp.vueApp.use(PrimeVue, { ripple: true });
@@ -205,6 +205,8 @@ export default defineNuxtPlugin((nuxtApp) => {
     nuxtApp.vueApp.component('TreeTable', TreeTable);
     nuxtApp.vueApp.component('TriStateCheckbox', TriStateCheckbox);
     nuxtApp.vueApp.component('VirtualScroller', VirtualScroller);
-   // nuxtApp.vueApp.directive('Quill', Quill);
+    // if (typeof window !== "undefined"){
+    //     nuxtApp.vueApp.component('Quill', Quill);
+    // }
     nuxtApp.vueApp.component('Editor', Editor);
 });

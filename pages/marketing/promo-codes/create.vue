@@ -8,138 +8,176 @@
         :validation-schema="schema"
         v-slot="{ errors }"
       >
-        <div class="flex flex-column gap-2 mb-1">
-          <label for="name">Name</label>
-          <Field
-            v-model="promo_code.name"
-            id="name"
-            name="name"
-            :class="{ 'p-invalid': errors.name }"
-            class="p-inputtext p-component"
-            aria-describedby="promo-code-name-error"
-            placeholder="Enter name"
-          />
-          <small class="p-error" id="promo-code-name-error">{{errors.name || "&nbsp;"}}</small>
+
+        <div class="flex flex-row gap-3">
+          <div class="col-6 mb-0">
+            <div class="flex flex-column gap-2 mb-0">
+              <label for="name">Name</label>
+              <Field
+                  v-model="promo_code.name"
+                  id="name"
+                  name="name"
+                  :class="{ 'p-invalid': errors.name }"
+                  class="p-inputtext p-component"
+                  aria-describedby="promo-code-name-error"
+                  placeholder="Enter name"
+              />
+              <small class="p-error" id="promo-code-name-error">{{errors.name || "&nbsp;"}}</small>
+            </div>
+          </div>
+          <div class="col-6 mb-0">
+            <div class="flex flex-column gap-2 mb-0">
+              <label for="description">Description</label>
+              <Field name="description" v-slot="{ field }">
+                <Editor
+                    v-bind="field"
+                    v-model="promo_code.description"
+                    :class="{ 'p-invalid': errors.description }"
+                    placeholder="Enter description"
+                    editorStyle="height: 150px" >
+                  <template v-slot:toolbar>
+                    <span class="ql-formats">
+                        <button v-tooltip.bottom="'Bold'" class="ql-bold"></button>
+                        <button v-tooltip.bottom="'Italic'" class="ql-italic"></button>
+                        <button v-tooltip.bottom="'Underline'" class="ql-underline"></button>
+                    </span>
+                  </template>
+                </Editor>
+              </Field>
+              <small class="p-error" id="promo-code-description-error">{{errors.description || "&nbsp;"}}</small>
+            </div>
+          </div>
         </div>
-        <div class="flex flex-column gap-2 mb-1">
-          <label for="description">Description</label>
-          <Field name="description" v-slot="{ field }">
-            <Editor
-                v-bind="field"
-                v-model="promo_code.description"
-                :class="{ 'p-invalid': errors.description }"
-                placeholder="Enter description"
-                editorStyle="height: 200px"
-            />
-          </Field>
-          <small class="p-error" id="promo-code-description-error">{{errors.description || "&nbsp;"}}</small>
+        <div class="flex flex-row gap-3">
+          <div class="col-6 mb-0">
+            <div class="flex flex-column gap-2 mb-0">
+              <label for="discount_type">Discount Type</label>
+              <Field name="discount_type" v-slot="{ field }">
+                <Dropdown
+                    v-bind="field"
+                    v-model="promo_code.discount_type"
+                    :options="discount_type_enums"
+                    optionLabel="name"
+                    optionValue="name"
+                    placeholder="Select a discount type"
+                    display="chip"
+                    :class="{ 'p-invalid': errors.discount_type }"
+                    aria-describedby="promo-code-discount-type-error"
+                ></Dropdown>
+              </Field>
+              <small class="p-error" id="promo-code-discount-type-error">{{errors.discount_type || "&nbsp;"}}</small>
+            </div>
+          </div>
+          <div class="col-6 mb-0">
+            <div class="flex flex-column gap-2 mb-0">
+              <label for="discount_amount">Discount Amount</label>
+              <Field
+                  v-model="promo_code.discount_amount"
+                  id="discount_amount"
+                  name="discount_amount"
+                  :class="{ 'p-invalid': errors.discount_amount }"
+                  class="p-inputtext p-component"
+                  aria-describedby="promo-code-discount-amount-error"
+                  placeholder="Discount amount"
+              />
+              <small class="p-error" id="promo-code-discount-amount-error">{{errors.discount_amount || "&nbsp;" }}</small>
+            </div>
+          </div>
         </div>
-        <div class="flex flex-column gap-2 mb-1">
-          <label for="discount_type">Discount Type</label>
-          <Field name="discount_type" v-slot="{ field }">
-            <Dropdown
-              v-bind="field"
-              v-model="promo_code.discount_type"
-              :options="discount_type_enums"
-              optionLabel="name"
-              optionValue="name"
-              placeholder="Select a discount type"
-              display="chip"
-              :class="{ 'p-invalid': errors.discount_type }"
-              aria-describedby="promo-code-discount-type-error"
-            ></Dropdown>
-          </Field>
-          <small class="p-error" id="promo-code-discount-type-error">{{errors.discount_type || "&nbsp;"}}</small>
+        <div class="flex flex-row gap-3">
+          <div class="col-6 mb-0">
+            <div class="flex flex-column gap-2 mb-0">
+              <label for="min_spend">Min Spend</label>
+              <Field
+                  v-model="promo_code.min_spend"
+                  id="min_spend"
+                  name="min_spend"
+                  :class="{ 'p-invalid': errors.min_spend }"
+                  class="p-inputtext p-component"
+                  aria-describedby="promo-code-min-spend-error"
+                  placeholder="Min spend"
+              />
+              <small class="p-error" id="promo-code-min-spend-error">{{errors.min_spend || "&nbsp;"}}</small>
+            </div>
+          </div>
+          <div class="col-6 mb-0">
+            <div class="flex flex-column gap-2 mb-0">
+              <label for="max_spend">Max Spend</label>
+              <Field
+                  v-model="promo_code.max_spend"
+                  id="max_spend"
+                  name="max_spend"
+                  :class="{ 'p-invalid': errors.max_spend }"
+                  class="p-inputtext p-component"
+                  aria-describedby="promo-code-max-spend-error"
+                  placeholder="Min spend"
+              />
+              <small class="p-error" id="promo-code-max-spend-error">{{errors.max_spend || "&nbsp;" }}</small>
+            </div>
+          </div>
         </div>
-        <div class="flex flex-column gap-2 mb-1">
-          <label for="discount_amount">Discount Amount</label>
-          <Field
-            v-model="promo_code.discount_amount"
-            id="discount_amount"
-            name="discount_amount"
-            :class="{ 'p-invalid': errors.discount_amount }"
-            class="p-inputtext p-component"
-            aria-describedby="promo-code-discount-amount-error"
-            placeholder="Discount amount"
-          />
-          <small class="p-error" id="promo-code-discount-amount-error">{{errors.discount_amount || "&nbsp;" }}</small>
+        <div class="flex flex-row gap-3">
+          <div class="col-6 mb-0">
+            <div class="flex flex-column gap-2 mb-0">
+              <label for="per_coupon_limit">Per Coupon Limit</label>
+              <Field
+                  v-model="promo_code.per_coupon_limit"
+                  id="per_coupon_limit"
+                  name="per_coupon_limit"
+                  :class="{ 'p-invalid': errors.per_coupon_limit }"
+                  class="p-inputtext p-component"
+                  aria-describedby="promo-code-per-coupon-limit-error"
+                  placeholder="Enter per coupon limit"
+              />
+              <small class="p-error" id="promo-code-per-coupon-limit-error">{{errors.per_coupon_limit || "&nbsp;"}}</small>
+            </div>
+          </div>
+          <div class="col-6 mb-0">
+            <div class="flex flex-column gap-2 mb-0">
+              <label for="per_user_limit">Per User Limit</label>
+              <Field v-model="promo_code.per_user_limit" id="per_user_limit" name="per_user_limit" :class="{ 'p-invalid': errors.per_user_limit }" class="p-inputtext p-component" aria-describedby="promo-code-per-user-limit-error" placeholder="Enter per user limit"/>
+              <small class="p-error" id="promo-per-user-limit-error">{{ errors.per_user_limit || '&nbsp;' }}</small>
+            </div>
+          </div>
         </div>
-        <div class="flex flex-column gap-2 mb-1">
-          <label for="min_spend">Min Spend</label>
-          <Field
-            v-model="promo_code.min_spend"
-            id="min_spend"
-            name="min_spend"
-            :class="{ 'p-invalid': errors.min_spend }"
-            class="p-inputtext p-component"
-            aria-describedby="promo-code-min-spend-error"
-            placeholder="Min spend"
-          />
-          <small class="p-error" id="promo-code-min-spend-error">{{errors.min_spend || "&nbsp;"}}</small>
-        </div>
-        <div class="flex flex-column gap-2 mb-1">
-          <label for="max_spend">Max Spend</label>
-          <Field
-            v-model="promo_code.max_spend"
-            id="max_spend"
-            name="max_spend"
-            :class="{ 'p-invalid': errors.max_spend }"
-            class="p-inputtext p-component"
-            aria-describedby="promo-code-max-spend-error"
-            placeholder="Min spend"
-          />
-          <small class="p-error" id="promo-code-max-spend-error">{{errors.max_spend || "&nbsp;" }}</small>
-        </div>
-        <div class="flex flex-column gap-2 mb-1">
-          <label for="per_coupon_limit">Per Coupon Limit</label>
-          <Field
-            v-model="promo_code.per_coupon_limit"
-            id="per_coupon_limit"
-            name="per_coupon_limit"
-            :class="{ 'p-invalid': errors.per_coupon_limit }"
-            class="p-inputtext p-component"
-            aria-describedby="promo-code-per-coupon-limit-error"
-            placeholder="Enter per coupon limit"
-          />
-          <small class="p-error" id="promo-code-per-coupon-limit-error">{{errors.per_coupon_limit || "&nbsp;"}}</small>
-        </div>
-        <div class="flex flex-column gap-2 mb-1">
-          <label for="per_user_limit">Per User Limit</label>
-          <Field v-model="promo_code.per_user_limit" id="per_user_limit" name="per_user_limit" :class="{ 'p-invalid': errors.per_user_limit }" class="p-inputtext p-component" aria-describedby="promo-code-per-user-limit-error" placeholder="Enter per user limit"/>
-          <small class="p-error" id="promo-per-user-limit-error">{{ errors.per_user_limit || '&nbsp;' }}</small>
-        </div>
-        <div class="flex flex-column gap-2 mb-1">
-          <label for="expiry_date">Expiry Date</label>
-          <Field name="expiry_date" v-slot="{ field }">
-            <Calendar
-                v-bind="field"
-                v-model="promo_code.expiry_date"
-                dateFormat="yy-mm-dd"
-                showIcon
-                showTime
-                hourFormat="12"
-                :class="{ 'p-invalid': errors.expiry_date }"
-                placeholder="Select expiry date"
-            />
-          </Field>
-          <small class="p-error" id="promo-per-user-limit-error">{{ errors.expiry_date || '&nbsp;' }}</small>
-        </div>
-        <div class="flex flex-column gap-2 mb-3">
-          <label for="status">Status</label>
-          <Field name="status" v-slot="{ field }">
-            <Dropdown
-              v-bind="field"
-              v-model="promo_code.status"
-              :options="status_enums"
-              optionLabel="name"
-              optionValue="name"
-              placeholder="Select a status"
-              display="chip"
-              :class="{ 'p-invalid': errors.status }"
-              aria-describedby="promo-code-status-error"
-            ></Dropdown>
-          </Field>
-          <small class="p-error" id="promo-code-status-error">{{errors.status || "&nbsp;"}}</small>
+        <div class="flex flex-row gap-3">
+          <div class="col-6 mb-0">
+            <div class="flex flex-column gap-2 mb-0">
+              <label for="expiry_date">Expiry Date</label>
+              <Field name="expiry_date" v-slot="{ field }">
+                <Calendar
+                    v-bind="field"
+                    v-model="promo_code.expiry_date"
+                    dateFormat="yy-mm-dd"
+                    showIcon
+                    showTime
+                    hourFormat="12"
+                    :class="{ 'p-invalid': errors.expiry_date }"
+                    placeholder="Select expiry date"
+                />
+              </Field>
+              <small class="p-error" id="promo-per-user-limit-error">{{ errors.expiry_date || '&nbsp;' }}</small>
+            </div>
+          </div>
+          <div class="col-6 mb-0">
+            <div class="flex flex-column gap-2 mb-0">
+              <label for="status">Status</label>
+              <Field name="status" v-slot="{ field }">
+                <Dropdown
+                    v-bind="field"
+                    v-model="promo_code.status"
+                    :options="status_enums"
+                    optionLabel="name"
+                    optionValue="name"
+                    placeholder="Select a status"
+                    display="chip"
+                    :class="{ 'p-invalid': errors.status }"
+                    aria-describedby="promo-code-status-error"
+                ></Dropdown>
+              </Field>
+              <small class="p-error" id="promo-code-status-error">{{errors.status || "&nbsp;"}}</small>
+            </div>
+          </div>
         </div>
         <Button
           class=""
@@ -162,7 +200,6 @@ import { Field, Form, useField, useForm } from "vee-validate";
 import { ref, defineComponent, nextTick, onMounted } from "vue";
 import * as Yup from "yup";
 import { useApiFetch } from "~/composables/useApiFetch";
-
 
 export default defineComponent({
   components: { Form, Field },

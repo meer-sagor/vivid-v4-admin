@@ -41,7 +41,11 @@
 
           <Column field="id" header="ID" style="width: 5%"></Column>
           <Column field="name" header="Name" style="width: 20%"></Column>
-          <Column field="description" header="Description" style="width: 25%"></Column>
+          <Column field="description" header="Description" style="width: 25%">
+            <template #body="slotProps">
+              {{ removeHTMLSpecialChars(slotProps.data.description) }}
+            </template>
+          </Column>
           <Column field="discount_type" header="Discount Type" style="width: 10%"></Column>
           <Column field="discount_amount" header="Discount Amount" style="width: 10%"></Column>
           <Column field="expiry_date" header="Expiry Date" style="width: 10%"></Column>
@@ -151,6 +155,11 @@ const deletePromoCode = async () => {
     await fetchPromoCodes()
   }
 };
+const removeHTMLSpecialChars = (inputString) => {
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(inputString, 'text/xml');
+  return xmlDoc.documentElement.textContent;
+}
 
 </script>
 
