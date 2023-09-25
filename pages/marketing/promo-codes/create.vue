@@ -23,16 +23,15 @@
         </div>
         <div class="flex flex-column gap-2 mb-1">
           <label for="description">Description</label>
-          <Field
-            type="textarea"
-            v-model="promo_code.description"
-            id="description"
-            name="description"
-            :class="{ 'p-invalid': errors.description }"
-            class="p-inputtext p-component"
-            aria-describedby="promo-code-description-error"
-            placeholder="Enter description"
-          />
+          <Field name="description" v-slot="{ field }">
+            <Editor
+                v-bind="field"
+                v-model="promo_code.description"
+                :class="{ 'p-invalid': errors.description }"
+                placeholder="Enter description"
+                editorStyle="height: 200px"
+            />
+          </Field>
           <small class="p-error" id="promo-code-description-error">{{errors.description || "&nbsp;"}}</small>
         </div>
         <div class="flex flex-column gap-2 mb-1">
@@ -305,6 +304,11 @@ export default defineComponent({
 
 .p-checkbox.p-invalid {
   border-color: #e24c4c;
+}
+
+.p-editor-container.p-invalid {
+  border: 1px solid #e24c4c !important;
+  border-radius: 6px;
 }
 
 .form-control[type="file"]:not(:disabled):not([readonly]) {
