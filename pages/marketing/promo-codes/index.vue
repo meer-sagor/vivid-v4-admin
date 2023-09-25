@@ -48,7 +48,12 @@
           </Column>
           <Column field="discount_type" header="Discount Type" style="width: 10%"></Column>
           <Column field="discount_amount" header="Discount Amount" style="width: 10%"></Column>
-          <Column field="expiry_date" header="Expiry Date" style="width: 10%"></Column>
+          <Column field="expiry_date" header="Expiry Date" style="width: 10%">
+            <template #body="slotProps">
+              {{ createdAt(slotProps.data.expiry_date)}}
+            </template>
+            createdAt
+          </Column>
           <Column field="status" header="Status" style="width: 10%">
             <template #body="slotProps">
               <span v-if="slotProps.data.status == 'enable'">Enable</span>
@@ -109,6 +114,8 @@ import {ref, onMounted, nextTick} from "vue";
 import { useApiFetch } from "~/composables/useApiFetch";
 import { useToast } from "primevue/usetoast";
 import { usePromoCodeStore} from "~/stores/usePromoCodeStore";
+import moment from "moment/moment";
+
 const toast = useToast();
 const PromoCodeStore = usePromoCodeStore();
 const search = ref(null);
@@ -159,6 +166,10 @@ const removeHTMLSpecialChars = (inputString) => {
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(inputString, 'text/xml');
   return xmlDoc.documentElement.textContent;
+}
+
+const createdAt = (date) => {
+  return moment(date).format('MMMM Do YYYY, h:mm:ss a')
 }
 
 </script>

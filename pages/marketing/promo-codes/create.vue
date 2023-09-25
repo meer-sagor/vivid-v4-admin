@@ -29,20 +29,14 @@
             <div class="flex flex-column gap-2 mb-0">
               <label for="description">Description</label>
               <Field name="description" v-slot="{ field }">
-                <Editor
-                    v-bind="field"
-                    v-model="promo_code.description"
-                    :class="{ 'p-invalid': errors.description }"
-                    placeholder="Enter description"
-                    editorStyle="height: 150px" >
-                  <template v-slot:toolbar>
-                    <span class="ql-formats">
-                        <button v-tooltip.bottom="'Bold'" class="ql-bold"></button>
-                        <button v-tooltip.bottom="'Italic'" class="ql-italic"></button>
-                        <button v-tooltip.bottom="'Underline'" class="ql-underline"></button>
-                    </span>
-                  </template>
-                </Editor>
+                <ClientOnly>
+                  <QuillEditor
+                      v-bind="field"
+                      v-model="promo_code.description"
+                      :class="{ 'p-invalid': errors.description }"
+                      aria-describedby="promo-code-description-error"
+                      theme="snow" />
+                </ClientOnly>
               </Field>
               <small class="p-error" id="promo-code-description-error">{{errors.description || "&nbsp;"}}</small>
             </div>

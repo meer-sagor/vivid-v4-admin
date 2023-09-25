@@ -3,10 +3,10 @@
     <h5>Update Promo code</h5>
     <template v-if="fetching">
       <Form
-        id="add_promo_code_form"
-        @submit="onSubmit"
-        :validation-schema="schema"
-        v-slot="{ errors }"
+          id="add_promo_code_form"
+          @submit="onSubmit"
+          :validation-schema="schema"
+          v-slot="{ errors }"
       >
         <div class="flex flex-row gap-3">
           <div class="col-6 mb-0">
@@ -28,20 +28,14 @@
             <div class="flex flex-column gap-2 mb-0">
               <label for="description">Description</label>
               <Field name="description" v-slot="{ field }">
-                <Editor
-                    v-bind="field"
-                    v-model="promo_code.description"
-                    :class="{ 'p-invalid': errors.description }"
-                    placeholder="Enter description"
-                    editorStyle="height: 150px" >
-                  <template v-slot:toolbar>
-                    <span class="ql-formats">
-                        <button v-tooltip.bottom="'Bold'" class="ql-bold"></button>
-                        <button v-tooltip.bottom="'Italic'" class="ql-italic"></button>
-                        <button v-tooltip.bottom="'Underline'" class="ql-underline"></button>
-                    </span>
-                  </template>
-                </Editor>
+                <ClientOnly>
+                  <QuillEditor
+                      v-bind="field"
+                      v-model="promo_code.description"
+                      :class="{ 'p-invalid': errors.description }"
+                      aria-describedby="promo-code-description-error"
+                      theme="snow" />
+                </ClientOnly>
               </Field>
               <small class="p-error" id="promo-code-description-error">{{errors.description || "&nbsp;"}}</small>
             </div>
@@ -148,7 +142,6 @@
                     v-bind="field"
                     v-model="promo_code.expiry_date"
                     dateFormat="yy-mm-dd"
-                    showIcon
                     showTime
                     hourFormat="12"
                     :class="{ 'p-invalid': errors.expiry_date }"
@@ -167,7 +160,6 @@
     </div>
   </div>
 </template>
-
 <script lang="ts">
 import { useToast } from "primevue/usetoast";
 import { Field, Form, useField, useForm } from "vee-validate";
@@ -190,8 +182,7 @@ export default defineComponent({
     const router = useRouter();
 
     const promo_code = ref({
-      name: "",
-      description: "",
+      description: '',
       discount_type: "",
       discount_amount: "",
       min_spend: "",
@@ -235,19 +226,11 @@ export default defineComponent({
 
     const schema = Yup.object().shape({
       name: Yup.string().required().min(2).max(100).label("Name"),
-      description: Yup.string().required().min(2).max(10000).label("Description"),
-      discount_type: Yup.mixed().required().label("Discount type"),
+      //description: Yup.string().required().min(2).max(10000).label("Description"),
       discount_amount: Yup.number().typeError('Discount amount is required field').required().min(2).max(10000).label("Discount amount"),
-      // min_spend: Yup.string().when('min_spend', {
-      //   is: (value: any | string | undefined | null) => value !== undefined && value !== null && value !== '',
-      //   then: Yup.string().required('Field is required'),
-      //   otherwise: Yup.string(),
-      // }),
-      // min_spend: Yup.number().typeError('Min spend is number field').nullable().label("Min spend"),
-      //max_spend: Yup.number().typeError('Max spend is number field').nullable().label("Max spend"),
       per_coupon_limit: Yup.number().typeError('Per coupon limit is number field').nullable().label("Per coupon limit"),
       per_user_limit: Yup.number().typeError('Per user limit is number field').nullable().label("Per user limit"),
-      expiry_date: Yup.mixed().required().label("Expiry date"),
+      expiry_date: Yup.mixed().typeError('Expiry date is a required field').required().label("Expiry date"),
     });
 
     const onSubmit = async (
@@ -298,6 +281,8 @@ export default defineComponent({
         resetForm.reset();
       }
     };
+
+
 
     return {
       schema,
@@ -370,5 +355,16 @@ export default defineComponent({
   background-repeat: no-repeat;
   background-position: right calc(0.375em + 0.3875rem) center;
   background-size: calc(0.75em + 0.775rem) calc(0.75em + 0.775rem);
+}
+:deep(.ql-editor) {
+  min-height: 200px;
+}
+:deep(.ql-toolbar.ql-snow) {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+:deep(.ql-container.ql-snow) {
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
 </style>
