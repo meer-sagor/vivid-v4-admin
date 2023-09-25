@@ -2,16 +2,9 @@
   <div class="card">
     <h5>Add Role</h5>
     <template v-if="fetching">
-      <Form
-        id="add_role_form"
-        @submit="onSubmit"
-        :validation-schema="schema"
-        v-slot="{ errors }"
-      >
-        <div class="grid">
-          <div class="col-6">
-            <div class="card p-fluid">
-              <div class="flex flex-column gap-2 mb-1">
+      <Form id="add_role_form" @submit="onSubmit" :validation-schema="schema" v-slot="{ errors }">
+          <div class="col-6 mb-0">
+              <div class="flex flex-column gap-2">
                 <label for="name">Role Name</label>
                 <Field
                   v-model="role.name"
@@ -22,137 +15,39 @@
                   aria-describedby="role-name-error"
                   placeholder="Role name"
                 />
-                <small class="p-error" id="role-name-error">{{
-                  errors.name || "&nbsp;"
-                }}</small>
+                <small class="p-error" id="role-name-error">{{errors.name || "&nbsp;"}}</small>
               </div>
-            </div>
           </div>
-          <div class="col-6">
-            <div class="card p-fluid">
-              <div class="flex flex-column gap-2 mb-1">
-                <label for="categories" class="mb-3">Permission Menu</label>
-
-                <Dropdown
-                  id="categories"
-                  v-model="selectedMenu"
-                  :options="permissionMenus"
-                  optionLabel="label"
-                  placeholder="Select a Category"
-                >
-                  <template #value="slotProps">
-                    <div v-if="slotProps.value && slotProps.value.value">
-                      <span
-                        :class="'product-badge status-' + slotProps.value.value"
-                        >{{ slotProps.value.label }}</span
-                      >
-                    </div>
-                    <div v-else-if="slotProps.value && !slotProps.value.value">
-                      <span
-                        :class="
-                          'product-badge status-' +
-                          slotProps.value.toLowerCase()
-                        "
-                        >{{ slotProps.value }}</span
-                      >
-                    </div>
-                    <span v-else>
-                      {{ slotProps.placeholder }}
+         <div class="col-12">
+           <div v-if="permissions.length > 0">
+             <label for="permissions">Permissions</label>
+             <div class="col-12" style="margin-bottom: 0px !important;">
+               <div v-for="(permission, index) in permissions" :key="index">
+                 <div v-for="(menu, key) in permission" :key="key" class="align-items-center mb-3">
+                   <h6 style="margin-bottom: 4px !important;">{{ key }}</h6>
+                   <span  class="flex flex-column sm:flex-row justify-content-between">
+                      <span v-for="(single_menu, index) in menu" :key="index" class="flex align-items-center">
+                      <Field
+                          type="checkbox"
+                          v-model="role.permissions"
+                          :value="single_menu.id"
+                          :id="'single_menu' + key"
+                          name="permissions"
+                          :class="{ 'p-invalid': errors.permissions }"
+                          class="p-checkbox p-component"
+                          binary
+                          aria-describedby="permissions-error"
+                      />
+                      <label :for="single_menu.name" class="ml-2">{{ single_menu.name }}</label>
                     </span>
-                  </template>
-                </Dropdown>
-
-                <label class="mb-3">Permissions</label>
-                <div class="grid">
-                  <div class="col-12 md:col-4">
-                    <div class="field-checkbox mb-0">
-                      <Checkbox
-                        id="checkOption1"
-                        v-model="selectedPermissions"
-                        name="option"
-                        value="can_create"
-                      />
-                      <label for="checkOption1">Can create</label>
-                    </div>
-                  </div>
-                  <div class="col-12 md:col-4">
-                    <div class="field-checkbox mb-0">
-                      <Checkbox
-                        id="checkOption2"
-                        v-model="selectedPermissions"
-                        name="option"
-                        value="can_edit"
-                      />
-                      <label for="checkOption2">Can edit</label>
-                    </div>
-                  </div>
-                  <div class="col-12 md:col-4">
-                    <div class="field-checkbox mb-0">
-                      <Checkbox
-                        id="checkOption3"
-                        v-model="selectedPermissions"
-                        name="option"
-                        value="can_view"
-                      />
-                      <label for="checkOption3">Can View</label>
-                    </div>
-                  </div>
-                  <div class="col-12 md:col-4">
-                    <div class="field-checkbox mb-0">
-                      <Checkbox
-                        id="checkOption4"
-                        v-model="selectedPermissions"
-                        name="option"
-                        value="can_delete"
-                      />
-                      <label for="checkOption4">Can Delete</label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div v-if="permissions.length > 0" class="flex flex-column gap-2 mb-3">
-          <label for="permissions">Permissions</label>
-          <div class="col-md-12">
-            <div class="flex flex-column sm:flex-row justify-content-between">
-              <div
-                v-for="(permission, index) in permissions"
-                :key="index"
-                class="flex align-items-center"
-              >
-                <Field
-                  type="checkbox"
-                  v-model="role.permissions"
-                  :value="permission.id"
-                  :id="'permission' + index"
-                  name="permissions"
-                  :class="{ 'p-invalid': errors.permissions }"
-                  class="p-checkbox p-component"
-                  binary
-                  aria-describedby="permissions-error"
-                />
-                <label :for="permission.name" class="ml-2">
-                  {{ permission.name }}
-                </label>
-              </div>
-            </div>
-            <div class="col-md-12">
-              <small class="p-error" id="permissions-error">{{
-                errors.permissions || "&nbsp;"
-              }}</small>
-            </div>
-          </div>
-        </div>
-        <Button
-          class=""
-          type="submit"
-          label="Submit"
-          :loading="loading"
-          icon="pi pi-check"
-        />
+                    </span>
+                 </div>
+               </div>
+               <small class="p-error" id="permissions-error">{{errors.permissions || "&nbsp;"}}</small>
+             </div>
+           </div>
+         </div>
+        <Button class="" type="submit" label="Submit" :loading="loading" icon="pi pi-check"/>
       </Form>
     </template>
     <div class="flex justify-content-center">
@@ -211,10 +106,9 @@ export default defineComponent({
       spinner.value = false;
       if (data.value) {
         fetching.value = true;
-        const getPermissions = JSON.parse(
-          JSON.stringify(computed(() => data.value).value)
-        );
+        const getPermissions = JSON.parse(JSON.stringify(computed(() => data.value).value));
         permissions.value = getPermissions.permissions;
+
       }
     };
 

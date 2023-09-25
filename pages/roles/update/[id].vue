@@ -3,24 +3,39 @@
     <h5>Add Role</h5>
     <template v-if="fetching">
       <Form id="add_role_form" @submit="onSubmit" :validation-schema="schema" v-slot="{ errors }">
-        <div class="flex flex-column gap-2 mb-1">
-          <label for="name">Role Name</label>
-          <Field v-model="role.name" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="role-name-error" placeholder="Role name"/>
-          <small class="p-error" id="role-name-error">{{ errors.name || '&nbsp;' }}</small>
+        <div class="col-6 mb-0">
+          <div class="flex flex-column gap-2">
+            <label for="name">Role Name</label>
+            <Field v-model="role.name" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="role-name-error" placeholder="Role name"/>
+            <small class="p-error" id="role-name-error">{{ errors.name || '&nbsp;' }}</small>
+          </div>
         </div>
-        <div v-if="permissions.length > 0" class="flex flex-column gap-2 mb-3">
-          <label for="permissions">Permissions</label>
-          <div class="col-md-12">
-            <div class="flex flex-column sm:flex-row justify-content-between">
-              <div v-for="(permission, index) in permissions" :key="index" class="flex align-items-center">
-                <Field type="checkbox" v-model="role.permissions" :value="permission.id" :id="'permission'+index"
-                       name="permissions" :class="{ 'p-invalid': errors.permissions }" class="p-checkbox p-component"
-                       binary aria-describedby="permissions-error"/>
-                <label :for="permission.name" class="ml-2"> {{ permission.name }} </label>
+        <div class="col-12">
+          <div v-if="permissions.length > 0">
+            <label for="permissions">Permissions</label>
+            <div class="col-12" style="margin-bottom: 0px !important;">
+              <div v-for="(permission, index) in permissions" :key="index">
+                <div v-for="(menu, key) in permission" :key="key" class="align-items-center mb-3">
+                  <h6 style="margin-bottom: 4px !important;">{{ key }}</h6>
+                  <span  class="flex flex-column sm:flex-row justify-content-between">
+                      <span v-for="(single_menu, index) in menu" :key="index" class="flex align-items-center">
+                      <Field
+                          type="checkbox"
+                          v-model="role.permissions"
+                          :value="single_menu.id"
+                          :id="'single_menu' + key"
+                          name="permissions"
+                          :class="{ 'p-invalid': errors.permissions }"
+                          class="p-checkbox p-component"
+                          binary
+                          aria-describedby="permissions-error"
+                      />
+                      <label :for="single_menu.name" class="ml-2">{{ single_menu.name }}</label>
+                    </span>
+                    </span>
+                </div>
               </div>
-            </div>
-            <div class="col-md-12">
-              <small class="p-error" id="permissions-error">{{ errors.permissions || '&nbsp;' }}</small>
+              <small class="p-error" id="permissions-error">{{errors.permissions || "&nbsp;"}}</small>
             </div>
           </div>
         </div>
