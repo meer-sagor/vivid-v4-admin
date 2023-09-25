@@ -99,8 +99,8 @@ import VirtualScroller from 'primevue/virtualscroller';
 import BlockViewer from '@/components/BlockViewer.vue';
 import CodeHighlight from '@/components/CodeHighlight.vue';
 import Editor from 'primevue/editor';
-import 'quill/dist/quill.snow.css';
-import Quill from "quill"
+// import 'quill/dist/quill.snow.css';
+// import Quill from "quill"
 
 export default defineNuxtPlugin((nuxtApp) => {
     nuxtApp.vueApp.use(PrimeVue, { ripple: true });
@@ -108,7 +108,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     nuxtApp.vueApp.use(DialogService);
     nuxtApp.vueApp.use(ConfirmationService);
 
-    nuxtApp.vueApp.directive('Quill', Quill);
+    // nuxtApp.vueApp.directive('Quill', Quill);
     nuxtApp.vueApp.directive('tooltip', Tooltip);
     nuxtApp.vueApp.directive('badge', BadgeDirective);
     nuxtApp.vueApp.directive('ripple', Ripple);
