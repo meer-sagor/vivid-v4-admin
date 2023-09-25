@@ -3,7 +3,18 @@ import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
 import { onMounted, ref , nextTick,watch, computed} from "vue";
-
+import {Field, Form, useField, useForm} from 'vee-validate';
+import * as Yup from "yup";
+const {handleSubmit, resetForm} = useForm();
+const fetching = ref(false);
+const spinner = ref(false);
+const schema = Yup.object().shape({
+  name: Yup.string().required().min(2).max(15).label("Name"),
+  order: Yup.number().typeError('Order is number field').required().label("Order"),
+  type: Yup.mixed().required().label("Type"),
+  status: Yup.mixed().required().label("status"),
+  category: Yup.mixed().required().label("category"),
+});
 const toast = useToast();
 
 const products = ref(null);
@@ -38,7 +49,7 @@ onMounted(async () => {
   await initialize();
 });
 const initialize = async (event) => {
-  // console.log(searchTerm.value);
+  spinner.value = true
   let page = 1
   if (event?.first){
     page = event.first / event.rows + 1;
@@ -46,13 +57,17 @@ const initialize = async (event) => {
   const { data, error } = await useApiFetch("/api/brands/?page=" + page + searchTerm.value, {
     method: "GET",
   });
-  console.log(data, "calling");
-  // errorMessage.value = null;
-  // if (error.value) {
-  //   errorMessage.value = error.value.data.message;
-  // }
+  spinner.value = false
+  if (error.value) {
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Something Went worng",
+      life: 3000,
+    });
+  }
   if (data.value) {
-    console.log(data.value.brands);
+    fetching.value = true
     brands.value = data.value.brands.data;
     rowsPerPage.value = data.value.brands.per_page
     totalRecords.value = data.value.brands.total
@@ -358,18 +373,10 @@ const deleteSelectedProducts = () => {
           :modal="true"
           class="p-fluid"
         >
+        <Form id="add_brands_form" @submit="saveProduct" :validation-schema="schema" v-slot="{ errors }">
           <div class="field">
-            <label for="name">Name</label>
-            <InputText
-              id="name"
-              v-model.trim="product.name"
-              required="true"
-              autofocus
-              :class="{ 'p-invalid': submitted && !product.name }"
-            />
-            <small v-if="submitted && !product.name" class="p-invalid"
-              >Name is required.</small
-            >
+            <Field v-model="product.name" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Category name"/>
+            <small class="p-error" id="brnad-name-error">{{ errors.name || '&nbsp;' }}</small>
           </div>
 
           <div class="field">
@@ -384,37 +391,27 @@ const deleteSelectedProducts = () => {
           </div>
 
           <div class="field">
-            <label for="inventoryStatus" class="mb-3">Status</label>
-            <Dropdown
-              id="inventoryStatus"
-              v-model="product.status"
-              :options="statuses"
-              optionLabel="label"
-              placeholder="Select a Status"
-            >
-              <template #value="slotProps">
-                <div v-if="slotProps.value && slotProps.value.value">
-                  <span
-                    :class="'product-badge status-' + slotProps.value.value"
-                    >{{ slotProps.value.label }}</span
-                  >
-                </div>
-                <div v-else-if="slotProps.value && !slotProps.value.value">
-                  <span
-                    :class="
-                      'product-badge status-' + slotProps.value.toLowerCase()
-                    "
-                    >{{ slotProps.value }}</span
-                  >
-                </div>
-                <span v-else>
-                  {{ slotProps.placeholder }}
-                </span>
-              </template>
-            </Dropdown>
-          </div>
-
-          <template #footer>
+              <label for="status" class="mb-3">Status</label>
+              <Field name="status" v-slot="{ field }">
+                <Dropdown
+                  v-bind="field"
+                  v-model="product.status"
+                  :options="statuses"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select a status"
+                  display="chip"
+                  :class="{ 'p-invalid': errors.status }"
+                  aria-describedby="brand-code-status-error"
+                ></Dropdown>
+              </Field>
+              <small class="p-error" id="brand-code-status-error">{{
+                errors.status || "&nbsp;"
+              }}</small>
+            </div>
+          <Button class="" type="submit" label="Submit"  icon="pi pi-check"/>
+        </Form>
+          <!-- <template #footer>
             <Button
               label="Cancel"
               icon="pi pi-times"
@@ -427,7 +424,7 @@ const deleteSelectedProducts = () => {
               class="p-button-text"
               @click="saveProduct"
             />
-          </template>
+          </template> -->
         </Dialog>
 
         <Dialog
