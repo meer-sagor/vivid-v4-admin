@@ -332,6 +332,16 @@
     "@esbuild-kit/core-utils" "^3.0.0"
     "get-tsconfig" "^4.4.0"
 
+"@esbuild/win32-x64@0.17.19":
+  "integrity" "sha512-lAhycmKnVOuRYNtRtatQR1LPQf2oYCkRGkSFnseDAKPl8lu5SOsK/e1sXe5a0Pc5kHIHe6P2I/ilntNv2xf3cA=="
+  "resolved" "https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.17.19.tgz"
+  "version" "0.17.19"
+
+"@esbuild/win32-x64@0.18.20":
+  "integrity" "sha512-kTdfRcSiDfQca/y9QIkng02avJ+NCaQvrMejlsB3RRv5sE9rRoeBPISaZpKxHELzRxZyLvNts1P27W3wV+8geQ=="
+  "resolved" "https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.18.20.tgz"
+  "version" "0.18.20"
+
 "@eslint-community/eslint-utils@^4.2.0", "@eslint-community/eslint-utils@^4.4.0":
   "integrity" "sha512-1/sA4dwrzBAyeUoQ6oxahHKmrZvsnLCg4RfxW3ZFGGmQkSNQPFNLV9CUEFQP1x9EYXHTo5p6xdhZM1Ne9p/AfA=="
   "resolved" "https://registry.npmjs.org/@eslint-community/eslint-utils/-/eslint-utils-4.4.0.tgz"
@@ -749,6 +759,11 @@
     "micromatch" "^4.0.5"
     "napi-wasm" "^1.1.0"
 
+"@parcel/watcher-win32-x64@2.2.0":
+  "integrity" "sha512-JqGW0RJ61BkKx+yYzIURt9s53P7xMVbv0uxYPzAXLBINGaFmkIKSuUPyBVfy8TMbvp93lvF4SPBNDzVRJfvgOw=="
+  "resolved" "https://registry.npmjs.org/@parcel/watcher-win32-x64/-/watcher-win32-x64-2.2.0.tgz"
+  "version" "2.2.0"
+
 "@parcel/watcher@^2.1.0", "@parcel/watcher@^2.2.0":
   "integrity" "sha512-71S4TF+IMyAn24PK4KSkdKtqJDR3zRzb0HE3yXpacItqTM7XfF2f5q9NEGLEVl0dAaBAGfNwDCjH120y25F6Tg=="
   "resolved" "https://registry.npmjs.org/@parcel/watcher/-/watcher-2.2.0.tgz"
@@ -1075,7 +1090,8 @@
   "resolved" "https://registry.npmjs.org/@tiptap/extension-text/-/extension-text-2.1.11.tgz"
   "version" "2.1.11"
 
-"@tiptap/pm@^2.0.0":
+
+"@tiptap/pm@^2.0.0", "@tiptap/pm@^2.1.11":
   "integrity" "sha512-vBIAic+H8fjHfT8r2qJkAOxdx1Iiss9+qMyujAoIdPkiyjEc4+sXcM0qSYgIr6KL5icITyuK8J7x/V62VfB7Uw=="
   "resolved" "https://registry.npmjs.org/@tiptap/pm/-/pm-2.1.11.tgz"
   "version" "2.1.11"

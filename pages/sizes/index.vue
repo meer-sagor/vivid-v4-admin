@@ -3,7 +3,8 @@ import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
 import { onMounted, ref ,nextTick,watch, computed} from "vue";
-
+const fetching = ref(false);
+const spinner = ref(false);
 const toast = useToast();
 const sizes = ref([]);
 const rowsPerPage = ref(0)
@@ -38,6 +39,7 @@ onMounted(async () => {
   await initialize();
 });
 const initialize = async (event) => {
+  spinner.value = true
   let page = 1
   if (event?.first){
     page = event.first / event.rows + 1;
@@ -45,13 +47,17 @@ const initialize = async (event) => {
   const { data, error } = await useApiFetch("/api/sizes/?page=" + page + searchTerm.value, {
     method: "GET",
   });
-  // console.log(data, "calling");
-  // errorMessage.value = null;
-  // if (error.value) {
-  //   errorMessage.value = error.value.data.message;
-  // }
+  spinner.value = false
+  if (error.value) {
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Something Went worng",
+      life: 3000,
+    });
+  }
   if (data.value) {
-    //   console.log(data.value.brands);
+    fetching.value = true
     sizes.value = data.value.sizes.data;
     console.log(data.value.sizes);
     rowsPerPage.value = data.value.sizes.per_page
@@ -224,7 +230,7 @@ const deleteSelectedProducts = () => {
 
 <template>
   <div class="grid">
-    <div class="col-12">
+    <div class="col-12" v-if="fetching">
       <div class="card">
         <Toast />
         <DataTable
@@ -354,9 +360,9 @@ const deleteSelectedProducts = () => {
           class="p-fluid"
         >
           <div class="field">
-            <label for="name">Order</label>
+            <label for="order">Order</label>
             <InputNumber
-              id="name"
+              id="order"
               v-model.trim="product.order"
               mode="decimal"
               required="true"
@@ -402,8 +408,13 @@ const deleteSelectedProducts = () => {
               <InputNumber
                 id="quantity"
                 v-model="product.length"
+                :class="{ 'p-invalid': submitted && !product.length }"
+                :required="true"
                 integeronly
               />
+              <small v-if="submitted && !product.length" class="p-invalid"
+                >Length is required.</small
+              >
             </div>
           </div>
 
@@ -415,6 +426,8 @@ const deleteSelectedProducts = () => {
               :options="statuses"
               optionLabel="label"
               placeholder="Select a Status"
+              :class="{ 'p-invalid': submitted && !product.status }"
+              :required="true"
             >
               <template #value="slotProps">
                 <div v-if="slotProps.value && slotProps.value.value">
@@ -436,6 +449,9 @@ const deleteSelectedProducts = () => {
                 </span>
               </template>
             </Dropdown>
+            <small v-if="submitted && !product.status" class="p-invalid"
+                >Status is required.</small
+              >
           </div>
 
           <template #footer>
@@ -485,6 +501,11 @@ const deleteSelectedProducts = () => {
             />
           </template>
         </Dialog>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="flex justify-content-center">
+        <ProgressSpinner v-if="spinner"/>
       </div>
     </div>
   </div>

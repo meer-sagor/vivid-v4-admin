@@ -8,12 +8,9 @@ import * as Yup from "yup";
 const {handleSubmit, resetForm} = useForm();
 const fetching = ref(false);
 const spinner = ref(false);
-const schema = Yup.object().shape({
+const schema = Yup.object({
   name: Yup.string().required().min(2).max(15).label("Name"),
-  order: Yup.number().typeError('Order is number field').required().label("Order"),
-  type: Yup.mixed().required().label("Type"),
   status: Yup.mixed().required().label("status"),
-  category: Yup.mixed().required().label("category"),
 });
 const toast = useToast();
 
@@ -261,7 +258,7 @@ const deleteSelectedProducts = () => {
 
 <template>
   <div class="grid">
-    <div class="col-12">
+    <div class="col-12" v-if="fetching">
       <div class="card">
         <Toast />
         <DataTable
@@ -391,24 +388,24 @@ const deleteSelectedProducts = () => {
           </div>
 
           <div class="field">
-              <label for="status" class="mb-3">Status</label>
-              <Field name="status" v-slot="{ field }">
-                <Dropdown
-                  v-bind="field"
-                  v-model="product.status"
-                  :options="statuses"
-                  optionLabel="label"
-                  optionValue="value"
-                  placeholder="Select a status"
-                  display="chip"
-                  :class="{ 'p-invalid': errors.status }"
-                  aria-describedby="brand-code-status-error"
-                ></Dropdown>
-              </Field>
-              <small class="p-error" id="brand-code-status-error">{{
-                errors.status || "&nbsp;"
-              }}</small>
-            </div>
+            <label for="status" class="mb-3">Status</label>
+            <Field name="status" v-slot="{ field }">
+              <Dropdown
+                v-bind="field"
+                v-model="product.status"
+                :options="statuses"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Select a status"
+                display="chip"
+                :class="{ 'p-invalid': errors.status }"
+                aria-describedby="brand-code-status-error"
+              ></Dropdown>
+            </Field>
+            <small class="p-error" id="brand-code-status-error">{{
+              errors.status || "&nbsp;"
+            }}</small>
+          </div>
           <Button class="" type="submit" label="Submit"  icon="pi pi-check"/>
         </Form>
           <!-- <template #footer>
@@ -458,6 +455,11 @@ const deleteSelectedProducts = () => {
             />
           </template>
         </Dialog>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="flex justify-content-center">
+        <ProgressSpinner v-if="spinner"/>
       </div>
     </div>
   </div>

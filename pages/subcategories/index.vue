@@ -8,10 +8,9 @@ import * as Yup from "yup";
 const {handleSubmit, resetForm} = useForm();
 const fetching = ref(false);
 const spinner = ref(false);
-const schema = Yup.object().shape({
+const schema = Yup.object({
   name: Yup.string().required().min(2).max(15).label("Name"),
   order: Yup.number().typeError('Order is number field').required().label("Order"),
-  type: Yup.mixed().required().label("Type"),
   status: Yup.mixed().required().label("status"),
   category: Yup.mixed().required().label("category"),
 });
@@ -568,7 +567,7 @@ const onUpload = () => {
         >
           <Form id="add_category_form" @submit="saveProduct" :validation-schema="schema" v-slot="{ errors }">
             <div class="field">
-              <label for="name">Order</label>
+              <label for="order">Order</label>
               <Field v-model="product.order" id="order" name="order" :class="{ 'p-invalid': errors.order }" class="p-inputtext p-component" aria-describedby="category-order-error" placeholder="Sub Category Order"/>
               <small class="p-error" id="category-order-error">{{ errors.order || '&nbsp;' }}</small>
             </div>
