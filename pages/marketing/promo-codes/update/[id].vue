@@ -2,12 +2,7 @@
   <div class="card">
     <h5>Update Promo code</h5>
     <template v-if="fetching">
-      <Form
-          id="add_promo_code_form"
-          @submit="onSubmit"
-          :validation-schema="schema"
-          v-slot="{ errors }"
-      >
+      <Form id="add_promo_code_form" @submit="onSubmit" :validation-schema="schema" v-slot="{ errors }">
         <div class="flex flex-row gap-3">
           <div class="col-6 mb-0">
             <div class="flex flex-column gap-2 mb-0">
@@ -27,17 +22,16 @@
           <div class="col-6 mb-0">
             <div class="flex flex-column gap-2 mb-0">
               <label for="description">Description</label>
-              <Field name="description" v-slot="{ field }">
-                <ClientOnly>
-                  <QuillEditor
-                      v-bind="field"
-                      v-model="promo_code.description"
-                      :class="{ 'p-invalid': errors.description }"
-                      aria-describedby="promo-code-description-error"
-                      theme="snow" />
-                </ClientOnly>
-              </Field>
-              <small class="p-error" id="promo-code-description-error">{{errors.description || "&nbsp;"}}</small>
+              <ClientOnly>
+                <QuillEditor
+                    :content="promo_code.description"
+                    ref="editor"
+                    v-model.content="promo_code.description"
+                    theme="snow"
+                    content-type="html"
+                    :style="{ height: '200px' }"
+                    @update:content="handleChange"/>
+              </ClientOnly>
             </div>
           </div>
         </div>
@@ -142,13 +136,9 @@
                     v-bind="field"
                     v-model="promo_code.expiry_date"
                     dateFormat="yy-mm-dd"
-                    showTime
-                    hourFormat="12"
-                    :class="{ 'p-invalid': errors.expiry_date }"
                     placeholder="Select expiry date"
                 />
               </Field>
-              <small class="p-error" id="promo-per-user-limit-error">{{ errors.expiry_date || '&nbsp;' }}</small>
             </div>
           </div>
         </div>
@@ -182,7 +172,8 @@ export default defineComponent({
     const router = useRouter();
 
     const promo_code = ref({
-      description: '',
+      name: "",
+      description: "",
       discount_type: "",
       discount_amount: "",
       min_spend: "",
@@ -226,17 +217,25 @@ export default defineComponent({
 
     const schema = Yup.object().shape({
       name: Yup.string().required().min(2).max(100).label("Name"),
-      //description: Yup.string().required().min(2).max(10000).label("Description"),
       discount_amount: Yup.number().typeError('Discount amount is required field').required().min(2).max(10000).label("Discount amount"),
+      min_spend: Yup.number().nullable().transform((v, o) => (o === '' ? null : v)).typeError('Min spend is must be a number field').min(1).max(100).label("Min spend"),
+      max_spend: Yup.number().nullable().transform((v, o) => (o === '' ? null : v)).typeError('Max spend is must be a number field').min(1).max(100).label("Max spend"),
       per_coupon_limit: Yup.number().typeError('Per coupon limit is number field').nullable().label("Per coupon limit"),
       per_user_limit: Yup.number().typeError('Per user limit is number field').nullable().label("Per user limit"),
-      expiry_date: Yup.mixed().typeError('Expiry date is a required field').required().label("Expiry date"),
     });
 
-    const onSubmit = async (
-      values: any,
-      actions: { setErrors: (arg0: any) => void }
-    ) => {
+    const onSubmit = async (values: any, actions: { setErrors: (arg0: any) => void }) => {
+
+      if (promo_code.value.description == null || promo_code.value.description == '') {
+        toast.add({
+          severity: "info",
+          summary: "Danger",
+          detail: 'Description is a required field',
+          life: 3000,
+        });
+        return;
+      }
+
       loading.value = true;
 
       const { data, error } = await useApiFetch("/api/promo-codes/" + route.params.id, {
@@ -244,12 +243,8 @@ export default defineComponent({
         body: promo_code.value,
       });
       loading.value = false;
-      const data_obj = JSON.parse(
-        JSON.stringify(computed(() => data.value).value)
-      );
-      const error_obj = JSON.parse(
-        JSON.stringify(computed(() => error.value).value)
-      );
+      const data_obj = JSON.parse(JSON.stringify(computed(() => data.value).value));
+      const error_obj = JSON.parse(JSON.stringify(computed(() => error.value).value));
 
       if (error_obj && Object.keys(error_obj).length > 0) {
         const errorList = error_obj.data.errors;
@@ -257,9 +252,7 @@ export default defineComponent({
       }
 
       if (data.value) {
-        const message = JSON.parse(
-          JSON.stringify(computed(() => data_obj.message).value)
-        );
+        const message = JSON.parse(JSON.stringify(computed(() => data_obj.message).value));
         toast.add({
           severity: "info",
           summary: "Success",
@@ -274,15 +267,15 @@ export default defineComponent({
     };
 
     const resetModal = () => {
-      const resetForm = document.getElementById(
-        "add_promo_code_form"
-      ) as HTMLFormElement;
+      const resetForm = document.getElementById("add_promo_code_form") as HTMLFormElement;
       if (resetForm) {
         resetForm.reset();
       }
     };
 
-
+    const handleChange = (value: any) => {
+      promo_code.value.description = value
+    };
 
     return {
       schema,
@@ -294,6 +287,7 @@ export default defineComponent({
       resetModal,
       status_enums,
       discount_type_enums,
+      handleChange,
     };
   },
 });
