@@ -118,7 +118,7 @@ export default defineComponent({
 
       if (font_category.value.description == null || font_category.value.description == '') {
         toast.add({
-          severity: "info",
+          severity: "error",
           summary: "Danger",
           detail: 'Description is a required field',
           life: 3000,
