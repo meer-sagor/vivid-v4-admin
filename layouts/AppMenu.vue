@@ -163,6 +163,11 @@ const model = ref([
         to: "/associates",
       },
       {
+        label: "Manage Customers",
+        icon: "pi pi-fw pi-desktop",
+        to: "/customers",
+      },
+      {
         label: "Manage Roles",
         icon: "pi pi-fw pi-desktop",
         to: "/roles",
