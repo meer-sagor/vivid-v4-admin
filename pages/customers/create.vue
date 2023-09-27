@@ -109,7 +109,12 @@ export default defineComponent({
       user_name: Yup.string().required().min(2).max(100).label("User name"),
       email: Yup.string().email().required().min(2).max(100).label("Email"),
       password: Yup.string().required().min(6).max(10).label("Password"),
-      phone: Yup.string().required().min(6).max(10).label("Phone"),
+      phone: Yup.string().nullable().transform((v, o) => (o === '' ? null : v)).typeError('Phone no. is a number field')
+          .test('is-digit-range', 'Phone no. must have between 8 and 16 digits', value => {
+            if (!value) return true; // Allow empty values
+            const numericValue = parseInt(value, 10);
+            return numericValue >= 10 ** 7 && numericValue <= 10 ** 16;
+          }).label("Phone"),
       // roles: Yup.mixed().required().label("Role"),
       image: Yup.mixed().required().label("Image"),
     }, [

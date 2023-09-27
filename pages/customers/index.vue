@@ -4,6 +4,8 @@ import { useAssociatesStore } from "@/stores/useAssociatesStore";
 import { useApiFetch } from "@/composables/useApiFetch";
 import { useToast } from "primevue/usetoast";
 import {FilterMatchMode} from "primevue/api";
+const { $swal } = useNuxtApp()
+
 const toast = useToast();
 const associatesStore = useAssociatesStore();
 const search = ref(null);
@@ -67,6 +69,33 @@ const deleteAssociate = async () => {
     await fetchAssociates()
   }
 };
+
+const updateStatus = (customer) => {
+  $swal.fire({
+    title: "Confirm",
+    text: `Are you sure to update "${customer.name}" status?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#F85606',
+    cancelButtonColor: '#525252',
+    confirmButtonText: 'Yes, Changed it!',
+    cancelButtonText: 'No, cancel!',
+    buttonsStyling: true
+  }).then(async function (isConfirm) {
+    if (isConfirm.value === true) {
+      await useApiFetch("/api/customer/status" , {
+        method: "POST",
+        body: {
+          id: customer.id,
+          status: customer.status,
+        },
+      });
+
+      await fetchAssociates()
+    }
+  });
+}
+
 </script>
 <template>
   <div class="grid p-fluid">
@@ -140,8 +169,20 @@ const deleteAssociate = async () => {
           <Column field="dob" header="Birth date" style="width: 20%"></Column>
           <Column field="status" header="Status" style="width: 10%">
             <template #body="slotProps">
-              <span v-if="slotProps.data.status == 1">Active</span>
-              <span v-if="slotProps.data.status == 0">Inactive</span>
+              <div class="flex d-flex">
+                <div style="margin-right: 4px !important; margin-top: 3px !important;">
+                  <span v-if="slotProps.data.status == '1'">Active</span>
+                  <span v-if="slotProps.data.status == '0'">Inactive</span>
+                </div>
+                <input
+                    type="checkbox"
+                    :checked="slotProps.data.status == '1'"
+                    :id="'checkbox_' + slotProps.data.id"
+                    :name="'checkbox_' + slotProps.data.id"
+                    @change="updateStatus(slotProps.data)"
+                />
+
+              </div>
             </template>
           </Column>
           <Column :exportable="false" style="min-width: 8rem">
