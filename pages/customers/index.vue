@@ -118,11 +118,11 @@ const deleteAssociate = async () => {
           </template>
 
           <Column field="id" header="ID" style="width: 5%"></Column>
-          <!-- <Column header="Image" style="width: 10%">
+          <Column header="Image" style="width: 10%">
             <template #body="slotProps">
               <Image :src="slotProps.data.media?.url" alt="image" width="80" class="w-6rem shadow-2 border-round" preview />
             </template>
-          </Column> -->
+          </Column>
           <Column field="full_name" header="Full Name" style="width: 20%">
             <template #body="slotProps">
               <span class="p-column-title">Name</span>
@@ -133,10 +133,10 @@ const deleteAssociate = async () => {
           <Column field="email" header="Email" style="width: 20%"></Column>
           <Column field="phone" header="Phone" style="width: 20%"></Column>
           <Column field="dob" header="Birth date" style="width: 20%"></Column>
-          <Column field="Status" header="Status" style="width: 10%">
+          <Column field="status" header="Status" style="width: 10%">
             <template #body="slotProps">
-              <span v-if="slotProps.data.Status == 1">Active</span>
-              <span v-if="slotProps.data.Status == 0">Inactive</span>
+              <span v-if="slotProps.data.status == 1">Active</span>
+              <span v-if="slotProps.data.status == 0">Inactive</span>
             </template>
           </Column>
           <Column :exportable="false" style="min-width: 8rem">

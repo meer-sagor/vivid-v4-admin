@@ -1,6 +1,6 @@
 <template>
   <div class="card">
-    <h5>Add Associate</h5>
+    <h5>Edit Customers</h5>
     <template v-if="fetching">
       <Form id="add_associate_form" @submit="onSubmit" :validation-schema="schema" v-slot="{ errors }">
         <div class="flex flex-column gap-2 mb-1">
@@ -182,7 +182,7 @@ export default defineComponent({
           detail: message,
           life: 3000,
         });
-        await router.push({ path: "/associates" });
+        await router.push({ path: "/customers" });
 
         resetModal();
         resetForm()
