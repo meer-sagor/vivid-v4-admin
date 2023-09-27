@@ -43,7 +43,7 @@
           <Column field="name" header="Name" style="width: 20%"></Column>
           <Column field="description" header="Description" style="width: 25%">
             <template #body="slotProps">
-              {{ removeHTMLSpecialChars(slotProps.data.description) }}
+              <span v-html="slotProps.data.description"></span>
             </template>
           </Column>
           <Column field="discount_type" header="Discount Type" style="width: 10%"></Column>

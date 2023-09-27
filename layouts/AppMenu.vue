@@ -91,41 +91,45 @@ const model = ref([
       // },
     ],
   },
-  // {
-  //   label: "Design Studio",
-  //   items: [
-  //     {
-  //       label: "Manage Cliparts",
-  //       icon: "pi pi-fw pi-eye",
-  //       to: "/dummy",
-  //       badge: "NEW",
-  //     },
-  //     {
-  //       label: "Ink Colors",
-  //       icon: "pi pi-fw pi-globe",
-  //       url: "https://www.primefaces.org/primeblocks-vue",
-  //       target: "_blank",
-  //     },
-  //     {
-  //       label: "Fonts",
-  //       icon: "pi pi-fw pi-globe",
-  //       url: "https://www.primefaces.org/primeblocks-vue",
-  //       target: "_blank",
-  //     },
-  //     {
-  //       label: "Designs",
-  //       icon: "pi pi-fw pi-globe",
-  //       url: "https://www.primefaces.org/primeblocks-vue",
-  //       target: "_blank",
-  //     },
-  //     {
-  //       label: "Template Designs",
-  //       icon: "pi pi-fw pi-globe",
-  //       url: "https://www.primefaces.org/primeblocks-vue",
-  //       target: "_blank",
-  //     },
-  //   ],
-  // },
+  {
+    label: "Design Studio",
+    items: [
+      // {
+      //   label: "Manage Cliparts",
+      //   icon: "pi pi-fw pi-eye",
+      //   to: "/dummy",
+      //   badge: "NEW",
+      // },
+      // {
+      //   label: "Ink Colors",
+      //   icon: "pi pi-fw pi-globe",
+      //   url: "https://www.primefaces.org/primeblocks-vue",
+      //   target: "_blank",
+      // },
+      {
+        label: "Font Categories",
+        icon: "pi pi-fw pi-globe",
+        to: "/fonts/categories",
+      },
+      {
+        label: "Fonts",
+        icon: "pi pi-fw pi-globe",
+        to: "/fonts",
+      },
+      // {
+      //   label: "Designs",
+      //   icon: "pi pi-fw pi-globe",
+      //   url: "https://www.primefaces.org/primeblocks-vue",
+      //   target: "_blank",
+      // },
+      // {
+      //   label: "Template Designs",
+      //   icon: "pi pi-fw pi-globe",
+      //   url: "https://www.primefaces.org/primeblocks-vue",
+      //   target: "_blank",
+      // },
+    ],
+  },
   // {
   //   label: "Embroidery Section",
   //   items: [
@@ -161,6 +165,11 @@ const model = ref([
         label: "Manage Associates",
         icon: "pi pi-fw pi-desktop",
         to: "/associates",
+      },
+      {
+        label: "Manage Customers",
+        icon: "pi pi-fw pi-desktop",
+        to: "/customers",
       },
       {
         label: "Manage Roles",
