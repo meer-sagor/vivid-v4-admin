@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /VividCustoms-Admin
+cd /var/www/VividCustoms-Admin
 
 npm run generate
 pm2 delete all
