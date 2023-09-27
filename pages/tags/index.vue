@@ -165,6 +165,7 @@ const saveTag = async () => {
 
 const editTag = (editTag) => {
   product.value = { ...editTag };
+  product.value.status = product.value.status.toUpperCase()
   console.log(product.value);
   tagDialog.value = true;
 };
