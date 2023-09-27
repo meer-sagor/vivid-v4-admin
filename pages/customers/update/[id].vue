@@ -23,41 +23,15 @@
           <Field v-model="associate.email" id="email" name="email" :class="{ 'p-invalid': errors.email }" class="p-inputtext p-component" aria-describedby="associate-email-error" placeholder="Email address"/>
           <small class="p-error" id="associate-email-error">{{ errors.email || '&nbsp;' }}</small>
         </div>
-        <!-- <div class="flex flex-column gap-2 mb-1">
-          <label for="password">Password</label>
-          <Field v-model="associate.password" id="password" name="password" :class="{ 'p-invalid': errors.password }" class="p-inputtext p-component" aria-describedby="associate-password-error" placeholder="Password"/>
-          <small class="p-error" id="associate-password-error">{{ errors.password || '&nbsp;' }}</small>
-        </div> -->
         <div class="flex flex-column gap-2 mb-1">
           <label for="phone">User Phone</label>
           <Field v-model="associate.phone" id="phone" name="phone" :class="{ 'p-invalid': errors.phone }" class="p-inputtext p-component" aria-describedby="associate-phone-error" placeholder="User phone"/>
           <small class="p-error" id="associate-phone-error">{{ errors.phone || '&nbsp;' }}</small>
         </div>
-        <div class="flex flex-column gap-2 mb-1">
+        <div class="flex flex-column gap-2 mb-3">
           <label for="dob">Date of Birth</label>
           <Calendar v-model="associate.dob" dateFormat="yy-mm-dd" showIcon/>
         </div>
-        <!-- <div class="flex flex-column gap-2 mb-1">
-          <label for="associates">Role</label>
-          <Field name="roles" v-slot="{ field }">
-            <Dropdown
-                v-bind="field"
-                v-model="associate.roles"
-                :options="userRoles"
-                optionLabel="name"
-                optionValue="id"
-                placeholder="Select a role"
-                display="chip"
-                :class="{ 'p-invalid': errors.roles }"
-                aria-describedby="associate-roles-error"
-            ></Dropdown>
-          </Field>
-          <small class="p-error" id="associate-roles-error">{{ errors.roles || '&nbsp;' }}</small>
-        </div> -->
-        <!-- <div class="flex flex-column gap-2 mb-3">
-          <label for="image">Image</label>
-          <Field type="file" id="image" name="image" @change="handleImageSelected" class="form-control"  placeholder="Select image"/>
-        </div> -->
         <Button class="" type="submit" label="Submit" :loading="loading" icon="pi pi-check"/>
       </Form>
     </template>
@@ -97,7 +71,6 @@ export default defineComponent({
       image: "",
       phone:'',
       dob: "",
-      // roles: '',
       username:"",
     });
 
@@ -108,10 +81,12 @@ export default defineComponent({
       last_name: Yup.string().required().min(2).max(100).label("Last name"),
       username: Yup.string().required().min(2).max(100).label("User name"),
       email: Yup.string().email().required().min(2).max(100).label("Email"),
-      // password: Yup.string().required().min(6).max(10).label("Password"),
-      phone: Yup.string().required().min(6).max(10).label("Phone"),
-      // roles: Yup.mixed().required().label("Role"),
-      // image: Yup.mixed().required().label("Image"),
+      phone: Yup.string().nullable().transform((v, o) => (o === '' ? null : v)).typeError('Phone no. is a number field')
+          .test('is-digit-range', 'Phone no. must have between 8 and 16 digits', value => {
+            if (!value) return true; // Allow empty values
+            const numericValue = parseInt(value, 10);
+            return numericValue >= 10 ** 7 && numericValue <= 10 ** 16;
+          }).label("Phone"),
     });
 
     onMounted(async () => {
