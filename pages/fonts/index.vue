@@ -171,7 +171,6 @@ const updateStatus = (font) => {
     buttonsStyling: true
   }).then(async function (isConfirm) {
     if (isConfirm.value === true) {
-      console.log(font)
       await useApiFetch("/api/font/status" , {
         method: "POST",
         body: {

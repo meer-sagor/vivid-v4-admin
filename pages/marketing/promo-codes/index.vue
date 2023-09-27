@@ -56,8 +56,20 @@
           </Column>
           <Column field="status" header="Status" style="width: 10%">
             <template #body="slotProps">
-              <span v-if="slotProps.data.status == 'enable'">Enable</span>
-              <span v-if="slotProps.data.status == 'disable'">Disable</span>
+              <div class="flex d-flex">
+                <div style="margin-right: 4px !important; margin-top: 3px !important;">
+                  <span v-if="slotProps.data.status == 'enable'">Enable</span>
+                  <span v-if="slotProps.data.status == 'disable'">Disable</span>
+                </div>
+                <input
+                    type="checkbox"
+                    :checked="slotProps.data.status == 'enable'"
+                    :id="'checkbox_' + slotProps.data.status.id"
+                    :name="'checkbox_' + slotProps.data.status.id"
+                    @change="updateStatus(slotProps.data)"
+                />
+
+              </div>
             </template>
           </Column>
           <Column :exportable="false" style="width: 10%">
@@ -115,7 +127,7 @@ import { useApiFetch } from "~/composables/useApiFetch";
 import { useToast } from "primevue/usetoast";
 import { usePromoCodeStore} from "~/stores/usePromoCodeStore";
 import moment from "moment/moment";
-
+const { $swal } = useNuxtApp()
 const toast = useToast();
 const PromoCodeStore = usePromoCodeStore();
 const search = ref(null);
@@ -162,14 +174,35 @@ const deletePromoCode = async () => {
     await fetchPromoCodes()
   }
 };
-const removeHTMLSpecialChars = (inputString) => {
-  const parser = new DOMParser();
-  const xmlDoc = parser.parseFromString(inputString, 'text/xml');
-  return xmlDoc.documentElement.textContent;
-}
 
 const createdAt = (date) => {
   return moment(date).format('MMMM Do YYYY, h:mm:ss a')
+}
+
+const updateStatus = (promo_code) => {
+  $swal.fire({
+    title: "Confirm",
+    text: `Are you sure to update "${promo_code.name}" status?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#F85606',
+    cancelButtonColor: '#525252',
+    confirmButtonText: 'Yes, Changed it!',
+    cancelButtonText: 'No, cancel!',
+    buttonsStyling: true
+  }).then(async function (isConfirm) {
+    if (isConfirm.value === true) {
+      await useApiFetch("/api/promo-code/status" , {
+        method: "POST",
+        body: {
+          id: promo_code.id,
+          status: promo_code.status.toUpperCase(),
+        },
+      });
+
+      await fetchPromoCodes()
+    }
+  });
 }
 
 </script>

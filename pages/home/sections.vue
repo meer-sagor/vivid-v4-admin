@@ -46,8 +46,20 @@
           <Column field="view_all_url" header="Url" style="width: 15%"></Column>
           <Column field="status" header="Status" style="width: 10%">
             <template #body="slotProps">
-              <span v-if="slotProps.data.status == 'enable'">Enable</span>
-              <span v-if="slotProps.data.status == 'disable'">Disable</span>
+              <div class="flex d-flex">
+                <div style="margin-right: 4px !important; margin-top: 3px !important;">
+                  <span v-if="slotProps.data.status == 'enable'">Enable</span>
+                  <span v-if="slotProps.data.status == 'disable'">Disable</span>
+                </div>
+                <input
+                    type="checkbox"
+                    :checked="slotProps.data.status == 'enable'"
+                    :id="'checkbox_' + slotProps.data.status.id"
+                    :name="'checkbox_' + slotProps.data.status.id"
+                    @change="updateStatus(slotProps.data)"
+                />
+
+              </div>
             </template>
           </Column>
           <Column :exportable="false" style="min-width: 8rem">
@@ -105,6 +117,7 @@ import { useRolesStore } from "@/stores/useRolesStore";
 import { useApiFetch } from "@/composables/useApiFetch";
 import { useToast } from "primevue/usetoast";
 import {useHomeSectionStore} from "~/stores/useHomeSectionStore";
+const { $swal } = useNuxtApp()
 const toast = useToast();
 const HomeSectionStore = useHomeSectionStore();
 const search = ref(null);
@@ -151,6 +164,32 @@ const deleteHomeSection = async () => {
     await fetchHomeSections()
   }
 };
+
+const updateStatus = (home_section) => {
+  $swal.fire({
+    title: "Confirm",
+    text: `Are you sure to update "${home_section.name}" status?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#F85606',
+    cancelButtonColor: '#525252',
+    confirmButtonText: 'Yes, Changed it!',
+    cancelButtonText: 'No, cancel!',
+    buttonsStyling: true
+  }).then(async function (isConfirm) {
+    if (isConfirm.value === true) {
+      await useApiFetch("/api/home-section/status" , {
+        method: "POST",
+        body: {
+          id: home_section.id,
+          status: home_section.status.toUpperCase(),
+        },
+      });
+
+      await fetchHomeSections()
+    }
+  });
+}
 
 </script>
 
