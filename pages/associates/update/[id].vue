@@ -18,7 +18,7 @@
           <Field v-model="associate.email" id="email" name="email" :class="{ 'p-invalid': errors.email }" class="p-inputtext p-component" aria-describedby="associate-email-error" placeholder="Email address"/>
           <small class="p-error" id="associate-email-error">{{ errors.email || '&nbsp;' }}</small>
         </div>
-        <div class="flex flex-column gap-2 mb-1">
+        <div class="flex flex-column gap-2 mb-3">
           <label for="roles">Role</label>
           <Field name="roles" v-slot="{ field }">
             <Dropdown
@@ -29,11 +29,8 @@
                 optionValue="id"
                 placeholder="Select a role"
                 display="chip"
-                :class="{ 'p-invalid': errors.roles }"
-                aria-describedby="associate-roles-error"
             ></Dropdown>
           </Field>
-          <small class="p-error" id="associate-roles-error">{{ errors.roles || '&nbsp;' }}</small>
         </div>
         <Button class="" type="submit" label="Submit" :loading="loading" icon="pi pi-check"/>
       </Form>
@@ -79,7 +76,6 @@ export default defineComponent({
       first_name: Yup.string().required().min(2).max(100).label("First name"),
       last_name: Yup.string().required().min(2).max(100).label("Last name"),
       email: Yup.string().email().required().min(2).max(100).label("Email"),
-      roles: Yup.mixed().required().label("Role"),
     });
 
     onMounted(async () => {
