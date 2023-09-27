@@ -98,8 +98,11 @@ import VirtualScroller from 'primevue/virtualscroller';
 
 import BlockViewer from '@/components/BlockViewer.vue';
 import CodeHighlight from '@/components/CodeHighlight.vue';
+import Editor from 'primevue/editor';
+import '@vueup/vue-quill/dist/vue-quill.snow.css';
 
-export default defineNuxtPlugin((nuxtApp) => {
+
+export default defineNuxtPlugin(async (nuxtApp) => {
     nuxtApp.vueApp.use(PrimeVue, { ripple: true });
     nuxtApp.vueApp.use(ToastService);
     nuxtApp.vueApp.use(DialogService);
@@ -202,4 +205,12 @@ export default defineNuxtPlugin((nuxtApp) => {
     nuxtApp.vueApp.component('TreeTable', TreeTable);
     nuxtApp.vueApp.component('TriStateCheckbox', TriStateCheckbox);
     nuxtApp.vueApp.component('VirtualScroller', VirtualScroller);
+    nuxtApp.vueApp.component('Editor', Editor);
+
+    if (!process.server) {
+        const { QuillEditor } =  await import('@vueup/vue-quill');
+        nuxtApp.vueApp.component('QuillEditor', QuillEditor)
+        // const { vueApp } = useNuxtApp();
+        // vueApp.component('QuillEditor', QuillEditor);
+    }
 });

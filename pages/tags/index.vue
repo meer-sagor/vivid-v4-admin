@@ -3,7 +3,15 @@ import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
 import { onMounted, ref, nextTick ,watch, computed} from "vue";
-
+import {Field, Form, useField, useForm} from 'vee-validate';
+import * as Yup from "yup";
+const {handleSubmit, resetForm} = useForm();
+const fetching = ref(false);
+const spinner = ref(false);
+const schema = Yup.object({
+  name: Yup.string().required().min(2).max(15).label("Name"),
+  status: Yup.mixed().required().label("status"),
+});
 const toast = useToast();
 
 const tags = ref([]);
@@ -39,6 +47,7 @@ onMounted(async () => {
   await getTags();
 });
 const getTags = async (event) => {
+  spinner.value = true
   let page = 1
   if (event?.first){
     page = event.first / event.rows + 1;
@@ -47,7 +56,7 @@ const getTags = async (event) => {
   const { data, error } = await useApiFetch("/api/tags/?page=" + page + searchTerm.value, {
     method: "GET",
   });
-  // errorMessage.value = null;
+  spinner.value = false
   if (error.value) {
     toast.add({
       severity: "error",
@@ -57,6 +66,7 @@ const getTags = async (event) => {
     });
   }
   if (data.value) {
+    fetching.value = true
     tags.value = data.value.tags.data;
 
     //For pagination
@@ -228,7 +238,7 @@ const deleteSelectedTag = () => {
 
 <template>
   <div class="grid">
-    <div class="col-12">
+    <div class="col-12" v-if="fetching">
       <div class="card">
         <Toast />
         <DataTable
@@ -315,53 +325,64 @@ const deleteSelectedTag = () => {
           :modal="true"
           class="p-fluid"
         >
-          <div class="field">
-            <label for="name">Name</label>
-            <InputText
-              id="name"
-              v-model.trim="product.name"
-              required="true"
-              autofocus
-              :class="{ 'p-invalid': submitted && !product.name }"
-            />
-            <small v-if="submitted && !product.name" class="p-invalid">Name is required.</small>
-          </div>
+          <Form id="add_brands_form" @submit="saveTag" :validation-schema="schema" v-slot="{ errors }">
+            <!-- <div class="field">
+              <label for="name">Name</label>
+              <InputText
+                id="name"
+                v-model.trim="product.name"
+                required="true"
+                autofocus
+                :class="{ 'p-invalid': submitted && !product.name }"
+              />
+              <small v-if="submitted && !product.name" class="p-invalid">Name is required.</small>
+            </div> -->
+            <div class="field">
+              <Field v-model="product.name" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Tags name"/>
+              <small class="p-error" id="brnad-name-error">{{ errors.name || '&nbsp;' }}</small>
+            </div>
 
-          <div class="field">
-            <label for="inventoryStatus" class="mb-3">Status</label>
-            <Dropdown
-              id="inventoryStatus"
-              v-model="product.status"
-              :options="statuses"
-              optionLabel="label"
-              placeholder="Select a Status"
-            >
-              <template #value="slotProps">
-                <div v-if="slotProps.value && slotProps.value.value">
-                  <span :class="'product-badge status-' + slotProps.value.value">{{ slotProps.value.label }}</span>
-                </div>
-                <div v-else-if="slotProps.value && !slotProps.value.value">
-                  <span :class="'product-badge status-' + slotProps.value.toLowerCase()">{{ slotProps.value }}</span>
-                </div>
-                <span v-else>{{ slotProps.placeholder }}</span>
-              </template>
-            </Dropdown>
-          </div>
-
-          <template #footer>
-            <Button
-              label="Cancel"
-              icon="pi pi-times"
-              class="p-button-text"
-              @click="hideDialog"
-            />
-            <Button
-              label="Save"
-              icon="pi pi-check"
-              class="p-button-text"
-              @click="saveTag"
-            />
-          </template>
+            <!-- <div class="field">
+              <label for="inventoryStatus" class="mb-3">Status</label>
+              <Dropdown
+                id="inventoryStatus"
+                v-model="product.status"
+                :options="statuses"
+                optionLabel="label"
+                placeholder="Select a Status"
+              >
+                <template #value="slotProps">
+                  <div v-if="slotProps.value && slotProps.value.value">
+                    <span :class="'product-badge status-' + slotProps.value.value">{{ slotProps.value.label }}</span>
+                  </div>
+                  <div v-else-if="slotProps.value && !slotProps.value.value">
+                    <span :class="'product-badge status-' + slotProps.value.toLowerCase()">{{ slotProps.value }}</span>
+                  </div>
+                  <span v-else>{{ slotProps.placeholder }}</span>
+                </template>
+              </Dropdown>
+            </div> -->
+            <div class="field">
+              <label for="status" class="mb-3">Status</label>
+              <Field name="status" v-slot="{ field }">
+                <Dropdown
+                  v-bind="field"
+                  v-model="product.status"
+                  :options="statuses"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select a status"
+                  display="chip"
+                  :class="{ 'p-invalid': errors.status }"
+                  aria-describedby="brand-code-status-error"
+                ></Dropdown>
+              </Field>
+              <small class="p-error" id="brand-code-status-error">{{
+                errors.status || "&nbsp;"
+              }}</small>
+            </div>
+            <Button class="" type="submit" label="Submit"  icon="pi pi-check"/>
+          </Form>
         </Dialog>
 
         <Dialog v-model:visible="deleteProductDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
@@ -384,6 +405,11 @@ const deleteSelectedTag = () => {
             />
           </template>
         </Dialog>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="flex justify-content-center">
+        <ProgressSpinner v-if="spinner"/>
       </div>
     </div>
   </div>

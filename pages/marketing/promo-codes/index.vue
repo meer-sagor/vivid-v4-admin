@@ -41,10 +41,19 @@
 
           <Column field="id" header="ID" style="width: 5%"></Column>
           <Column field="name" header="Name" style="width: 20%"></Column>
-          <Column field="description" header="Description" style="width: 25%"></Column>
+          <Column field="description" header="Description" style="width: 25%">
+            <template #body="slotProps">
+              <span v-html="slotProps.data.description"></span>
+            </template>
+          </Column>
           <Column field="discount_type" header="Discount Type" style="width: 10%"></Column>
           <Column field="discount_amount" header="Discount Amount" style="width: 10%"></Column>
-          <Column field="expiry_date" header="Expiry Date" style="width: 10%"></Column>
+          <Column field="expiry_date" header="Expiry Date" style="width: 10%">
+            <template #body="slotProps">
+              {{ createdAt(slotProps.data.expiry_date)}}
+            </template>
+            createdAt
+          </Column>
           <Column field="status" header="Status" style="width: 10%">
             <template #body="slotProps">
               <span v-if="slotProps.data.status == 'enable'">Enable</span>
@@ -57,7 +66,7 @@
                   type="button"
                   icon="pi pi-plus"
                   class="p-button p-component p-button-icon-only p-button-primary p-button-rounded p-button-outlined mr-2"
-                  :to="{ path: '/home/section/update/' + slotProps.data.id }"
+                  :to="{ path: '/marketing/promo-codes/update/' + slotProps.data.id }"
               >
                 <span class="p-button-icon p-button-icon-left pi pi-pencil" data-pc-section="icon"></span>
               </NuxtLink>
@@ -105,6 +114,8 @@ import {ref, onMounted, nextTick} from "vue";
 import { useApiFetch } from "~/composables/useApiFetch";
 import { useToast } from "primevue/usetoast";
 import { usePromoCodeStore} from "~/stores/usePromoCodeStore";
+import moment from "moment/moment";
+
 const toast = useToast();
 const PromoCodeStore = usePromoCodeStore();
 const search = ref(null);
@@ -151,6 +162,15 @@ const deletePromoCode = async () => {
     await fetchPromoCodes()
   }
 };
+const removeHTMLSpecialChars = (inputString) => {
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(inputString, 'text/xml');
+  return xmlDoc.documentElement.textContent;
+}
+
+const createdAt = (date) => {
+  return moment(date).format('MMMM Do YYYY, h:mm:ss a')
+}
 
 </script>
 

@@ -3,7 +3,18 @@ import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
 import { onMounted, ref,nextTick,watch, computed } from "vue";
-
+import {Field, Form, useField, useForm} from 'vee-validate';
+import * as Yup from "yup";
+const {handleSubmit, resetForm} = useForm();
+const fetching = ref(false);
+const spinner = ref(false);
+const schema = Yup.object({
+  name: Yup.string().required().min(2).max(15).label("Name"),
+  hex: Yup.string().required().min(2).max(15).label("Name"),
+  colorFamily: Yup.mixed().required().label("Color Family"),
+  status: Yup.mixed().required().label("status"),
+});
+const imageError = ref(null);
 const toast = useToast();
 
 const products = ref(null);
@@ -31,6 +42,7 @@ const statuses = ref([
 
 const onPhotoSelect = ($event) => {
   product.value.image_id == null
+  imageError.value = null;
   files.value = fileInput.value?.files;
   console.log(files.value[0].objectURL);
 };
@@ -49,6 +61,7 @@ onMounted(async () => {
   await colorFamilyData();
 });
 const initialize = async (event) => {
+  spinner.value = true
   let page = 1
   if (event?.first){
     page = event.first / event.rows + 1;
@@ -56,13 +69,17 @@ const initialize = async (event) => {
   const { data, error } = await useApiFetch("/api/colors/?page=" + page + searchTerm.value, {
     method: "GET",
   });
-  console.log(data, "calling");
-  // errorMessage.value = null;
-  // if (error.value) {
-  //   errorMessage.value = error.value.data.message;
-  // }
+  spinner.value = false
+  if (error.value) {
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Something Went worng",
+      life: 3000,
+    });
+  }
   if (data.value) {
-    //   console.log(data.value.brands);
+    fetching.value = true
     colors.value = data.value.colors.data;
     rowsPerPage.value = data.value.colors.per_page
     totalRecords.value = data.value.colors.total
@@ -94,8 +111,12 @@ const hideDialog = () => {
 
 const saveProduct = async () => {
   if (product.value.image_id == null && product.value.image_id == undefined) {
-    console.log(product.value.image_id);
-    await uploadHandler();
+    if(files.value){
+      await uploadHandler();
+    }
+    else{
+      imageError.value = "This Feild is required";
+    }
   }
   submitted.value = true;
 
@@ -104,6 +125,9 @@ const saveProduct = async () => {
       ? product.value.status.value.toUpperCase()
       : product.value.status;
     if (product.value.id) {
+      if (product.value.media == null) {
+        await uploadHandler();
+      }
       product.value.status = product.value.status.toUpperCase()
       console.log(product.value.status);
       const { data, error } = await useApiFetch(
@@ -118,6 +142,7 @@ const saveProduct = async () => {
       // errorMessage.value = error.value.data.message;
       // }
       if (data.value) {
+        imageError.value = null;
         toast.add({
           severity: "info",
           summary: "Success",
@@ -142,6 +167,7 @@ const saveProduct = async () => {
         body: product.value,
       });
       if (data.value) {
+        imageError.value = null;
         toast.add({
           severity: "info",
           summary: "Success",
@@ -183,6 +209,7 @@ const uploadHandler = async () => {
   });
   // console.log(data);
   if (data.value) {
+    imageError.value = null;
     product.value.image_id = data.value.media.id
     // await auth.fetchUser();
     // uploading.value = false;
@@ -196,8 +223,11 @@ const uploadHandler = async () => {
 };
 const editProduct = (editProduct) => {
   product.value = { ...editProduct };
-  console.log(product);
   productDialog.value = true;
+  files.value = null;
+  if (product.value.media) {
+    fileData.value =  product.value.media.url
+  }
 };
 
 const confirmDeleteProduct = (editProduct) => {
@@ -291,7 +321,7 @@ const onUpload = () => {
 
 <template>
   <div class="grid">
-    <div class="col-12">
+    <div class="col-12" v-if="fetching">
       <div class="card">
         <Toast />
         <DataTable
@@ -349,6 +379,7 @@ const onUpload = () => {
             <template #body="slotProps">
               <span class="p-column-title">Image</span>
               <img
+                v-if="slotProps.data.media"
                 :src="slotProps.data.media.url"
                 :alt="slotProps.data.media.url"
                 class="shadow-2"
@@ -400,104 +431,83 @@ const onUpload = () => {
           :modal="true"
           class="p-fluid"
         >
-          <div class="field">
-            <label for="name">Name</label>
-            <InputText
-              id="name"
-              v-model.trim="product.name"
-              required="true"
-              autofocus
-              :class="{ 'p-invalid': submitted && !product.name }"
-            />
-            <small v-if="submitted && !product.name" class="p-invalid"
-              >Name is required.</small
-            >
-          </div>
+          <Form id="add_category_form" @submit="saveProduct" :validation-schema="schema" v-slot="{ errors }">
+            
+            <div class="field">
+              <label for="name">Name</label>
+              <Field v-model="product.name" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Name"/>
+              <small class="p-error" id="category-name-error">{{ errors.name || '&nbsp;' }}</small>
+            </div>
 
-          <div class="field">
-            <label for="name">Hex</label>
-            <InputText
-              id="name"
-              v-model.trim="product.hex"
-              required="true"
-              autofocus
-              :class="{ 'p-invalid': submitted && !product.hex }"
-            />
-            <small v-if="submitted && !product.hex" class="p-invalid"
-              >Name is required.</small
-            >
-          </div>
-          <div class="field">
-            <label for="category" class="mb-3">Category</label>
-            <Dropdown v-model="product.color_family_id" :options="colorFamilies" optionLabel="name" optionValue="id" placeholder="Select a color family" ></Dropdown>
-          </div>
-          <div class="field">
-            <label for="name">Image</label>
-            <!-- <FileUpload
-              name="demo[]"
-              @uploader="onUpload"
-              :multiple="true"
-              accept="image/*"
-              :maxFileSize="1000000"
-              customUpload
-            /> -->
-            <FileUpload ref="fileInput" mode="basic" name="demo[]" url="/api/upload" accept="image/*" customUpload @select="onPhotoSelect($event)" />
-            <br>
-            <img
-              v-if="files"
-              :src="files[0].objectURL"
-              :alt="files[0].objectURL"
-              class="shadow-2"
-              width="100"
-              height="50"
-            />
-          </div>
+            <div class="field">
+              <label for="hex">Hex</label>
+              <Field v-model="product.hex" id="hex" name="hex" :class="{ 'p-invalid': errors.hex }" class="p-inputtext p-component" aria-describedby="category-hex-error" placeholder="Color hex"/>
+              <small class="p-error" id="category-hex-error">{{ errors.hex || '&nbsp;' }}</small>
+            </div>
 
-          <div class="field">
-            <label for="inventoryStatus" class="mb-3">Status</label>
-            <Dropdown
-              id="inventoryStatus"
-              v-model="product.status"
-              :options="statuses"
-              optionLabel="label"
-              placeholder="Select a Status"
-            >
-              <template #value="slotProps">
-                <div v-if="slotProps.value && slotProps.value.value">
-                  <span
-                    :class="'product-badge status-' + slotProps.value.value"
-                    >{{ slotProps.value.label }}</span
-                  >
-                </div>
-                <div v-else-if="slotProps.value && !slotProps.value.value">
-                  <span
-                    :class="
-                      'product-badge status-' + slotProps.value.toLowerCase()
-                    "
-                    >{{ slotProps.value }}</span
-                  >
-                </div>
-                <span v-else>
-                  {{ slotProps.placeholder }}
-                </span>
-              </template>
-            </Dropdown>
-          </div>
+            <div class="field">
+              <label for="colorFamily" class="mb-3">Color Family</label>
+              <Field name="colorFamily" v-slot="{ field }">
+                <Dropdown
+                  v-bind="field"
+                  v-model="product.color_family_id"
+                  :options="colorFamilies" 
+                  optionLabel="name" 
+                  optionValue="id" 
+                  placeholder="Select a Color Family"
+                  display="chip"
+                  :class="{ 'p-invalid': errors.colorFamily }"
+                  aria-describedby="category-colorFamily-error"
+                ></Dropdown>
+              </Field>
+              <small class="p-error" id="category-colorFamily-error">{{
+                errors.colorFamily || "&nbsp;"
+              }}</small>
+            </div>
+            <div class="field">
+              <label for="name">Image</label>
+              <FileUpload ref="fileInput" mode="basic" name="demo[]" url="/api/upload" accept="image/*" customUpload @select="onPhotoSelect($event)" />
+              <span class="p-invalid" v-if="imageError">{{ imageError }}</span>
+              <br>
+              <img
+                v-if="files"
+                :src="files[0].objectURL"
+                :alt="files[0].objectURL"
+                class="shadow-2"
+                width="100"
+                height="50"
+              />
+              <img
+                v-else-if="fileData"
+                :src="fileData"
+                :alt="fileData"
+                class="shadow-2"
+                width="100"
+                height="50"
+              />
+            </div>
 
-          <template #footer>
-            <Button
-              label="Cancel"
-              icon="pi pi-times"
-              class="p-button-text"
-              @click="hideDialog"
-            />
-            <Button
-              label="Save"
-              icon="pi pi-check"
-              class="p-button-text"
-              @click="saveProduct"
-            />
-          </template>
+            <div class="field">
+              <label for="status" class="mb-3">Status</label>
+              <Field name="status" v-slot="{ field }">
+                <Dropdown
+                  v-bind="field"
+                  v-model="product.status"
+                  :options="statuses"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select a status"
+                  display="chip"
+                  :class="{ 'p-invalid': errors.status }"
+                  aria-describedby="category-code-status-error"
+                ></Dropdown>
+              </Field>
+              <small class="p-error" id="category-code-status-error">{{
+                errors.status || "&nbsp;"
+              }}</small>
+            </div>
+            <Button class="" type="submit" label="Submit"  icon="pi pi-check"/>
+          </Form>
         </Dialog>
 
         <Dialog
@@ -531,6 +541,11 @@ const onUpload = () => {
             />
           </template>
         </Dialog>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="flex justify-content-center">
+        <ProgressSpinner v-if="spinner"/>
       </div>
     </div>
   </div>

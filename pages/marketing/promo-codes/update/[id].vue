@@ -1,14 +1,8 @@
 <template>
   <div class="card">
-    <h5>Add Promo code</h5>
+    <h5>Update Promo code</h5>
     <template v-if="fetching">
-      <Form
-        id="add_promo_code_form"
-        @submit="onSubmit"
-        :validation-schema="schema"
-        v-slot="{ errors }"
-      >
-
+      <Form id="add_promo_code_form" @submit="onSubmit" :validation-schema="schema" v-slot="{ errors }">
         <div class="flex flex-row gap-3">
           <div class="col-6 mb-0">
             <div class="flex flex-column gap-2 mb-0">
@@ -30,6 +24,7 @@
               <label for="description">Description</label>
               <ClientOnly>
                 <QuillEditor
+                    :content="promo_code.description"
                     ref="editor"
                     v-model.content="promo_code.description"
                     theme="snow"
@@ -141,40 +136,13 @@
                     v-bind="field"
                     v-model="promo_code.expiry_date"
                     dateFormat="yy-mm-dd"
-                    :class="{ 'p-invalid': errors.expiry_date }"
                     placeholder="Select expiry date"
                 />
               </Field>
-              <small class="p-error" id="promo-per-user-limit-error">{{ errors.expiry_date || '&nbsp;' }}</small>
-            </div>
-          </div>
-          <div class="col-6 mb-0">
-            <div class="flex flex-column gap-2 mb-0">
-              <label for="status">Status</label>
-              <Field name="status" v-slot="{ field }">
-                <Dropdown
-                    v-bind="field"
-                    v-model="promo_code.status"
-                    :options="status_enums"
-                    optionLabel="name"
-                    optionValue="name"
-                    placeholder="Select a status"
-                    display="chip"
-                    :class="{ 'p-invalid': errors.status }"
-                    aria-describedby="promo-code-status-error"
-                ></Dropdown>
-              </Field>
-              <small class="p-error" id="promo-code-status-error">{{errors.status || "&nbsp;"}}</small>
             </div>
           </div>
         </div>
-        <Button
-          class=""
-          type="submit"
-          label="Submit"
-          :loading="loading"
-          icon="pi pi-check"
-        />
+        <Button class="" type="submit" label="Submit" :loading="loading" icon="pi pi-check"/>
       </Form>
     </template>
     <div class="flex justify-content-center">
@@ -182,13 +150,13 @@
     </div>
   </div>
 </template>
-
 <script lang="ts">
 import { useToast } from "primevue/usetoast";
 import { Field, Form, useField, useForm } from "vee-validate";
 import { ref, defineComponent, nextTick, onMounted } from "vue";
 import * as Yup from "yup";
 import { useApiFetch } from "~/composables/useApiFetch";
+import {useRoute, useRouter} from "vue-router";
 
 export default defineComponent({
   components: { Form, Field },
@@ -200,8 +168,10 @@ export default defineComponent({
     const spinner = ref(false);
     const status_enums = ref([]);
     const discount_type_enums = ref([]);
+    const route = useRoute();
+    const router = useRouter();
 
-     const promo_code = ref({
+    const promo_code = ref({
       name: "",
       description: "",
       discount_type: "",
@@ -211,12 +181,12 @@ export default defineComponent({
       per_coupon_limit: "",
       per_user_limit: "",
       expiry_date: "",
-      status: "",
     });
 
     onMounted(async () => {
       await nextTick();
       await fetchEnums();
+      await fetchPromoCodes();
     });
 
     const fetchEnums = async () => {
@@ -235,16 +205,23 @@ export default defineComponent({
       }
     };
 
+    const fetchPromoCodes = async () => {
+      const {data, error} = await useApiFetch("/api/promo-codes/" + route.params.id + '/edit', {
+        method: "GET",
+      });
+      if (data.value) {
+        const getPromoCodes = JSON.parse(JSON.stringify(computed(() => data.value).value))
+        promo_code.value = getPromoCodes.promo_code;
+      }
+    };
+
     const schema = Yup.object().shape({
       name: Yup.string().required().min(2).max(100).label("Name"),
-      discount_type: Yup.mixed().required().label("Discount type"),
       discount_amount: Yup.number().typeError('Discount amount is required field').required().min(2).max(10000).label("Discount amount"),
       min_spend: Yup.number().nullable().transform((v, o) => (o === '' ? null : v)).typeError('Min spend is must be a number field').min(1).max(100).label("Min spend"),
       max_spend: Yup.number().nullable().transform((v, o) => (o === '' ? null : v)).typeError('Max spend is must be a number field').min(1).max(100).label("Max spend"),
       per_coupon_limit: Yup.number().typeError('Per coupon limit is number field').nullable().label("Per coupon limit"),
       per_user_limit: Yup.number().typeError('Per user limit is number field').nullable().label("Per user limit"),
-      expiry_date: Yup.mixed().required().label("Expiry date"),
-      status: Yup.mixed().required().label("Status"),
     });
 
     const onSubmit = async (values: any, actions: { setErrors: (arg0: any) => void }) => {
@@ -261,8 +238,8 @@ export default defineComponent({
 
       loading.value = true;
 
-      const { data, error } = await useApiFetch("/api/promo-codes", {
-        method: "POST",
+      const { data, error } = await useApiFetch("/api/promo-codes/" + route.params.id, {
+        method: "PUT",
         body: promo_code.value,
       });
       loading.value = false;
@@ -283,18 +260,14 @@ export default defineComponent({
           life: 3000,
         });
 
-        promo_code.value.discount_type = "";
-        promo_code.value.status = "";
-        promo_code.value.expiry_date = "";
+        await router.push({ path: "/marketing/promo-codes" });
         resetModal();
         resetForm();
       }
     };
 
     const resetModal = () => {
-      const resetForm = document.getElementById(
-        "add_promo_code_form"
-      ) as HTMLFormElement;
+      const resetForm = document.getElementById("add_promo_code_form") as HTMLFormElement;
       if (resetForm) {
         resetForm.reset();
       }
@@ -376,5 +349,16 @@ export default defineComponent({
   background-repeat: no-repeat;
   background-position: right calc(0.375em + 0.3875rem) center;
   background-size: calc(0.75em + 0.775rem) calc(0.75em + 0.775rem);
+}
+:deep(.ql-editor) {
+  min-height: 200px;
+}
+:deep(.ql-toolbar.ql-snow) {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+:deep(.ql-container.ql-snow) {
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
 </style>

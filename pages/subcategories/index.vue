@@ -3,7 +3,18 @@ import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
 import { onMounted, ref ,nextTick,watch, computed} from "vue";
-
+import {Field, Form, useField, useForm} from 'vee-validate';
+import * as Yup from "yup";
+const {handleSubmit, resetForm} = useForm();
+const fetching = ref(false);
+const spinner = ref(false);
+const schema = Yup.object({
+  name: Yup.string().required().min(2).max(15).label("Name"),
+  order: Yup.number().typeError('Order is number field').required().label("Order"),
+  status: Yup.mixed().required().label("status"),
+  category: Yup.mixed().required().label("category"),
+});
+const imageError = ref(null);
 const toast = useToast();
 const categories = ref([]);
 const subCategories = ref([]);
@@ -35,6 +46,7 @@ const types = ref([
 ]);
 const onPhotoSelect = ($event) => {
   product.value.image_id == null
+  imageError.value = null;
   files.value = fileInput.value?.files;
   console.log(files.value[0].objectURL);
 };
@@ -52,6 +64,7 @@ onMounted(async () => {
   await categoryData();
 });
 const initialize = async (event) => {
+  spinner.value = true
   let page = 1
   if (event?.first){
     page = event.first / event.rows + 1;
@@ -59,7 +72,7 @@ const initialize = async (event) => {
   const { data, error } = await useApiFetch("/api/sub-categories/?page=" + page + searchTerm.value, {
     method: "GET",
   });
-  console.log(data, "calling");
+  spinner.value = false
   // errorMessage.value = null;
   if (error.value) {
     toast.add({
@@ -71,6 +84,7 @@ const initialize = async (event) => {
   }
   if (data.value) {
     //   console.log(data.value.brands);
+    fetching.value = true
     subCategories.value = data.value.sub_categories.data;
     rowsPerPage.value = data.value.sub_categories.per_page
     totalRecords.value = data.value.sub_categories.total
@@ -111,12 +125,16 @@ const hideDialog = () => {
 
 const saveProduct = async () => {
   if (product.value.image_id == null && product.value.image_id == undefined) {
-    console.log(product.value.image_id);
-    await uploadHandler();
+    if(files.value){
+      await uploadHandler();
+    }
+    else{
+      imageError.value = "This Feild is required";
+    }
   }
   submitted.value = true;
   console.log(product.value);
-  if (product.value.name && product.value.name.trim()) {
+  if (product.value.name && product.value.name.trim() && product.value.image_id) {
     product.value.status = product.value.status.value
       ? product.value.status.value
       : product.value.status;
@@ -124,6 +142,9 @@ const saveProduct = async () => {
       // ? product.value.type.value.toUpperCase()
       // : product.value.type.toUpperCase();
     if (product.value.id) {
+      if (product.value.media == null) {
+        await uploadHandler();
+      }
       product.value.status = product.value.status.toUpperCase()
       // product.value.status = product.value.status.value ? product.value.status.value : product.value.status;
       const { data, error } = await useApiFetch(
@@ -146,6 +167,7 @@ const saveProduct = async () => {
         });
       }
       if (data.value) {
+        imageError.value = null;
         toast.add({
           severity: "info",
           summary: "Success",
@@ -154,6 +176,7 @@ const saveProduct = async () => {
         });
       }
       subCategories.value[findIndexById(product.value.id)] = product.value;
+      await initialize();
       // toast.add({
       //     severity: 'success',
       //     summary: 'Successful',
@@ -174,6 +197,7 @@ const saveProduct = async () => {
         });
       }
       if (data.value) {
+        imageError.value = null;
         toast.add({
           severity: "info",
           summary: "Success",
@@ -213,6 +237,7 @@ const uploadHandler = async () => {
   });
   // console.log(data);
   if (data.value) {
+    imageError.value = null;
     product.value.image_id = data.value.media.id
     // await auth.fetchUser();
     // uploading.value = false;
@@ -227,9 +252,11 @@ const uploadHandler = async () => {
 
 const editProduct = (editProduct) => {
   product.value = { ...editProduct };
-  console.log(product);
-  fileData.value =  product.value.media.url
   productDialog.value = true;
+  files.value = null;
+  if (product.value.media) {
+    fileData.value =  product.value.media.url
+  }
 };
 
 const confirmDeleteProduct = (editProduct) => {
@@ -328,7 +355,7 @@ const onUpload = () => {
 
 <template>
   <div class="grid">
-    <div class="col-12">
+    <div class="col-12" v-if="fetching">
       <div class="card">
         <Toast />
         <DataTable
@@ -487,6 +514,7 @@ const onUpload = () => {
             <template #body="slotProps">
               <span class="p-column-title">Image</span>
               <img
+                v-if="slotProps.data.media"
                 :src="slotProps.data.media.url"
                 :alt="slotProps.data.media.url"
                 class="shadow-2"
@@ -537,159 +565,94 @@ const onUpload = () => {
           :modal="true"
           class="p-fluid"
         >
-          <div class="field">
-            <label for="name">Order</label>
-            <InputNumber
-              id="name"
-              v-model.trim="product.order"
-              mode="decimal"
-              required="true"
-              showButtons 
-              :min="0"
-              autofocus
-              :class="{ 'p-invalid': submitted && !product.order }"
-            />
-            <small v-if="submitted && !product.name" class="p-invalid"
-              >Order is required.</small
-            >
-          </div>
+          <Form id="add_category_form" @submit="saveProduct" :validation-schema="schema" v-slot="{ errors }">
+            <div class="field">
+              <label for="order">Order</label>
+              <Field v-model="product.order" id="order" name="order" :class="{ 'p-invalid': errors.order }" class="p-inputtext p-component" aria-describedby="category-order-error" placeholder="Sub Category Order"/>
+              <small class="p-error" id="category-order-error">{{ errors.order || '&nbsp;' }}</small>
+            </div>
 
-          <div class="field">
-            <label for="category" class="mb-3">Category</label>
-            <Dropdown v-model="product.category_id" :options="categories" optionLabel="name" optionValue="id" placeholder="Select a Category" ></Dropdown>
-          </div>
+            <div class="field">
+              <label for="category" class="mb-3">Category</label>
+              <Field name="category" v-slot="{ field }">
+                <Dropdown
+                  v-bind="field"
+                  v-model="product.category_id"
+                  :options="categories" 
+                  optionLabel="name" 
+                  optionValue="id" 
+                  placeholder="Select a Category"
+                  display="chip"
+                  :class="{ 'p-invalid': errors.category }"
+                  aria-describedby="category-category_field-error"
+                ></Dropdown>
+              </Field>
+              <small class="p-error" id="category-category_field-error">{{
+                errors.category || "&nbsp;"
+              }}</small>
+            </div>
 
-          <div class="field">
-            <label for="name">Name</label>
-            <InputText
-              id="name"
-              v-model.trim="product.name"
-              required="true"
-              autofocus
-              :class="{ 'p-invalid': submitted && !product.name }"
-            />
-            <small v-if="submitted && !product.name" class="p-invalid"
-              >Name is required.</small
-            >
-          </div>
+            <div class="field">
+              <label for="name">Name</label>
+              <Field v-model="product.name" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Category name"/>
+              <small class="p-error" id="category-name-error">{{ errors.name || '&nbsp;' }}</small>
+            </div>
 
-          <div class="field">
-            <label for="description">Description</label>
-            <Textarea
-              id="description"
-              v-model="product.description"
-              required="true"
-              rows="3"
-              cols="20"
-            />
-          </div>
+            <div class="field">
+              <label for="description">Description</label>
+              <Textarea
+                id="description"
+                v-model="product.description"
+                required="true"
+                rows="3"
+                cols="20"
+              />
+            </div>
 
-          <div class="field">
-            <label for="name">Image</label>
-            <!-- <FileUpload
-              name="demo[]"
-              @uploader="onUpload"
-              :multiple="true"
-              accept="image/*"
-              :maxFileSize="1000000"
-              customUpload
-            /> -->
-            <FileUpload ref="fileInput" mode="basic" name="demo[]" url="/api/upload" accept="image/*" customUpload @select="onPhotoSelect($event)" />
-            <br>
-            <img
-              v-if="files"
-              :src="files[0].objectURL"
-              :alt="files[0].objectURL"
-              class="shadow-2"
-              width="100"
-              height="50"
-            />
-            <img
-              v-else
-              :src="fileData"
-              :alt="fileData"
-              class="shadow-2"
-              width="100"
-              height="50"
-            />
-          </div>
+            <div class="field">
+              <label for="name">Image</label>
+              <FileUpload ref="fileInput" mode="basic" name="demo[]" url="/api/upload" accept="image/*" customUpload @select="onPhotoSelect($event)" />
+              <span class="p-invalid" v-if="imageError">{{ imageError }}</span>
+              <br>
+              <img
+                v-if="files"
+                :src="files[0].objectURL"
+                :alt="files[0].objectURL"
+                class="shadow-2"
+                width="100"
+                height="50"
+              />
+              <img
+                v-else-if="fileData"
+                :src="fileData"
+                :alt="fileData"
+                class="shadow-2"
+                width="100"
+                height="50"
+              />
+            </div>
 
-          <!-- <div class="field">
-            <label for="type" class="mb-3">Type</label>
-            <Dropdown
-              id="type"
-              v-model="product.type"
-              :options="types"
-              optionLabel="label"
-              placeholder="Select a Type"
-            >
-              <template #value="slotProps">
-                <div v-if="slotProps.value && slotProps.value.value">
-                  <span
-                    :class="'product-badge status-' + slotProps.value.value"
-                    >{{ slotProps.value.label }}</span
-                  >
-                </div>
-                <div v-else-if="slotProps.value && !slotProps.value.value">
-                  <span
-                    :class="
-                      'product-badge status-' + slotProps.value.toLowerCase()
-                    "
-                    >{{ slotProps.value }}</span
-                  >
-                </div>
-                <span v-else>
-                  {{ slotProps.placeholder }}
-                </span>
-              </template>
-            </Dropdown>
-          </div> -->
-
-          <div class="field">
-            <label for="status" class="mb-3">Status</label>
-            <Dropdown
-              id="status"
-              v-model="product.status"
-              :options="statuses"
-              optionLabel="label"
-              placeholder="Select a Status"
-            >
-              <template #value="slotProps">
-                <div v-if="slotProps.value && slotProps.value.value">
-                  <span
-                    :class="'product-badge status-' + slotProps.value.value"
-                    >{{ slotProps.value.label }}</span
-                  >
-                </div>
-                <div v-else-if="slotProps.value && !slotProps.value.value">
-                  <span
-                    :class="
-                      'product-badge status-' + slotProps.value.toLowerCase()
-                    "
-                    >{{ slotProps.value }}</span
-                  >
-                </div>
-                <span v-else>
-                  {{ slotProps.placeholder }}
-                </span>
-              </template>
-            </Dropdown>
-          </div>
-
-          <template #footer>
-            <Button
-              label="Cancel"
-              icon="pi pi-times"
-              class="p-button-text"
-              @click="hideDialog"
-            />
-            <Button
-              label="Save"
-              icon="pi pi-check"
-              class="p-button-text"
-              @click="saveProduct"
-            />
-          </template>
+            <div class="field">
+              <label for="status" class="mb-3">Status</label>
+              <Field name="status" v-slot="{ field }">
+                <Dropdown
+                  v-bind="field"
+                  v-model="product.status"
+                  :options="statuses"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select a status"
+                  display="chip"
+                  :class="{ 'p-invalid': errors.status }"
+                  aria-describedby="category-code-status-error"
+                ></Dropdown>
+              </Field>
+              <small class="p-error" id="category-code-status-error">{{
+                errors.status || "&nbsp;"
+              }}</small>
+            </div>
+            <Button class="" type="submit" label="Submit"  icon="pi pi-check"/>
+          </Form>
         </Dialog>
 
         <Dialog
@@ -723,6 +686,11 @@ const onUpload = () => {
             />
           </template>
         </Dialog>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="flex justify-content-center">
+        <ProgressSpinner v-if="spinner"/>
       </div>
     </div>
   </div>
