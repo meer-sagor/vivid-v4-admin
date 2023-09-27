@@ -6,5 +6,5 @@
 # sudo chmod 2775 /var/www
 # find /var/www -type d -exec sudo chmod 2775 {} \;
 # find /var/www -type f -exec sudo chmod 0664 {} \;
-sudo chown -R www-data:www-data /VividCustoms-Admin
-sudo chmod -R 775 /VividCustoms-Admin
+sudo chown -R www-data:www-data /var/www/VividCustoms-Admin
+sudo chmod -R 775 /var/www/VividCustoms-Admin

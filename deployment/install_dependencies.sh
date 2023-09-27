@@ -4,7 +4,7 @@
 # source ~/.bashrc
 # nvm install 16
 
-cd /VividCustoms-Admin
+cd /var/www/VividCustoms-Admin
 
 # npm install -g pm2
 if [ -d "node_modules" ]; then rm -Rf node_modules; fi
