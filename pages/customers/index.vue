@@ -16,12 +16,15 @@ const page = ref(1);
 const totalData = ref(null);
 const deleteAssociateDialog = ref(false);
 const associate = ref({});
+const fetching = ref(false);
+const spinner = ref(false);
 const id = ref(null);
 const errorMessage = ref("");
 const associates = ref([]);
 const rowsPerPage = ref(0)
 const totalRecords = ref(0)
 const fetchAssociates = async (event) => {
+  spinner.value = true
   let page = 1
   if (event?.first){
     page = event.first / event.rows + 1;
@@ -29,7 +32,9 @@ const fetchAssociates = async (event) => {
   const { data, error } = await useApiFetch("/api/customers/?page=" + page, {
     method: "GET",
   });
+  spinner.value = false
   if (data.value) {
+    fetching.value = true
     associates.value = data.value.customers.data;
     rowsPerPage.value = data.value.customers.per_page
     totalRecords.value = data.value.customers.total
@@ -94,7 +99,7 @@ const updateStatus = (customer) => {
 </script>
 <template>
   <div class="grid p-fluid">
-    <div class="col-12">
+    <div class="col-12" v-if="fetching">
       <div class="card">
         <DataTable
           :value="associates"
@@ -224,6 +229,11 @@ const updateStatus = (customer) => {
             />
           </template>
         </Dialog>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="flex justify-content-center">
+        <ProgressSpinner v-if="spinner"/>
       </div>
     </div>
   </div>
