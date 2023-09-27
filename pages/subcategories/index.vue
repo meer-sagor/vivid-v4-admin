@@ -252,6 +252,7 @@ const uploadHandler = async () => {
 
 const editProduct = (editProduct) => {
   product.value = { ...editProduct };
+  product.value.status = product.value.status.toUpperCase()
   productDialog.value = true;
   files.value = null;
   if (product.value.media) {
