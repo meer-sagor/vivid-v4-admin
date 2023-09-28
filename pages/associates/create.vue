@@ -61,6 +61,7 @@ import {ref, defineComponent, nextTick, onMounted} from "vue";
 import * as Yup from "yup";
 import {useApiFetch} from "~/composables/useApiFetch";
 import {useImageUpload} from "@/components/image/useImageUpload.js";
+import {useRouter} from "vue-router";
 
 export default defineComponent({
   components: {Form, Field},
@@ -72,6 +73,7 @@ export default defineComponent({
     const spinner = ref(false);
     const userRoles = ref([]);
     const files = ref();
+    const router = useRouter();
 
     const associate = ref({
       first_name: "",
@@ -147,6 +149,7 @@ export default defineComponent({
           life: 3000,
         });
 
+        await router.push({ path: "/associates" });
         resetModal();
         resetForm()
       }

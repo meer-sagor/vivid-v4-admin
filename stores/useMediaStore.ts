@@ -11,6 +11,7 @@ interface Medias {
 export const useMediaStore = defineStore('media', () => {
     const medias = ref([]);
     const categories = ref([]);
+    const media_types = ref([]);
     const media = ref<Medias | null>(null)
     const success = ref();
     const error = ref();
@@ -36,5 +37,16 @@ export const useMediaStore = defineStore('media', () => {
         }
     }
 
-    return { medias, getMedias, getMediaCategories, categories }
+    async function getMediaTypes() {
+        try {
+            const { data, error } = await useApiFetch("/api/getEnums");
+            const getMediaTypes = JSON.parse(JSON.stringify(computed(() => data.value).value))
+            media_types.value = getMediaTypes.media_types;
+            success.value = JSON.parse(JSON.stringify(computed(() => getMediaTypes.success).value));
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    return { medias, getMedias, getMediaCategories, getMediaTypes, categories, media_types }
 })

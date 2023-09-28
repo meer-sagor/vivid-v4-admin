@@ -39,7 +39,7 @@
         <div class="flex flex-row gap-3">
           <div class="col-6 mb-0">
             <div class="flex flex-column gap-2 mb-0">
-              <label for="file">File Type</label>
+              <label for="file">Upload Font</label>
               <Field name="file" v-slot="{ field }">
                 <Dropdown
                     v-bind="field"
@@ -113,6 +113,7 @@ import { Field, Form, useField, useForm } from "vee-validate";
 import { ref, defineComponent, nextTick, onMounted } from "vue";
 import * as Yup from "yup";
 import { useApiFetch } from "~/composables/useApiFetch";
+import {useRouter} from "vue-router";
 
 export default defineComponent({
   components: { Form, Field },
@@ -125,6 +126,7 @@ export default defineComponent({
     const status_enums = ref([]);
     const font_file_type_enums = ref([]);
     const font_categories = ref([]);
+    const router = useRouter();
 
     const font = ref({
       name: "",
@@ -167,7 +169,7 @@ export default defineComponent({
     const schema = Yup.object().shape({
       name: Yup.string().required().min(2).max(100).label("Name"),
       size: Yup.number().typeError('Size must be a number field.').required().min(2).max(2000).label("Size"),
-      file: Yup.mixed().required().label("File"),
+      file: Yup.mixed().required().label("Upload font"),
       font_category_id: Yup.mixed().required().label("Font category"),
       status: Yup.mixed().required().label("Status"),
     });
@@ -197,9 +199,7 @@ export default defineComponent({
           life: 3000,
         });
 
-        font.value.status = "";
-        font.value.font_category_id = "";
-        font.value.file = "";
+        await router.push({ path: "/fonts" });
         resetModal();
         resetForm();
       }

@@ -39,7 +39,7 @@
         <div class="flex flex-row gap-3">
           <div class="col-6 mb-0">
             <div class="flex flex-column gap-2 mb-0">
-              <label for="file">File</label>
+              <label for="file">Upload Font</label>
               <Field name="file" v-slot="{ field }">
                 <Dropdown
                     v-bind="field"
@@ -180,7 +180,7 @@ export default defineComponent({
     const schema = Yup.object().shape({
       name: Yup.string().required().min(2).max(100).label("Name"),
       size: Yup.number().typeError('Size must be a number field.').required().min(2).max(2000).label("Size"),
-      file: Yup.string().required().label("File"),
+      file: Yup.string().required().label("Upload font"),
       font_category_id: Yup.mixed().required().label("Font category"),
       status: Yup.mixed().required().label("Status"),
     });
