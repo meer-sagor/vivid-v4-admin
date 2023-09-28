@@ -9,7 +9,7 @@ const {handleSubmit, resetForm} = useForm();
 const fetching = ref(false);
 const spinner = ref(false);
 const schema = Yup.object().shape({
-  name: Yup.string().required().min(2).max(15).label("This"),
+  name: Yup.string().required().min(2).max(50).label("This"),
   order: Yup.number().typeError('Order is number field').required().label("Order Reqired"),
   type: Yup.mixed().required().label("Type"),
   status: Yup.mixed().required().label("status"),
@@ -26,6 +26,7 @@ const imageError = ref(null);
 const toast = useToast();
 const products = ref(null);
 const search = ref(null);
+const status = ref(null);
 const fileInput = ref(null);
 const files = ref();
 const fileData = ref();
@@ -65,6 +66,12 @@ watch(search, (newValue, oldValue) => {
 const searchTerm = computed(() => {
   return search.value ? '&name=' + search.value : ''
 })
+const statusTerm = computed(() => {
+  // console.log(status.value.value);
+  if (typeof(status.value) != "undefined"){
+    return status.value ? '&status=' + status.value : ''
+  }
+})
 onMounted( async () => {
   await nextTick();
   await initialize();
@@ -75,7 +82,7 @@ const initialize = async (event) => {
   if (event?.first){
     page = event.first / event.rows + 1;
   }
-  const { data, error } = await useApiFetch("/api/categories/?page=" + page + searchTerm.value, {
+  const { data, error } = await useApiFetch("/api/categories/?page=" + page + searchTerm.value + statusTerm.value, {
     method: "GET",
   });
   spinner.value = false
@@ -412,10 +419,11 @@ const onUpload = () => {
                   <label for="inventoryStatus" class="mb-0">Status</label>
                   <Dropdown
                     id="inventoryStatus"
-                    v-model="product.inventoryStatus"
+                    v-model="status"
                     :options="statuses"
                     optionLabel="label"
                     placeholder="Select a Status"
+                    @change="initialize"
                   >
                     <template #value="slotProps">
                       <div v-if="slotProps.value && slotProps.value.value">

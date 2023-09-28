@@ -9,7 +9,7 @@ const {handleSubmit, resetForm} = useForm();
 const fetching = ref(false);
 const spinner = ref(false);
 const schema = Yup.object({
-  name: Yup.string().required().min(2).max(15).label("Name"),
+  name: Yup.string().required().min(2).max(50).label("Name"),
   order: Yup.number().typeError('Order is number field').required().label("Order"),
   status: Yup.mixed().required().label("status"),
   category: Yup.mixed().required().label("category"),

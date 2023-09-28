@@ -9,8 +9,8 @@ const {handleSubmit, resetForm} = useForm();
 const fetching = ref(false);
 const spinner = ref(false);
 const schema = Yup.object({
-  name: Yup.string().required().min(2).max(15).label("Name"),
-  hex: Yup.string().required().min(2).max(15).label("Name"),
+  name: Yup.string().required().min(2).max(50).label("Name"),
+  hex: Yup.string().required().min(2).max(50).label("Name"),
   colorFamily: Yup.mixed().required().label("Color Family"),
   status: Yup.mixed().required().label("status"),
 });
