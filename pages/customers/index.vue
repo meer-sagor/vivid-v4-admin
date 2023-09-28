@@ -92,6 +92,8 @@ const updateStatus = (customer) => {
       });
 
       await fetchAssociates()
+    } else  {
+      location.reload();
     }
   });
 }
@@ -174,13 +176,15 @@ const updateStatus = (customer) => {
                   <span v-if="slotProps.data.status == '1'">Active</span>
                   <span v-if="slotProps.data.status == '0'">Inactive</span>
                 </div>
-                <input
-                    type="checkbox"
-                    :checked="slotProps.data.status == '1'"
-                    :id="'checkbox_' + slotProps.data.id"
-                    :name="'checkbox_' + slotProps.data.id"
-                    @change="updateStatus(slotProps.data)"
-                />
+
+                <label class="switch">
+                  <input type="checkbox" :checked="slotProps.data.status == '1'"
+                         :id="'checkbox_' + slotProps.data.id"
+                         :name="'checkbox_' + slotProps.data.id"
+                         @change="updateStatus(slotProps.data)"
+                  >
+                  <span class="slider round"></span>
+                </label>
 
               </div>
             </template>

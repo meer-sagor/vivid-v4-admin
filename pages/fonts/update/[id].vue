@@ -2,7 +2,7 @@
   <div class="card">
     <h5>Update Font Category</h5>
     <template v-if="fetching">
-      <Form id="add_font_form" @submit="onSubmit" :validation-schema="schema" v-slot="{ errors }">
+      <Form id="add_font_form" :initial-values="font" @submit="onSubmit" :validation-schema="schema" v-slot="{ errors }">
 
         <div class="flex flex-row gap-3">
           <div class="col-6 mb-0">
@@ -40,15 +40,19 @@
           <div class="col-6 mb-0">
             <div class="flex flex-column gap-2 mb-0">
               <label for="file">File</label>
-              <Field
-                  v-model="font.file"
-                  id="file"
-                  name="file"
-                  :class="{ 'p-invalid': errors.file }"
-                  class="p-inputtext p-component"
-                  aria-describedby="promo-file-error"
-                  placeholder="Enter file"
-              />
+              <Field name="file" v-slot="{ field }">
+                <Dropdown
+                    v-bind="field"
+                    v-model="font.file"
+                    :options="font_file_type_enums"
+                    optionLabel="name"
+                    optionValue="name"
+                    placeholder="Select a file type"
+                    display="chip"
+                    :class="{ 'p-invalid': errors.file }"
+                    aria-describedby="promo-file-error"
+                ></Dropdown>
+              </Field>
               <small class="p-error" id="font-file-error">{{errors.file || "&nbsp;"}}</small>
             </div>
           </div>
@@ -69,6 +73,27 @@
                 ></Dropdown>
               </Field>
               <small class="p-error" id="font-font-category-error">{{errors.font_category_id || "&nbsp;"}}</small>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-row gap-3">
+          <div class="col-6 mb-0">
+            <div class="flex flex-column gap-2 mb-0">
+              <label for="status">Status</label>
+              <Field name="status" v-slot="{ field }">
+                <Dropdown
+                    v-bind="field"
+                    v-model="font.status"
+                    :options="status_enums"
+                    optionLabel="name"
+                    optionValue="name"
+                    placeholder="Select a status"
+                    display="chip"
+                    :class="{ 'p-invalid': errors.status }"
+                    aria-describedby="promo-code-status-error"
+                ></Dropdown>
+              </Field>
+              <small class="p-error" id="promo-code-status-error">{{errors.status || "&nbsp;"}}</small>
             </div>
           </div>
         </div>
@@ -98,6 +123,8 @@ export default defineComponent({
     const fetching = ref(false);
     const spinner = ref(false);
     const font_categories = ref([]);
+    const font_file_type_enums = ref([]);
+    const status_enums = ref([]);
     const route = useRoute();
     const router = useRouter();
 
@@ -106,11 +133,13 @@ export default defineComponent({
       size: "",
       file: "",
       font_category_id: "",
+      status: "",
     });
 
     onMounted(async () => {
       await nextTick();
       await fetchFontCategories();
+      await fetchEnums();
       await fetchFonts();
     });
 
@@ -127,6 +156,17 @@ export default defineComponent({
       }
     };
 
+    const fetchEnums = async () => {
+      const {data, error} = await useApiFetch("/api/getEnums", {
+        method: "GET",
+      });
+      if (data.value) {
+        const getEnums = JSON.parse(JSON.stringify(computed(() => data.value).value));
+        status_enums.value = getEnums.statuses;
+        font_file_type_enums.value = getEnums.font_file_types;
+      }
+    };
+
     const fetchFonts = async () => {
       const {data, error} = await useApiFetch("/api/fonts/" + route.params.id + '/edit', {
         method: "GET",
@@ -140,8 +180,9 @@ export default defineComponent({
     const schema = Yup.object().shape({
       name: Yup.string().required().min(2).max(100).label("Name"),
       size: Yup.number().typeError('Size must be a number field.').required().min(2).max(2000).label("Size"),
-      file: Yup.string().required().min(2).max(2000).label("File"),
+      file: Yup.string().required().label("File"),
       font_category_id: Yup.mixed().required().label("Font category"),
+      status: Yup.mixed().required().label("Status"),
     });
 
     const onSubmit = async (values: any, actions: { setErrors: (arg0: any) => void }) => {
@@ -193,6 +234,8 @@ export default defineComponent({
       spinner,
       resetModal,
       font_categories,
+      status_enums,
+      font_file_type_enums,
     };
   },
 });

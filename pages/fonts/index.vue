@@ -42,16 +42,7 @@
                   <span v-if="slotProps.data.status == 'enable'">Enable</span>
                   <span v-if="slotProps.data.status == 'disable'">Disable</span>
                 </div>
-                <input
-                    type="checkbox"
-                    :checked="slotProps.data.status == 'enable'"
-                    :id="'checkbox_' + slotProps.data.status.id"
-                    :name="'checkbox_' + slotProps.data.status.id"
-                    @change="updateStatus(slotProps.data)"
-                />
-
               </div>
-
             </template>
           </Column>
           <Column :exportable="false" header="Actions"  style="width: 15%">
@@ -108,7 +99,6 @@ import {ref, onMounted, nextTick} from "vue";
 import { useApiFetch } from "@/composables/useApiFetch";
 import { useToast } from "primevue/usetoast";
 import {useFontsStore} from "~/stores/useFontsStore";
-const { $swal } = useNuxtApp()
 const toast = useToast();
 const fontsStore = useFontsStore();
 const search = ref(null);
@@ -157,32 +147,6 @@ const deleteFont = async () => {
     await fetchFonts()
   }
 };
-
-const updateStatus = (font) => {
-  $swal.fire({
-    title: "Confirm",
-    text: `Are you sure to update "${font.name}" status?`,
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#F85606',
-    cancelButtonColor: '#525252',
-    confirmButtonText: 'Yes, Changed it!',
-    cancelButtonText: 'No, cancel!',
-    buttonsStyling: true
-  }).then(async function (isConfirm) {
-    if (isConfirm.value === true) {
-      await useApiFetch("/api/font/status" , {
-        method: "POST",
-        body: {
-          id: font.id,
-          status: font.status.toUpperCase(),
-        },
-      });
-
-      await fetchFonts()
-    }
-  });
-}
 
 </script>
 <style scoped>

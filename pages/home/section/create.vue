@@ -15,8 +15,15 @@
         </div>
         <div class="flex flex-column gap-2 mb-1">
           <label for="description">Description</label>
-          <Field type="textarea" v-model="home_section.description" id="description" name="description" :class="{ 'p-invalid': errors.description }" class="p-inputtext p-component" aria-describedby="home-section-description-error" placeholder="Description"/>
-          <small class="p-error" id="home-section-description-error">{{ errors.description || '&nbsp;' }}</small>
+          <ClientOnly>
+            <QuillEditor
+                ref="editor"
+                v-model.content="home_section.description"
+                theme="snow"
+                content-type="html"
+                :style="{ height: '200px' }"
+                @update:content="handleChange"/>
+          </ClientOnly>
         </div>
         <div class="flex flex-column gap-2 mb-1">
           <label for="view_all_url">Url</label>
@@ -73,6 +80,7 @@ import {ref, defineComponent, nextTick, onMounted} from "vue";
 import * as Yup from "yup";
 import {useApiFetch} from "~/composables/useApiFetch";
 import {useImageUpload} from "~/components/image/useImageUpload.js";
+import {useRouter} from "vue-router";
 
 export default defineComponent({
   components: {Form, Field},
@@ -84,6 +92,7 @@ export default defineComponent({
     const spinner = ref(false);
     const categories = ref([]);
     const status_enums = ref([]);
+    const router = useRouter();
 
     const home_section = ref({
       name: "",
@@ -125,13 +134,23 @@ export default defineComponent({
     const schema = Yup.object().shape({
       name: Yup.string().required().min(2).max(100).label("Name"),
       section_title: Yup.string().required().min(2).max(100).label("Section title"),
-      description: Yup.string().required().min(2).max(100).label("Description"),
-      view_all_url: Yup.string().required().min(2).max(100).label("Url"),
+      view_all_url: Yup.string().url().required().min(2).max(100).label("Url"),
       categories: Yup.mixed().required().label("Categories"),
       status: Yup.mixed().required().label("Status"),
     });
 
     const onSubmit = async (values: any, actions: { setErrors: (arg0: any) => void; }) => {
+
+      if (home_section.value.description == null || home_section.value.description == '') {
+        toast.add({
+          severity: "info",
+          summary: "Danger",
+          detail: 'Description is a required field',
+          life: 3000,
+        });
+        return;
+      }
+
       loading.value = true
 
       const {data, error} = await useApiFetch("/api/home-sections", {
@@ -156,6 +175,7 @@ export default defineComponent({
           life: 3000,
         });
 
+        await router.push({ path: "/home/sections" });
         home_section.value.categories = []
         home_section.value.status = ''
         resetModal();
@@ -171,8 +191,12 @@ export default defineComponent({
       }
     };
 
+    const handleChange = (value: any) => {
+      home_section.value.description = value
+    };
+
     return {
-      schema, onSubmit, home_section, loading, fetching, spinner, resetModal, categories, status_enums
+      schema, onSubmit, home_section, loading, fetching, spinner, resetModal, categories, status_enums, handleChange
     }
 
   }

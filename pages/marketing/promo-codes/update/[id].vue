@@ -2,7 +2,7 @@
   <div class="card">
     <h5>Update Promo code</h5>
     <template v-if="fetching">
-      <Form id="add_promo_code_form" @submit="onSubmit" :validation-schema="schema" v-slot="{ errors }">
+      <Form id="add_promo_code_form" :initial-values="promo_code" @submit="onSubmit" :validation-schema="schema" v-slot="{ errors }">
         <div class="flex flex-row gap-3">
           <div class="col-6 mb-0">
             <div class="flex flex-column gap-2 mb-0">
@@ -141,6 +141,25 @@
               </Field>
             </div>
           </div>
+          <div class="col-6 mb-0">
+            <div class="flex flex-column gap-2 mb-0">
+              <label for="status">Status</label>
+              <Field name="status" v-slot="{ field }">
+                <Dropdown
+                    v-bind="field"
+                    v-model="promo_code.status"
+                    :options="status_enums"
+                    optionLabel="name"
+                    optionValue="name"
+                    placeholder="Select a status"
+                    display="chip"
+                    :class="{ 'p-invalid': errors.status }"
+                    aria-describedby="promo-code-status-error"
+                ></Dropdown>
+              </Field>
+              <small class="p-error" id="promo-code-status-error">{{errors.status || "&nbsp;"}}</small>
+            </div>
+          </div>
         </div>
         <Button class="" type="submit" label="Submit" :loading="loading" icon="pi pi-check"/>
       </Form>
@@ -181,6 +200,7 @@ export default defineComponent({
       per_coupon_limit: "",
       per_user_limit: "",
       expiry_date: "",
+      status: ""
     });
 
     onMounted(async () => {
@@ -222,6 +242,7 @@ export default defineComponent({
       max_spend: Yup.number().nullable().transform((v, o) => (o === '' ? null : v)).typeError('Max spend is must be a number field').min(1).max(100).label("Max spend"),
       per_coupon_limit: Yup.number().typeError('Per coupon limit is number field').nullable().label("Per coupon limit"),
       per_user_limit: Yup.number().typeError('Per user limit is number field').nullable().label("Per user limit"),
+      status: Yup.mixed().required().label("Status"),
     });
 
     const onSubmit = async (values: any, actions: { setErrors: (arg0: any) => void }) => {

@@ -5,6 +5,7 @@
         <DataTable
             :value="home_sections"
             data-key="id"
+            index="id"
             tableStyle="min-width: 50rem"
         >
           <template #paginatorstart>
@@ -42,7 +43,11 @@
           <Column field="id" header="ID" style="width: 5%"></Column>
           <Column field="name" header="Name" style="width: 10%"></Column>
           <Column field="section_title" header="Section Title" style="width: 15%"></Column>
-          <Column field="description" header="Description" style="width: 25%"></Column>
+          <Column field="description" header="Description" style="width: 25%">
+            <template #body="slotProps">
+              <span v-html="slotProps.data.description"></span>
+            </template>
+          </Column>
           <Column field="view_all_url" header="Url" style="width: 15%"></Column>
           <Column field="status" header="Status" style="width: 10%">
             <template #body="slotProps">
@@ -51,13 +56,15 @@
                   <span v-if="slotProps.data.status == 'enable'">Enable</span>
                   <span v-if="slotProps.data.status == 'disable'">Disable</span>
                 </div>
-                <input
-                    type="checkbox"
-                    :checked="slotProps.data.status == 'enable'"
-                    :id="'checkbox_' + slotProps.data.status.id"
-                    :name="'checkbox_' + slotProps.data.status.id"
-                    @change="updateStatus(slotProps.data)"
-                />
+                <label class="switch">
+                  <input type="checkbox"
+                         :checked="slotProps.data.status == 'enable'"
+                         :id="'checkbox_' + slotProps.data.id"
+                         :name="'checkbox_' + slotProps.data.id"
+                         @change="updateStatus(slotProps.data)"
+                  >
+                  <span class="slider round"></span>
+                </label>
 
               </div>
             </template>
@@ -117,6 +124,8 @@ import { useRolesStore } from "@/stores/useRolesStore";
 import { useApiFetch } from "@/composables/useApiFetch";
 import { useToast } from "primevue/usetoast";
 import {useHomeSectionStore} from "~/stores/useHomeSectionStore";
+import '@/assets/custom.css';
+
 const { $swal } = useNuxtApp()
 const toast = useToast();
 const HomeSectionStore = useHomeSectionStore();
@@ -128,6 +137,10 @@ const home_section = ref({});
 const id = ref(null);
 const home_sections = ref([]);
 const errorMessage = ref("");
+
+const checked = ref(false);
+
+
 const fetchHomeSections = async () => {
   await HomeSectionStore.getHomeSections();
   if (HomeSectionStore.home_sections) {
@@ -185,8 +198,9 @@ const updateStatus = (home_section) => {
           status: home_section.status.toUpperCase(),
         },
       });
-
       await fetchHomeSections()
+    } else  {
+      location.reload();
     }
   });
 }
