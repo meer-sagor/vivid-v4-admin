@@ -21,6 +21,7 @@ const products = ref(null);
 const search = ref(null);
 const fileInput = ref(null);
 const files = ref();
+const fileData = ref();
 const colors = ref([]);
 const colorFamilies = ref([]);
 const rowsPerPage = ref(0)
