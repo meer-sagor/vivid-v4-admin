@@ -12,9 +12,10 @@
                       :options="media_types"
                       optionLabel="name"
                       optionValue="name"
-                      placeholder="Select a type"
+                      placeholder="Select a media type"
                       display="chip"
-                  ></Dropdown>
+                  >
+                  </Dropdown>
                 </div>
               </div>
               <div class="col-3 mb-0">
@@ -110,6 +111,9 @@ const fetchMediaCategories = async () => {
   await mediaStore.getMediaCategories();
   if (mediaStore.categories) {
     categories.value = mediaStore.categories;
+    let valueNullObject = { id: '', name: '' }
+    categories.value.unshift(valueNullObject);
+
   }
 };
 
@@ -117,6 +121,8 @@ const fetchMediaTypes = async () => {
   await mediaStore.getMediaTypes();
   if (mediaStore.media_types) {
     media_types.value = mediaStore.media_types;
+    let valueNullObject = { id: '', name: '' }
+    media_types.value.unshift(valueNullObject);
   }
 };
 
