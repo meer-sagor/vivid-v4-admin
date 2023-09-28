@@ -162,6 +162,18 @@ const onUpload = () => {
 </script>
 
 <template>
+  <div
+    class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
+  >
+    <NuxtLink to="/product">
+      <Button
+        icon="pi pi-angle-left"
+        label="Go Back"
+        class="p-button-text mr-2 mb-2"
+      />
+    </NuxtLink>
+  </div>
+
   <div class="grid">
     <div class="col-12">
       <div class="card">
@@ -179,121 +191,14 @@ const onUpload = () => {
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
           responsiveLayout="scroll"
         >
+          <h3 class="mb-4">Child Product</h3>
           <template #header>
-            <div class="col-12 mb-4">
-              <h3 class="m-0">Product</h3>
-            </div>
             <div
-              class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
+              class="flex flex-column md:flex-row md:justify-content-end md:align-items-center"
             >
               <div
                 class="flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3"
               >
-                <div class="flex gap-2 md:align-items-center">
-                  <label for="inventoryStatus" class="mb-0">Brand</label>
-                  <Dropdown
-                    id="inventoryStatus"
-                    v-model="product.inventoryStatus"
-                    :options="statuses"
-                    optionLabel="label"
-                    placeholder="Select a Brand"
-                  >
-                    <template #value="slotProps">
-                      <div v-if="slotProps.value && slotProps.value.value">
-                        <span
-                          :class="
-                            'product-badge status-' + slotProps.value.value
-                          "
-                          >{{ slotProps.value.label }}</span
-                        >
-                      </div>
-                      <div
-                        v-else-if="slotProps.value && !slotProps.value.value"
-                      >
-                        <span
-                          :class="
-                            'product-badge status-' +
-                            slotProps.value.toLowerCase()
-                          "
-                          >{{ slotProps.value }}</span
-                        >
-                      </div>
-                      <span v-else>
-                        {{ slotProps.placeholder }}
-                      </span>
-                    </template>
-                  </Dropdown>
-                </div>
-                <div class="flex gap-2 md:align-items-center">
-                  <label for="inventoryStatus" class="mb-0">Category</label>
-                  <Dropdown
-                    id="inventoryStatus"
-                    v-model="product.inventoryStatus"
-                    :options="statuses"
-                    optionLabel="label"
-                    placeholder="Select a Category"
-                  >
-                    <template #value="slotProps">
-                      <div v-if="slotProps.value && slotProps.value.value">
-                        <span
-                          :class="
-                            'product-badge status-' + slotProps.value.value
-                          "
-                          >{{ slotProps.value.label }}</span
-                        >
-                      </div>
-                      <div
-                        v-else-if="slotProps.value && !slotProps.value.value"
-                      >
-                        <span
-                          :class="
-                            'product-badge status-' +
-                            slotProps.value.toLowerCase()
-                          "
-                          >{{ slotProps.value }}</span
-                        >
-                      </div>
-                      <span v-else>
-                        {{ slotProps.placeholder }}
-                      </span>
-                    </template>
-                  </Dropdown>
-                </div>
-                <div class="flex gap-2 md:align-items-center">
-                  <label for="inventoryStatus" class="mb-0">Subcategory</label>
-                  <Dropdown
-                    id="inventoryStatus"
-                    v-model="product.inventoryStatus"
-                    :options="statuses"
-                    optionLabel="label"
-                    placeholder="Select a Subcategory"
-                  >
-                    <template #value="slotProps">
-                      <div v-if="slotProps.value && slotProps.value.value">
-                        <span
-                          :class="
-                            'product-badge status-' + slotProps.value.value
-                          "
-                          >{{ slotProps.value.label }}</span
-                        >
-                      </div>
-                      <div
-                        v-else-if="slotProps.value && !slotProps.value.value"
-                      >
-                        <span
-                          :class="
-                            'product-badge status-' +
-                            slotProps.value.toLowerCase()
-                          "
-                          >{{ slotProps.value }}</span
-                        >
-                      </div>
-                      <span v-else>
-                        {{ slotProps.placeholder }}
-                      </span>
-                    </template>
-                  </Dropdown>
-                </div>
                 <div class="flex gap-2 md:align-items-center">
                   <label for="inventoryStatus" class="mb-0">Status</label>
                   <Dropdown
@@ -337,7 +242,7 @@ const onUpload = () => {
                   />
                 </span>
 
-                <NuxtLink to="/product/create">
+                <NuxtLink to="/product/child/create">
                   <Button
                     label="New"
                     icon="pi pi-plus"
@@ -366,9 +271,9 @@ const onUpload = () => {
               />
             </template>
           </Column>
-          <Column field="name" header="Style Numer">
+          <Column field="name" header="Style Numer" :sortable="true">
             <template #body="slotProps">
-              <span class="p-column-title">Style Number</span>
+              <span class="p-column-title">Style Numer</span>
               {{ slotProps.data.name }}
             </template>
           </Column>
@@ -378,19 +283,19 @@ const onUpload = () => {
               {{ slotProps.data.name }}
             </template>
           </Column>
-          <Column field="name" header="Sub Category">
+          <Column field="name" header="Sub Category" :sortable="true">
             <template #body="slotProps">
-              <span class="p-column-title">Sub-Category</span>
+              <span class="p-column-title">Sub Category</span>
               {{ slotProps.data.name }}
             </template>
           </Column>
-          <Column field="name" header="Brand">
+          <Column field="name" header="Brand" :sortable="true">
             <template #body="slotProps">
               <span class="p-column-title">Brand</span>
               {{ slotProps.data.name }}
             </template>
           </Column>
-          <Column field="name" header="Childs">
+          <Column field="name" header="Childs" :sortable="true">
             <template #body="slotProps">
               <span class="p-column-title">Childs</span>
               {{ slotProps.data.name }}
@@ -418,13 +323,9 @@ const onUpload = () => {
           </Column>
           <Column class="text-right" style="min-width: 270px">
             <template #body="slotProps">
-              <NuxtLink :to="{ path: '/product/child' }" class="mr-4">
-                <Button
-                  severity="default"
-                  label="View Child"
-                  class="p-button-info p-button-text"
-                />
-              </NuxtLink>
+              <!-- <NuxtLink :to="{ path: '/product/child' }" class="mr-4">
+                View Child
+              </NuxtLink> -->
               <span class="p-buttonset">
                 <Button
                   icon="pi pi-pencil"

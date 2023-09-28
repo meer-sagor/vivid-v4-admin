@@ -3,7 +3,6 @@ import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
 import { onMounted, ref } from "vue";
-import TipTap from "@/components/TipTap.vue";
 
 const description = ref(null);
 const chartDescription = ref(null);
@@ -51,6 +50,10 @@ const openNew = () => {
   product.value = {};
   submitted.value = false;
   productDialog.value = true;
+};
+
+const handleChange = (value) => {
+  description = value;
 };
 
 const hideDialog = () => {
@@ -154,7 +157,7 @@ const onUpload = () => {
 
 <template>
   <div
-    class="card flex flex-column md:flex-row md:justify-content-between md:align-items-center"
+    class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
   >
     <NuxtLink to="/product">
       <Button
@@ -163,12 +166,13 @@ const onUpload = () => {
         class="p-button-text mr-2 mb-2"
       />
     </NuxtLink>
-    <h5>Create Product</h5>
   </div>
+
   <div class="grid">
     <div class="col-8">
       <div class="card p-fluid">
-        <div class="field">
+        <h5>Create Product</h5>
+        <div class="field mt-4">
           <label for="name">Name</label>
           <InputText
             id="name"
@@ -243,12 +247,30 @@ const onUpload = () => {
 
         <div class="field">
           <label for="name" class="mb-3">Description</label>
-          <TipTap v-model="description" />
+          <ClientOnly>
+            <QuillEditor
+              ref="editor"
+              v-model.content="description"
+              theme="snow"
+              content-type="html"
+              :style="{ height: '200px' }"
+              @update:content="handleChange"
+            />
+          </ClientOnly>
         </div>
 
         <div class="field">
           <label for="name" class="mb-3">Size Chart Description</label>
-          <TipTap v-model="chartDescription" />
+          <ClientOnly>
+            <QuillEditor
+              ref="editor"
+              v-model.content="chartDescription"
+              theme="snow"
+              content-type="html"
+              :style="{ height: '200px' }"
+              @update:content="handleChange"
+            />
+          </ClientOnly>
         </div>
 
         <div class="field">
@@ -287,7 +309,18 @@ const onUpload = () => {
     <div class="col-4">
       <div class="card p-fluid">
         <div class="field">
-          <label for="name">Images</label>
+          <label for="name">Primary Image</label>
+          <FileUpload
+            name="demo[]"
+            @uploader="onUpload"
+            accept="image/*"
+            :maxFileSize="1000000"
+            customUpload
+          />
+        </div>
+
+        <div class="field">
+          <label for="name">Additional Images</label>
           <FileUpload
             name="demo[]"
             @uploader="onUpload"
@@ -431,6 +464,150 @@ const onUpload = () => {
             <div class="field col">
               <label for="name" class="flex mb-3">Default Embroidery</label>
               <InputSwitch v-model="defaultEmbroidery" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="card">
+        <div class="field">
+          <div
+            class="formgrid"
+            style="
+              border: 1px solid #e4e4e4;
+              border-radius: 12px;
+              padding: 16px;
+            "
+          >
+            <div>
+              <div
+                class="flex justify-content-between flex-column sm:flex-row mb-3"
+              >
+                <h4>Size Chart</h4>
+                <div>
+                  <Button
+                    label="Add"
+                    icon="pi pi-plus"
+                    class="mr-2 mb-2"
+                  ></Button>
+                </div>
+              </div>
+              <table style="width: 100%; text-align: left">
+                <thead>
+                  <tr>
+                    <th>Sizes</th>
+                    <th>Width</th>
+                    <th>Length</th>
+                    <th>Remove</th>
+                    <th>Up/Down</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <InputText type="text" placeholder="Default"></InputText>
+                    </td>
+                    <td>
+                      <InputText type="text" placeholder="Default"></InputText>
+                    </td>
+                    <td>
+                      <InputText type="text" placeholder="Default"></InputText>
+                    </td>
+                    <td>
+                      <i class="pi pi-times"></i>
+                    </td>
+                    <td>
+                      <Button
+                        icon="pi pi-sort-alt"
+                        class="p-button-rounded p-button-text mr-2 mb-2"
+                      />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div
+            class="formgrid"
+            style="
+              border: 1px solid #e4e4e4;
+              border-radius: 12px;
+              padding: 16px;
+            "
+          >
+            <div>
+              <div
+                class="flex justify-content-between flex-column sm:flex-row mb-3"
+              >
+                <h4>Price Shirt Chart</h4>
+                <div>
+                  <Button
+                    label="Add"
+                    icon="pi pi-plus"
+                    class="mr-2 mb-2"
+                  ></Button>
+                </div>
+              </div>
+              <table style="width: 100%; text-align: left">
+                <thead>
+                  <tr>
+                    <th>Sizes</th>
+                    <th>Range From</th>
+                    <th>Range To</th>
+                    <th>Price</th>
+                    <th>Remove</th>
+                    <th>Up/Down</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Infant Colors</td>
+                    <td>
+                      <InputText type="text" placeholder="Default"></InputText>
+                    </td>
+                    <td>
+                      <InputText type="text" placeholder="Default"></InputText>
+                    </td>
+                    <td>
+                      <InputText type="text" placeholder="Default"></InputText>
+                    </td>
+                    <td>
+                      <i class="pi pi-times"></i>
+                    </td>
+                    <td>
+                      <Button
+                        icon="pi pi-sort-alt"
+                        class="p-button-rounded p-button-text mr-2 mb-2"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Infant White</td>
+                    <td>
+                      <InputText type="text" placeholder="Default"></InputText>
+                    </td>
+                    <td>
+                      <InputText type="text" placeholder="Default"></InputText>
+                    </td>
+                    <td>
+                      <InputText type="text" placeholder="Default"></InputText>
+                    </td>
+                    <td>
+                      <i class="pi pi-times"></i>
+                    </td>
+                    <td>
+                      <Button
+                        icon="pi pi-sort-alt"
+                        class="p-button-rounded p-button-text mr-2 mb-2"
+                      />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
