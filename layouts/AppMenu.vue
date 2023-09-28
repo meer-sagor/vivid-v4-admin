@@ -65,6 +65,11 @@ const model = ref([
         to: "/fabrics",
       },
       {
+        label: "Colors Family",
+        icon: "pi pi-fw pi-id-card",
+        to: "/color-family",
+      },
+      {
         label: "Colors",
         icon: "pi pi-fw pi-id-card",
         to: "/colors",

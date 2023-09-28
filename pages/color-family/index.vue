@@ -11,7 +11,7 @@ const spinner = ref(false);
 const schema = Yup.object({
   name: Yup.string().required().min(2).max(50).label("Name"),
   hex: Yup.string().required().min(2).max(50).label("Name"),
-  colorFamily: Yup.mixed().required().label("Color Family"),
+  // colorFamily: Yup.mixed().required().label("Color Family"),
   status: Yup.mixed().required().label("status"),
 });
 const imageError = ref(null);
@@ -67,7 +67,7 @@ const initialize = async (event) => {
   if (event?.first){
     page = event.first / event.rows + 1;
   }
-  const { data, error } = await useApiFetch("/api/colors/?page=" + page + searchTerm.value, {
+  const { data, error } = await useApiFetch("/api/color-families/?page=" + page + searchTerm.value, {
     method: "GET",
   });
   spinner.value = false
@@ -81,9 +81,9 @@ const initialize = async (event) => {
   }
   if (data.value) {
     fetching.value = true
-    colors.value = data.value.colors.data;
-    rowsPerPage.value = data.value.colors.per_page
-    totalRecords.value = data.value.colors.total
+    colors.value = data.value.color_families.data;
+    rowsPerPage.value = data.value.color_families.per_page
+    totalRecords.value = data.value.color_families.total
     //   totalData.value  = data.value.roles.total
   }
 };
@@ -132,7 +132,7 @@ const saveProduct = async () => {
       product.value.status = product.value.status.toUpperCase()
       console.log(product.value.status);
       const { data, error } = await useApiFetch(
-        "/api/colors/" + product.value.id,
+        "/api/color-families/" + product.value.id,
         {
           method: "PUT",
           body: product.value,
@@ -163,7 +163,7 @@ const saveProduct = async () => {
       //   life: 3000,
       // });
     } else {
-      const { data, error } = await useApiFetch("/api/colors", {
+      const { data, error } = await useApiFetch("/api/color-families/", {
         method: "POST",
         body: product.value,
       });
@@ -238,7 +238,7 @@ const confirmDeleteProduct = (editProduct) => {
 };
 
 const deleteProduct = async () => {
-  const { data, error } = await useApiFetch("/api/colors/" + product.value.id, {
+  const { data, error } = await useApiFetch("/api/color-families/" + product.value.id, {
     method: "DELETE",
   });
   // errorMessage.value = null;
@@ -343,7 +343,7 @@ const onUpload = () => {
             <div
               class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
             >
-              <h3 class="m-0">Colors</h3>
+              <h3 class="m-0">Color Family</h3>
               <div
                 class="flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3"
               >
@@ -447,7 +447,7 @@ const onUpload = () => {
               <small class="p-error" id="category-hex-error">{{ errors.hex || '&nbsp;' }}</small>
             </div>
 
-            <div class="field">
+            <!-- <div class="field">
               <label for="colorFamily" class="mb-3">Color Family</label>
               <Field name="colorFamily" v-slot="{ field }">
                 <Dropdown
@@ -465,7 +465,7 @@ const onUpload = () => {
               <small class="p-error" id="category-colorFamily-error">{{
                 errors.colorFamily || "&nbsp;"
               }}</small>
-            </div>
+            </div> -->
             <div class="field">
               <label for="name">Image</label>
               <FileUpload ref="fileInput" mode="basic" name="demo[]" url="/api/upload" accept="image/*" customUpload @select="onPhotoSelect($event)" />

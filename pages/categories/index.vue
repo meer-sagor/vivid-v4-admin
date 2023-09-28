@@ -27,6 +27,7 @@ const toast = useToast();
 const products = ref(null);
 const search = ref(null);
 const status = ref(null);
+const type = ref(null);
 const fileInput = ref(null);
 const files = ref();
 const fileData = ref();
@@ -67,9 +68,18 @@ const searchTerm = computed(() => {
   return search.value ? '&name=' + search.value : ''
 })
 const statusTerm = computed(() => {
-  // console.log(status.value.value);
-  if (typeof(status.value) != "undefined"){
-    return status.value ? '&status=' + status.value : ''
+  if (status.value){
+    return  '&status=' + status.value.value
+  }else{
+    return ''
+  }
+})
+const typeTerm = computed(() => {
+  // console.log(status.value,'status');
+  if (type.value){
+    return  '&type=' + type.value.value
+  }else{
+    return ''
   }
 })
 onMounted( async () => {
@@ -82,7 +92,7 @@ const initialize = async (event) => {
   if (event?.first){
     page = event.first / event.rows + 1;
   }
-  const { data, error } = await useApiFetch("/api/categories/?page=" + page + searchTerm.value + statusTerm.value, {
+  const { data, error } = await useApiFetch("/api/categories/?page=" + page + searchTerm.value + statusTerm.value + typeTerm.value, {
     method: "GET",
   });
   spinner.value = false
@@ -383,10 +393,11 @@ const onUpload = () => {
                   <label for="inventoryStatus" class="mb-0">Type</label>
                   <Dropdown
                     id="inventoryStatus"
-                    v-model="product.inventoryStatus"
-                    :options="statuses"
+                    v-model="type"
+                    :options="types"
                     optionLabel="label"
                     placeholder="Select a Type"
+                    @change="initialize"
                   >
                     <template #value="slotProps">
                       <div v-if="slotProps.value && slotProps.value.value">
