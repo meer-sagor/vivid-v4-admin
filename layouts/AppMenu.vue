@@ -178,9 +178,9 @@ const model = ref([
       },
     ],
   },
-  {
-    label: "Manage Pages",
-    icon: "pi pi-fw pi-briefcase",
+  // {
+  //   label: "Manage Pages",
+  //   icon: "pi pi-fw pi-briefcase",
     // items: [
     //   {
     //     label: "Pages",
@@ -198,7 +198,7 @@ const model = ref([
     //     to: "/dummy",
     //   },
     // ],
-  },
+  // },
   // {
   //   label: "Settings",
   //   icon: "pi pi-fw pi-briefcase",
@@ -206,18 +206,18 @@ const model = ref([
   //     {
   //       label: "Media",
   //       icon: "pi pi-fw pi-exclamation-circle",
-  //       to: "/dummy",
+  //       to: "/medias",
   //     },
-  //     {
-  //       label: "Analytics",
-  //       icon: "pi pi-fw pi-circle-off",
-  //       to: "/dummy",
-  //     },
-  //     {
-  //       label: "Settings",
-  //       icon: "pi pi-fw pi-circle-off",
-  //       to: "/dummy",
-  //     },
+      // {
+      //   label: "Analytics",
+      //   icon: "pi pi-fw pi-circle-off",
+      //   to: "/dummy",
+      // },
+      // {
+      //   label: "Settings",
+      //   icon: "pi pi-fw pi-circle-off",
+      //   to: "/dummy",
+      // },
   //   ],
   // },
   // {
