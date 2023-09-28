@@ -1,7 +1,10 @@
 import type { UseFetchOptions } from "nuxt/app";
 import { baseURL, apiURL } from "@/config/environment"
+import {useAuthStore} from "~/stores/useAuthStore";
 
 export function useApiFetch<T> (path: string, options: UseFetchOptions<T> = {}) {
+
+  const authStore = useAuthStore();
 
   let headers: any = {
     accept: "application/json",
@@ -9,6 +12,10 @@ export function useApiFetch<T> (path: string, options: UseFetchOptions<T> = {}) 
   }
 
   const token = useCookie("XSRF-TOKEN");
+
+  // if (!token.value){
+  //   authStore.logout().then(r => console.log(r))
+  // }
 
   if (token.value) {
     headers['X-XSRF-TOKEN'] = token.value as string;
