@@ -2,7 +2,7 @@
   <div class="card">
     <h5>Add Font Category</h5>
     <template v-if="fetching">
-      <Form id="add_font_category_form" @submit="onSubmit" :validation-schema="schema" v-slot="{ errors }">
+      <Form id="add_font_category_form" :initial-values="font_category" @submit="onSubmit" :validation-schema="schema" v-slot="{ errors }">
 
         <div class="flex flex-row gap-3">
           <div class="col-6 mb-0">
@@ -41,7 +41,7 @@
           <div class="col-6 mb-0">
             <div class="flex flex-column gap-2 mb-0">
               <label for="status">Status</label>
-              <Field name="status" v-slot="{ field }">
+              <Field  name="status" v-slot="{ field, meta }">
                 <Dropdown
                     v-bind="field"
                     v-model="font_category.status"
@@ -88,7 +88,7 @@ export default defineComponent({
     const font_category = ref({
       name: "",
       description: "",
-      status: "",
+      status: "ENABLE",
     });
 
     onMounted(async () => {
@@ -111,7 +111,11 @@ export default defineComponent({
 
     const schema = Yup.object().shape({
       name: Yup.string().required().min(2).max(100).label("Name"),
-      status: Yup.mixed().required().label("Status"),
+      status: Yup.string()
+          .transform((currentValue, originalValue) => {
+            return originalValue.value || currentValue;
+          })
+          .required().label("Status"),
     });
 
     const onSubmit = async (values: any, actions: { setErrors: (arg0: any) => void }) => {
@@ -157,7 +161,6 @@ export default defineComponent({
       }
     };
 
-
     const resetModal = () => {
       const resetForm = document.getElementById("add_font_category_form") as HTMLFormElement;
       if (resetForm) {
@@ -168,7 +171,6 @@ export default defineComponent({
     const handleChange = (value: any) => {
       font_category.value.description = value
     };
-
 
     const clearEditor = () => {
       if (editor.value !== null) {

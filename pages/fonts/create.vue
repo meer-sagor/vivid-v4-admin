@@ -2,7 +2,7 @@
   <div class="card">
     <h5>Add Font Category</h5>
     <template v-if="fetching">
-      <Form id="add_font_form" @submit="onSubmit" :validation-schema="schema" v-slot="{ errors }">
+      <Form id="add_font_form" :initial-values="font" @submit="onSubmit" :validation-schema="schema" v-slot="{ errors }">
 
         <div class="flex flex-row gap-3">
           <div class="col-6 mb-0">
@@ -131,7 +131,7 @@ export default defineComponent({
       size: "",
       file: "",
       font_category_id: "",
-      status: "",
+      status: "ENABLE",
     });
 
     onMounted(async () => {
@@ -199,6 +199,7 @@ export default defineComponent({
 
         font.value.status = "";
         font.value.font_category_id = "";
+        font.value.file = "";
         resetModal();
         resetForm();
       }
@@ -224,6 +225,7 @@ export default defineComponent({
       status_enums,
       font_file_type_enums,
       font_categories,
+      status_enums,
     };
   },
 });

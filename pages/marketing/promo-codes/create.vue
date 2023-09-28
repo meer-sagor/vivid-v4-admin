@@ -4,6 +4,7 @@
     <template v-if="fetching">
       <Form
         id="add_promo_code_form"
+        :initial-values="promo_code"
         @submit="onSubmit"
         :validation-schema="schema"
         v-slot="{ errors }"
@@ -189,6 +190,7 @@ import { Field, Form, useField, useForm } from "vee-validate";
 import { ref, defineComponent, nextTick, onMounted } from "vue";
 import * as Yup from "yup";
 import { useApiFetch } from "~/composables/useApiFetch";
+import {useRouter} from "vue-router";
 
 export default defineComponent({
   components: { Form, Field },
@@ -200,6 +202,7 @@ export default defineComponent({
     const spinner = ref(false);
     const status_enums = ref([]);
     const discount_type_enums = ref([]);
+    const router = useRouter();
 
      const promo_code = ref({
       name: "",
@@ -211,7 +214,7 @@ export default defineComponent({
       per_coupon_limit: "",
       per_user_limit: "",
       expiry_date: "",
-      status: "",
+      status: "ENABLE",
     });
 
     onMounted(async () => {
@@ -283,9 +286,7 @@ export default defineComponent({
           life: 3000,
         });
 
-        promo_code.value.discount_type = "";
-        promo_code.value.status = "";
-        promo_code.value.expiry_date = "";
+        await router.push({ path: "/marketing/promo-codes" });
         resetModal();
         resetForm();
       }

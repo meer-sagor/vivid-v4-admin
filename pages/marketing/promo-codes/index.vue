@@ -60,15 +60,6 @@
                   <span v-if="slotProps.data.status == 'enable'">Enable</span>
                   <span v-if="slotProps.data.status == 'disable'">Disable</span>
                 </div>
-                <label class="switch">
-                  <input type="checkbox" :checked="slotProps.data.status == 'enable'"
-                         :id="'checkbox_' + slotProps.data.id"
-                         :name="'checkbox_' + slotProps.data.id"
-                         @change="updateStatus(slotProps.data)"
-                  >
-                  <span class="slider round"></span>
-                </label>
-
               </div>
             </template>
           </Column>
@@ -127,7 +118,6 @@ import { useApiFetch } from "~/composables/useApiFetch";
 import { useToast } from "primevue/usetoast";
 import { usePromoCodeStore} from "~/stores/usePromoCodeStore";
 import moment from "moment/moment";
-const { $swal } = useNuxtApp()
 const toast = useToast();
 const PromoCodeStore = usePromoCodeStore();
 const search = ref(null);
@@ -176,35 +166,7 @@ const deletePromoCode = async () => {
 };
 
 const createdAt = (date) => {
-  return moment(date).format('MMMM Do YYYY, h:mm:ss a')
-}
-
-const updateStatus = (promo_code) => {
-  $swal.fire({
-    title: "Confirm",
-    text: `Are you sure to update "${promo_code.name}" status?`,
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#F85606',
-    cancelButtonColor: '#525252',
-    confirmButtonText: 'Yes, Changed it!',
-    cancelButtonText: 'No, cancel!',
-    buttonsStyling: true
-  }).then(async function (isConfirm) {
-    if (isConfirm.value === true) {
-      await useApiFetch("/api/promo-code/status" , {
-        method: "POST",
-        body: {
-          id: promo_code.id,
-          status: promo_code.status.toUpperCase(),
-        },
-      });
-
-      await fetchPromoCodes()
-    } else  {
-      location.reload();
-    }
-  });
+  return moment(date).format('MMMM Do YYYY')
 }
 
 </script>
