@@ -145,6 +145,7 @@ const saveProduct = async () => {
 
 const editProduct = (editProduct) => {
   product.value = { ...editProduct };
+  product.value.status = product.value.status.toUpperCase()
   console.log(product);
   productDialog.value = true;
 };
