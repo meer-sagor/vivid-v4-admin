@@ -2,12 +2,11 @@
   <div class="grid p-fluid">
     <div class="col-12">
       <div class="card">
-        <Galleria :value="medias" :responsiveOptions="responsiveOptions" :numVisible="7"
-                  containerStyle="max-width: 850px" :circular="true" :fullScreen="true" :showItemNavigators="true" :showThumbnails="false">
-          <template #item="slotProps">
-            <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt" style="width: 100%; display: block" />
-          </template>
-        </Galleria>
+        <div v-if="medias" class="grid" style="max-width: 400px">
+          <div v-for="(image, index) of medias" :key="index" class="col-4">
+            <img :src="image.url" :alt="image.type"/>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -23,6 +22,25 @@ const mediaStore = useMediaStore();
 const search = ref(null);
 const medias = ref([]);
 const categories = ref([]);
+const responsiveOptions = ref([
+  {
+    breakpoint: '1024px',
+    numVisible: 5
+  },
+  {
+    breakpoint: '768px',
+    numVisible: 3
+  },
+  {
+    breakpoint: '560px',
+    numVisible: 1
+  }
+]);
+
+const imageClick = (index) => {
+  activeIndex.value = index;
+  displayCustom.value = true;
+};
 
 const fetchMedias = async () => {
   await mediaStore.getMedias();
