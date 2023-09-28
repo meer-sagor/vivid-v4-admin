@@ -22,6 +22,7 @@ const rowsPerPage = ref(0)
 const totalRecords = ref(0)
 const products = ref(null);
 const search = ref(null);
+const status = ref(null);
 const fileInput = ref(null);
 const files = ref();
 const fileData = ref();
@@ -58,6 +59,13 @@ watch(search, (newValue, oldValue) => {
 const searchTerm = computed(() => {
   return search.value ? '&name=' + search.value : ''
 })
+const statusTerm = computed(() => {
+  if (status.value){
+    return  '&status=' + status.value.value
+  }else{
+    return ''
+  }
+})
 onMounted(async () => {
   await nextTick();
   await initialize();
@@ -69,7 +77,7 @@ const initialize = async (event) => {
   if (event?.first){
     page = event.first / event.rows + 1;
   }
-  const { data, error } = await useApiFetch("/api/sub-categories/?page=" + page + searchTerm.value, {
+  const { data, error } = await useApiFetch("/api/sub-categories/?page=" + page + searchTerm.value + statusTerm.value, {
     method: "GET",
   });
   spinner.value = false
@@ -394,7 +402,7 @@ const onUpload = () => {
               <div
                 class="flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3"
               >
-                <div class="flex gap-2 md:align-items-center">
+                <!-- <div class="flex gap-2 md:align-items-center">
                   <label for="inventoryStatus" class="mb-0">Category</label>
                   <Dropdown
                     id="inventoryStatus"
@@ -416,11 +424,8 @@ const onUpload = () => {
                         v-else-if="slotProps.value && !slotProps.value.value"
                       >
                         <span
-                          :class="
-                            'product-badge status-' +
-                            slotProps.value.toLowerCase()
-                          "
-                          >{{ slotProps.value }}</span
+                          :class="'product-badge status-' + slotProps.value.toLowerCase()"
+                        >{{ slotProps.value }}</span
                         >
                       </div>
                       <span v-else>
@@ -428,15 +433,16 @@ const onUpload = () => {
                       </span>
                     </template>
                   </Dropdown>
-                </div>
+                </div> -->
                 <div class="flex gap-2 md:align-items-center">
                   <label for="inventoryStatus" class="mb-0">Status</label>
                   <Dropdown
                     id="inventoryStatus"
-                    v-model="product.inventoryStatus"
+                    v-model="status"
                     :options="statuses"
                     optionLabel="label"
                     placeholder="Select a Status"
+                    @change="initialize"
                   >
                     <template #value="slotProps">
                       <div v-if="slotProps.value && slotProps.value.value">

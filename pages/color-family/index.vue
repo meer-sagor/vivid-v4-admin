@@ -8,30 +8,21 @@ import * as Yup from "yup";
 const {handleSubmit, resetForm} = useForm();
 const fetching = ref(false);
 const spinner = ref(false);
-const schema = Yup.object().shape({
-  name: Yup.string().required().min(2).max(50).label("This"),
-  order: Yup.number().typeError('Order is number field').required().label("Order Reqired"),
-  type: Yup.mixed().required().label("Type"),
+const schema = Yup.object({
+  name: Yup.string().required().min(2).max(50).label("Name"),
+  hex: Yup.string().required().min(2).max(50).label("Name"),
+  // colorFamily: Yup.mixed().required().label("Color Family"),
   status: Yup.mixed().required().label("status"),
 });
 const imageError = ref(null);
-// const resetModal = () => {
-//   const resetForm = document.getElementById(
-//     "add_promo_code_form"
-//   ) as HTMLFormElement;
-//   if (resetForm) {
-//     resetForm.reset();
-//   }
-// };
 const toast = useToast();
+
 const products = ref(null);
 const search = ref(null);
-const status = ref(null);
-const type = ref(null);
 const fileInput = ref(null);
 const files = ref();
-const fileData = ref();
-const categories = ref([]);
+const colors = ref([]);
+const colorFamilies = ref([]);
 const rowsPerPage = ref(0)
 const totalRecords = ref(0)
 const productDialog = ref(false);
@@ -48,15 +39,11 @@ const statuses = ref([
   { label: "Enable", value: "ENABLE" },
   { label: "Disable", value: "DISABLE" },
 ]);
-const types = ref([
-  { label: "Product", value: "product" },
-  { label: "Product Design", value: "product_design" },
-  { label: "Embroidery Design", value: "embroidery_design" },
-]);
+
 const onPhotoSelect = ($event) => {
   product.value.image_id == null
-  files.value = fileInput.value?.files;
   imageError.value = null;
+  files.value = fileInput.value?.files;
   console.log(files.value[0].objectURL);
 };
 // wathcer 
@@ -67,24 +54,11 @@ watch(search, (newValue, oldValue) => {
 const searchTerm = computed(() => {
   return search.value ? '&name=' + search.value : ''
 })
-const statusTerm = computed(() => {
-  if (status.value){
-    return  '&status=' + status.value.value
-  }else{
-    return ''
-  }
-})
-const typeTerm = computed(() => {
-  // console.log(status.value,'status');
-  if (type.value){
-    return  '&type=' + type.value.value
-  }else{
-    return ''
-  }
-})
-onMounted( async () => {
+onMounted(async () => {
+  // ProductService.getProducts().then((data) => (products.value = data));
   await nextTick();
   await initialize();
+  await colorFamilyData();
 });
 const initialize = async (event) => {
   spinner.value = true
@@ -92,11 +66,10 @@ const initialize = async (event) => {
   if (event?.first){
     page = event.first / event.rows + 1;
   }
-  const { data, error } = await useApiFetch("/api/categories/?page=" + page + searchTerm.value + statusTerm.value + typeTerm.value, {
+  const { data, error } = await useApiFetch("/api/color-families/?page=" + page + searchTerm.value, {
     method: "GET",
   });
   spinner.value = false
-  // errorMessage.value = null;
   if (error.value) {
     toast.add({
       severity: "error",
@@ -106,12 +79,19 @@ const initialize = async (event) => {
     });
   }
   if (data.value) {
-    //   console.log(data.value.brands);
     fetching.value = true
-    categories.value = data.value.categories.data;
-    rowsPerPage.value = data.value.categories.per_page
-    totalRecords.value = data.value.categories.total
+    colors.value = data.value.color_families.data;
+    rowsPerPage.value = data.value.color_families.per_page
+    totalRecords.value = data.value.color_families.total
     //   totalData.value  = data.value.roles.total
+  }
+};
+const colorFamilyData = async () => {
+  const { data, error } = await useApiFetch("/api/color-families/", {
+    method: "GET",
+  });
+  if (data.value) {
+    colorFamilies.value = data.value.color_families.data;
   }
 };
 const formatCurrency = (value) => {
@@ -139,38 +119,30 @@ const saveProduct = async () => {
     }
   }
   submitted.value = true;
-  console.log(product.value);
-  if (product.value.name && product.value.name.trim() && product.value.image_id) {
+
+  if (product.value.name && product.value.name.trim()) {
     product.value.status = product.value.status.value
-      ? product.value.status.value
+      ? product.value.status.value.toUpperCase()
       : product.value.status;
-      product.value.type = product.value.type.value
-      ? product.value.type.value.toUpperCase()
-      : product.value.type.toUpperCase();
     if (product.value.id) {
       if (product.value.media == null) {
         await uploadHandler();
       }
       product.value.status = product.value.status.toUpperCase()
-      // product.value.status = product.value.status.value ? product.value.status.value : product.value.status;
+      console.log(product.value.status);
       const { data, error } = await useApiFetch(
-        "/api/categories/" + product.value.id,
+        "/api/color-families/" + product.value.id,
         {
           method: "PUT",
           body: product.value,
         }
       );
       // errorMessage.value = null;
-      if (error.value) {
-        toast.add({
-          severity: "error",
-          summary: "Error",
-          detail: "Something Went worng",
-          life: 3000,
-        });
-      }
+      // if (error.value) {
+      // errorMessage.value = error.value.data.message;
+      // }
       if (data.value) {
-        imageError.value = null; 
+        imageError.value = null;
         toast.add({
           severity: "info",
           summary: "Success",
@@ -178,27 +150,22 @@ const saveProduct = async () => {
           life: 3000,
         });
       }
-      categories.value[findIndexById(product.value.id)] = product.value;
-      await initialize();
+      colors.value[findIndexById(product.value.id)] = product.value;
+      // product.value.inventoryStatus = product.value.inventoryStatus.value
+      //   ? product.value.inventoryStatus.value
+      //   : product.value.inventoryStatus;
+      // products.value[findIndexById(product.value.id)] = product.value;
       // toast.add({
-      //     severity: 'success',
-      //     summary: 'Successful',
-      //     detail: 'Product Updated',
-      //     life: 3000
+      //   severity: "success",
+      //   summary: "Successful",
+      //   detail: "Product Updated",
+      //   life: 3000,
       // });
     } else {
-      const { data, error } = await useApiFetch("/api/categories", {
+      const { data, error } = await useApiFetch("/api/color-families/", {
         method: "POST",
         body: product.value,
       });
-      if (error.value) {
-        toast.add({
-          severity: "error",
-          summary: "Error",
-          detail: "Something Went worng",
-          life: 3000,
-        });
-      }
       if (data.value) {
         imageError.value = null;
         toast.add({
@@ -211,14 +178,16 @@ const saveProduct = async () => {
       await initialize();
       // product.value.id = createId();
       // product.value.code = createId();
-      // product.value.image = 'product-placeholder.svg';
-      // product.value.inventoryStatus = product.value.inventoryStatus ? product.value.inventoryStatus.value : 'Enable';
+      // product.value.image = "product-placeholder.svg";
+      // product.value.inventoryStatus = product.value.inventoryStatus
+      //   ? product.value.inventoryStatus.value
+      //   : "Enable";
       // products.value.push(product.value);
       // toast.add({
-      //     severity: 'success',
-      //     summary: 'Successful',
-      //     detail: 'Product Created',
-      //     life: 3000
+      //   severity: "success",
+      //   summary: "Successful",
+      //   detail: "Product Created",
+      //   life: 3000,
       // });
     }
 
@@ -240,8 +209,8 @@ const uploadHandler = async () => {
   });
   // console.log(data);
   if (data.value) {
-    product.value.image_id = data.value.media.id
     imageError.value = null;
+    product.value.image_id = data.value.media.id
     // await auth.fetchUser();
     // uploading.value = false;
     // toast.add({
@@ -254,7 +223,6 @@ const uploadHandler = async () => {
 };
 const editProduct = (editProduct) => {
   product.value = { ...editProduct };
-  console.log(product.value.status);
   product.value.status = product.value.status.toUpperCase()
   productDialog.value = true;
   files.value = null;
@@ -269,17 +237,13 @@ const confirmDeleteProduct = (editProduct) => {
 };
 
 const deleteProduct = async () => {
-  const { data, error } = await useApiFetch("/api/categories/" + product.value.id, {
+  const { data, error } = await useApiFetch("/api/color-families/" + product.value.id, {
     method: "DELETE",
   });
-  if (error.value) {
-    toast.add({
-      severity: "error",
-      summary: "Error",
-      detail: "Something Went worng",
-      life: 3000,
-    });
-  }
+  // errorMessage.value = null;
+  // if (error.value) {
+  //   errorMessage.value = error.value.data.message;
+  // }
   if (data.value) {
     toast.add({
       severity: "success",
@@ -287,17 +251,23 @@ const deleteProduct = async () => {
       detail: data.value.message,
       life: 3000,
     });
-    categories.value = categories.value.filter((val) => val.id !== product.value.id);
-    product.value = {};
   }
+  colors.value = colors.value.filter((val) => val.id !== product.value.id);
   deleteProductDialog.value = false;
+  product.value = {};
+  // toast.add({
+  //   severity: "success",
+  //   summary: "Successful",
+  //   detail: "Product Deleted",
+  //   life: 3000,
+  // });
 };
 
 const findIndexById = (id) => {
   let index = -1;
 
-  for (let i = 0; i < categories.value.length; i++) {
-    if (categories.value[i].id === id) {
+  for (let i = 0; i < colors.value.length; i++) {
+    if (colors.value[i].id === id) {
       index = i;
       break;
     }
@@ -358,110 +328,24 @@ const onUpload = () => {
         <DataTable
           ref="dt"
           v-model:selection="selectedProducts"
-          :value="categories"
-          :lazy="true"
+          :value="colors"
           dataKey="id"
           :paginator="true"
-          :rows="rowsPerPage"
-          :totalRecords="totalRecords"
-          :first="first"
-          @page="initialize"
+          :rows="10"
           :filters="filters"
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-          currentPageReportTemplate="Total {totalRecords} brands"
+          :rowsPerPageOptions="[5, 10, 25]"
+          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
           responsiveLayout="scroll"
         >
-          <template #paginatorstart>
-            <Button
-              type="button"
-              icon="pi pi-refresh"
-              text
-              @click="initialize"
-            />
-          </template>
-          <template #paginatorend>
-            <Button type="button" icon="pi pi-download" text />
-          </template>
           <template #header>
             <div
               class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
             >
-              <h3 class="m-0">Categories</h3>
+              <h3 class="m-0">Color Family</h3>
               <div
                 class="flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3"
               >
-                <div class="flex gap-2 md:align-items-center">
-                  <label for="inventoryStatus" class="mb-0">Type</label>
-                  <Dropdown
-                    id="inventoryStatus"
-                    v-model="type"
-                    :options="types"
-                    optionLabel="label"
-                    placeholder="Select a Type"
-                    @change="initialize"
-                  >
-                    <template #value="slotProps">
-                      <div v-if="slotProps.value && slotProps.value.value">
-                        <span
-                          :class="
-                            'product-badge status-' + slotProps.value.value
-                          "
-                          >{{ slotProps.value.label }}</span
-                        >
-                      </div>
-                      <div
-                        v-else-if="slotProps.value && !slotProps.value.value"
-                      >
-                        <span
-                          :class="
-                            'product-badge status-' +
-                            slotProps.value.toLowerCase()
-                          "
-                          >{{ slotProps.value }}</span
-                        >
-                      </div>
-                      <span v-else>
-                        {{ slotProps.placeholder }}
-                      </span>
-                    </template>
-                  </Dropdown>
-                </div>
-                <div class="flex gap-2 md:align-items-center">
-                  <label for="inventoryStatus" class="mb-0">Status</label>
-                  <Dropdown
-                    id="inventoryStatus"
-                    v-model="status"
-                    :options="statuses"
-                    optionLabel="label"
-                    placeholder="Select a Status"
-                    @change="initialize"
-                  >
-                    <template #value="slotProps">
-                      <div v-if="slotProps.value && slotProps.value.value">
-                        <span
-                          :class="
-                            'product-badge status-' + slotProps.value.value
-                          "
-                          >{{ slotProps.value.label }}</span
-                        >
-                      </div>
-                      <div
-                        v-else-if="slotProps.value && !slotProps.value.value"
-                      >
-                        <span
-                          :class="
-                            'product-badge status-' +
-                            slotProps.value.toLowerCase()
-                          "
-                          >{{ slotProps.value }}</span
-                        >
-                      </div>
-                      <span v-else>
-                        {{ slotProps.placeholder }}
-                      </span>
-                    </template>
-                  </Dropdown>
-                </div>
                 <span class="block mt-2 md:mt-0 p-input-icon-left">
                   <i class="pi pi-search" />
                   <InputText
@@ -480,27 +364,16 @@ const onUpload = () => {
           </template>
 
           <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
-          <Column
-            field="order"
-            header="Order"
-            :sortable="true"
-            headerStyle="width:14%; min-width:10rem;"
-          >
-            <template #body="slotProps">
-              <span class="p-column-title">Order</span>
-              {{ slotProps.data.order }}
-            </template>
-          </Column>
           <Column field="name" header="Name" :sortable="true">
             <template #body="slotProps">
               <span class="p-column-title">Name</span>
               {{ slotProps.data.name }}
             </template>
           </Column>
-          <Column field="description" header="Description" :sortable="true">
+          <Column field="name" header="Hex" :sortable="true">
             <template #body="slotProps">
-              <span class="p-column-title">Description</span>
-              {{ slotProps.data.description }}
+              <span class="p-column-title">Hex</span>
+              {{ slotProps.data.name }}
             </template>
           </Column>
           <Column header="Image" headerStyle="width:14%; min-width:10rem;">
@@ -513,12 +386,6 @@ const onUpload = () => {
                 class="shadow-2"
                 width="100"
               />
-            </template>
-          </Column>
-          <Column field="description" header="Type" :sortable="true">
-            <template #body="slotProps">
-              <span class="p-column-title">Type</span>
-              {{ slotProps.data.type }}
             </template>
           </Column>
           <Column field="inventoryStatus" header="Status" :sortable="true">
@@ -565,29 +432,39 @@ const onUpload = () => {
           :modal="true"
           class="p-fluid"
         >
-          <Form id="add_role_form" @submit="saveProduct" :validation-schema="schema" v-slot="{ errors }">
+          <Form id="add_category_form" @submit="saveProduct" :validation-schema="schema" v-slot="{ errors }">
+            
             <div class="field">
-              <label for="name">Order</label>
-              <Field v-model="product.order" id="order" name="order" :class="{ 'p-invalid': errors.order }" class="p-inputtext p-component" aria-describedby="category-order-error" placeholder="Category Order"/>
-              <small class="p-error" id="category-order-error">{{ errors.order || '&nbsp;' }}</small>
-            </div>
-
-            <div class="field">
-              <Field v-model="product.name" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Category name"/>
+              <label for="name">Name</label>
+              <Field v-model="product.name" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Name"/>
               <small class="p-error" id="category-name-error">{{ errors.name || '&nbsp;' }}</small>
             </div>
 
             <div class="field">
-              <label for="description">Description</label>
-              <Textarea
-                id="description"
-                v-model="product.description"
-                required="true"
-                rows="3"
-                cols="20"
-              />
+              <label for="hex">Hex</label>
+              <Field v-model="product.hex" id="hex" name="hex" :class="{ 'p-invalid': errors.hex }" class="p-inputtext p-component" aria-describedby="category-hex-error" placeholder="Color hex"/>
+              <small class="p-error" id="category-hex-error">{{ errors.hex || '&nbsp;' }}</small>
             </div>
 
+            <!-- <div class="field">
+              <label for="colorFamily" class="mb-3">Color Family</label>
+              <Field name="colorFamily" v-slot="{ field }">
+                <Dropdown
+                  v-bind="field"
+                  v-model="product.color_family_id"
+                  :options="colorFamilies" 
+                  optionLabel="name" 
+                  optionValue="id" 
+                  placeholder="Select a Color Family"
+                  display="chip"
+                  :class="{ 'p-invalid': errors.colorFamily }"
+                  aria-describedby="category-colorFamily-error"
+                ></Dropdown>
+              </Field>
+              <small class="p-error" id="category-colorFamily-error">{{
+                errors.colorFamily || "&nbsp;"
+              }}</small>
+            </div> -->
             <div class="field">
               <label for="name">Image</label>
               <FileUpload ref="fileInput" mode="basic" name="demo[]" url="/api/upload" accept="image/*" customUpload @select="onPhotoSelect($event)" />
@@ -612,27 +489,7 @@ const onUpload = () => {
             </div>
 
             <div class="field">
-              <label for="Types">Types</label>
-              <Field name="type" v-slot="{ field }">
-                <Dropdown
-                  v-bind="field"
-                  v-model="product.type"
-                  :options="types"
-                  optionLabel="label"
-                  optionValue="value"
-                  placeholder="Select a Type"
-                  display="chip"
-                  :class="{ 'p-invalid': errors.type }"
-                  aria-describedby="category-code-type-error"
-                ></Dropdown>
-              </Field>
-              <small class="p-error" id="category-code-type-error">{{
-                errors.type || "&nbsp;"
-              }}</small>
-            </div>
-
-            <div class="field">
-              <label for="inventoryStatus" class="mb-3">Status</label>
+              <label for="status" class="mb-3">Status</label>
               <Field name="status" v-slot="{ field }">
                 <Dropdown
                   v-bind="field"
@@ -650,12 +507,7 @@ const onUpload = () => {
                 errors.status || "&nbsp;"
               }}</small>
             </div>
-
-              <Button
-                class="" type="submit" label="Submit"
-                icon="pi pi-check"
-              />
-            <!-- </template> -->
+            <Button class="" type="submit" label="Submit"  icon="pi pi-check"/>
           </Form>
         </Dialog>
 
