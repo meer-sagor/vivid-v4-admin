@@ -42,16 +42,15 @@
                   <span v-if="slotProps.data.status == 'enable'">Enable</span>
                   <span v-if="slotProps.data.status == 'disable'">Disable</span>
                 </div>
-                <input
-                    type="checkbox"
-                    :checked="slotProps.data.status == 'enable'"
-                    :id="'checkbox_' + slotProps.data.status.id"
-                    :name="'checkbox_' + slotProps.data.status.id"
-                    @change="updateStatus(slotProps.data)"
-                />
-
+                <label class="switch">
+                  <input type="checkbox" :checked="slotProps.data.status == 'enable'"
+                         :id="'checkbox_' + slotProps.data.id"
+                         :name="'checkbox_' + slotProps.data.id"
+                         @change="updateStatus(slotProps.data)"
+                  >
+                  <span class="slider round"></span>
+                </label>
               </div>
-
             </template>
           </Column>
           <Column :exportable="false" header="Actions"  style="width: 15%">
@@ -180,6 +179,8 @@ const updateStatus = (font) => {
       });
 
       await fetchFonts()
+    } else  {
+      location.reload();
     }
   });
 }

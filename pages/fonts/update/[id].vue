@@ -23,15 +23,19 @@
           <div class="col-6 mb-0">
             <div class="flex flex-column gap-2 mb-0">
               <label for="size">Size</label>
-              <Field
-                  v-model="font.size"
-                  id="size"
-                  name="size"
-                  :class="{ 'p-invalid': errors.size }"
-                  class="p-inputtext p-component"
-                  aria-describedby="font-size-error"
-                  placeholder="Enter size"
-              />
+              <Field name="file" v-slot="{ field }">
+                <Dropdown
+                    v-bind="field"
+                    v-model="font.file"
+                    :options="font_file_type_enums"
+                    optionLabel="name"
+                    optionValue="name"
+                    placeholder="Select a file type"
+                    display="chip"
+                    :class="{ 'p-invalid': errors.file }"
+                    aria-describedby="promo-file-error"
+                ></Dropdown>
+              </Field>
               <small class="p-error" id="font-size-error">{{errors.size || "&nbsp;"}}</small>
             </div>
           </div>
@@ -98,6 +102,7 @@ export default defineComponent({
     const fetching = ref(false);
     const spinner = ref(false);
     const font_categories = ref([]);
+    const font_file_type_enums = ref([]);
     const route = useRoute();
     const router = useRouter();
 
@@ -112,6 +117,7 @@ export default defineComponent({
       await nextTick();
       await fetchFontCategories();
       await fetchFonts();
+      await fetchEnums();
     });
 
     const fetchFontCategories = async () => {
@@ -124,6 +130,16 @@ export default defineComponent({
         fetching.value = true;
         const getFontCategories = JSON.parse(JSON.stringify(computed(() => data.value).value));
         font_categories.value = getFontCategories.font_categories;
+      }
+    };
+
+    const fetchEnums = async () => {
+      const {data, error} = await useApiFetch("/api/getEnums", {
+        method: "GET",
+      });
+      if (data.value) {
+        const getEnums = JSON.parse(JSON.stringify(computed(() => data.value).value));
+        font_file_type_enums.value = getEnums.font_file_types;
       }
     };
 
@@ -140,7 +156,7 @@ export default defineComponent({
     const schema = Yup.object().shape({
       name: Yup.string().required().min(2).max(100).label("Name"),
       size: Yup.number().typeError('Size must be a number field.').required().min(2).max(2000).label("Size"),
-      file: Yup.string().required().min(2).max(2000).label("File"),
+      file: Yup.string().required().label("File"),
       font_category_id: Yup.mixed().required().label("Font category"),
     });
 
@@ -193,6 +209,7 @@ export default defineComponent({
       spinner,
       resetModal,
       font_categories,
+      font_file_type_enums,
     };
   },
 });

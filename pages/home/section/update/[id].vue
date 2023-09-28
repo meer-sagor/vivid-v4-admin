@@ -15,8 +15,16 @@
         </div>
         <div class="flex flex-column gap-2 mb-1">
           <label for="description">Description</label>
-          <Field type="textarea" v-model="home_section.description" id="description" name="description" :class="{ 'p-invalid': errors.description }" class="p-inputtext p-component" aria-describedby="home-section-description-error" placeholder="Description"/>
-          <small class="p-error" id="home-section-description-error">{{ errors.description || '&nbsp;' }}</small>
+          <ClientOnly>
+            <QuillEditor
+                :content="home_section.description"
+                ref="editor"
+                v-model.content="home_section.description"
+                theme="snow"
+                content-type="html"
+                :style="{ height: '200px' }"
+                @update:content="handleChange"/>
+          </ClientOnly>
         </div>
         <div class="flex flex-column gap-2 mb-1">
           <label for="view_all_url">Url</label>
@@ -89,7 +97,7 @@ export default defineComponent({
       name: Yup.string().required().min(2).max(100).label("Name"),
       section_title: Yup.string().required().min(2).max(100).label("Section title"),
       description: Yup.string().required().min(2).max(100).label("Description"),
-      view_all_url: Yup.string().required().min(2).max(100).label("Url"),
+      view_all_url: Yup.string().url().required().min(2).max(100).label("Url"),
     });
 
      const fetchCategories = async () => {
@@ -120,6 +128,17 @@ export default defineComponent({
 
 
     const onSubmit = async (values: any, actions: { setErrors: (arg0: any) => void; }) => {
+
+      if (home_section.value.description == null || home_section.value.description == '') {
+        toast.add({
+          severity: "info",
+          summary: "Danger",
+          detail: 'Description is a required field',
+          life: 3000,
+        });
+        return;
+      }
+
       loading.value = true
 
       const {data, error} = await useApiFetch("/api/home-sections/" + route.params.id, {
@@ -158,8 +177,12 @@ export default defineComponent({
       }
     };
 
+    const handleChange = (value: any) => {
+      home_section.value.description = value
+    };
+
     return {
-      schema, onSubmit, home_section, loading, fetching, spinner, resetModal,categories
+      schema, onSubmit, home_section, loading, fetching, spinner, resetModal, categories, handleChange
     }
 
   }

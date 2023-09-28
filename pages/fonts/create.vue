@@ -39,16 +39,21 @@
         <div class="flex flex-row gap-3">
           <div class="col-6 mb-0">
             <div class="flex flex-column gap-2 mb-0">
-              <label for="file">File</label>
-              <Field
-                  v-model="font.file"
-                  id="file"
-                  name="file"
-                  :class="{ 'p-invalid': errors.file }"
-                  class="p-inputtext p-component"
-                  aria-describedby="promo-file-error"
-                  placeholder="Enter file"
-              />
+              <label for="file">File Type</label>
+              <Field name="file" v-slot="{ field }">
+                <Dropdown
+                    v-bind="field"
+                    v-model="font.file"
+                    :options="font_file_type_enums"
+                    optionLabel="name"
+                    optionValue="name"
+                    placeholder="Select a file type"
+                    display="chip"
+                    :class="{ 'p-invalid': errors.file }"
+                    aria-describedby="promo-file-error"
+                ></Dropdown>
+              </Field>
+
               <small class="p-error" id="font-file-error">{{errors.file || "&nbsp;"}}</small>
             </div>
           </div>
@@ -118,6 +123,7 @@ export default defineComponent({
     const fetching = ref(false);
     const spinner = ref(false);
     const status_enums = ref([]);
+    const font_file_type_enums = ref([]);
     const font_categories = ref([]);
 
     const font = ref({
@@ -144,6 +150,7 @@ export default defineComponent({
         fetching.value = true;
         const getEnums = JSON.parse(JSON.stringify(computed(() => data.value).value));
         status_enums.value = getEnums.statuses;
+        font_file_type_enums.value = getEnums.font_file_types;
       }
     };
 
@@ -160,7 +167,7 @@ export default defineComponent({
     const schema = Yup.object().shape({
       name: Yup.string().required().min(2).max(100).label("Name"),
       size: Yup.number().typeError('Size must be a number field.').required().min(2).max(2000).label("Size"),
-      file: Yup.string().required().min(2).max(2000).label("File"),
+      file: Yup.mixed().required().label("File"),
       font_category_id: Yup.mixed().required().label("Font category"),
       status: Yup.mixed().required().label("Status"),
     });
@@ -215,6 +222,7 @@ export default defineComponent({
       spinner,
       resetModal,
       status_enums,
+      font_file_type_enums,
       font_categories,
     };
   },
