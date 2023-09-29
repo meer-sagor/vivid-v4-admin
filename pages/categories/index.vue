@@ -364,7 +364,6 @@ const onUpload = () => {
           :paginator="true"
           :rows="rowsPerPage"
           :totalRecords="totalRecords"
-          :first="first"
           @page="initialize"
           :filters="filters"
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -565,7 +564,7 @@ const onUpload = () => {
           :modal="true"
           class="p-fluid"
         >
-          <Form id="add_role_form" @submit="saveProduct" :validation-schema="schema" v-slot="{ errors }">
+          <Form id="add_role_form" @submit="saveProduct"  :initial-values="product" :validation-schema="schema" v-slot="{ errors }">
             <div class="field">
               <label for="name">Order</label>
               <Field v-model="product.order" id="order" name="order" :class="{ 'p-invalid': errors.order }" class="p-inputtext p-component" aria-describedby="category-order-error" placeholder="Category Order"/>
@@ -573,6 +572,7 @@ const onUpload = () => {
             </div>
 
             <div class="field">
+              <label for="description">Name</label>
               <Field v-model="product.name" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Category name"/>
               <small class="p-error" id="category-name-error">{{ errors.name || '&nbsp;' }}</small>
             </div>

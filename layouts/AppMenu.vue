@@ -204,15 +204,15 @@ const model = ref([
     //   },
     // ],
   // },
-  // {
-  //   label: "Settings",
-  //   icon: "pi pi-fw pi-briefcase",
-  //   items: [
-  //     {
-  //       label: "Media",
-  //       icon: "pi pi-fw pi-exclamation-circle",
-  //       to: "/medias",
-  //     },
+  {
+    label: "Settings",
+    icon: "pi pi-fw pi-briefcase",
+    items: [
+      {
+        label: "Media",
+        icon: "pi pi-fw pi-exclamation-circle",
+        to: "/medias",
+      },
       // {
       //   label: "Analytics",
       //   icon: "pi pi-fw pi-circle-off",
@@ -223,8 +223,8 @@ const model = ref([
       //   icon: "pi pi-fw pi-circle-off",
       //   to: "/dummy",
       // },
-  //   ],
-  // },
+    ],
+  },
   // {
   //   label: "Documentation",
   //   icon: "pi pi-fw pi-briefcase",

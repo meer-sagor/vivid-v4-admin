@@ -73,6 +73,7 @@ import { Field, Form, useField, useForm } from "vee-validate";
 import { ref, defineComponent, nextTick, onMounted } from "vue";
 import * as Yup from "yup";
 import { useApiFetch } from "~/composables/useApiFetch";
+import {useRouter} from "vue-router";
 
 export default defineComponent({
   components: { Form, Field },
@@ -84,6 +85,7 @@ export default defineComponent({
     const spinner = ref(false);
     const status_enums = ref([]);
     const editor = ref(null)
+    const router = useRouter();
 
     const font_category = ref({
       name: "",
@@ -154,8 +156,8 @@ export default defineComponent({
           life: 3000,
         });
 
-        font_category.value.status = "";
         clearEditor()
+        await router.push({ path: "/fonts/categories" })
         resetModal();
         resetForm();
       }

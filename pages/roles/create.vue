@@ -62,6 +62,7 @@ import { Field, Form, useField, useForm } from "vee-validate";
 import { ref, defineComponent, nextTick, onMounted } from "vue";
 import * as Yup from "yup";
 import { useApiFetch } from "~/composables/useApiFetch";
+import {useRouter} from "vue-router";
 
 export default defineComponent({
   components: { Form, Field },
@@ -72,6 +73,7 @@ export default defineComponent({
     const fetching = ref(false);
     const spinner = ref(false);
     const permissions = ref([]);
+    const router = useRouter();
 
     const permissionMenus = ref([
       { label: "Promo Code", value: "promo_code" },
@@ -145,6 +147,7 @@ export default defineComponent({
           life: 3000,
         });
 
+        await router.push({ path: "/roles" });
         resetModal();
         resetForm();
       }
