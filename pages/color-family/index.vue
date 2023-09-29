@@ -101,6 +101,7 @@ const formatCurrency = (value) => {
 
 const openNew = () => {
   product.value = {};
+  product.value.status = "ENABLE";
   submitted.value = false;
   productDialog.value = true;
 };
@@ -441,10 +442,16 @@ const onUpload = () => {
               <small class="p-error" id="category-name-error">{{ errors.name || '&nbsp;' }}</small>
             </div>
 
-            <div class="field">
-              <label for="hex">Hex</label>
-              <Field v-model="product.hex" id="hex" name="hex" :class="{ 'p-invalid': errors.hex }" class="p-inputtext p-component" aria-describedby="category-hex-error" placeholder="Color hex"/>
-              <small class="p-error" id="category-hex-error">{{ errors.hex || '&nbsp;' }}</small>
+            <div class="formgrid grid">
+              <div class="field col">
+                <label for="hex">Hex</label>
+                <Field v-model="product.hex" id="hex" name="hex" :class="{ 'p-invalid': errors.hex }" class="p-inputtext p-component" aria-describedby="category-hex-error" placeholder="Color hex"/> 
+                <small class="p-error" id="category-hex-error">{{ errors.hex || '&nbsp;' }}</small>
+              </div>
+              <div class="field col-3">
+                <label for="color-picker">Pick Color</label>
+                <ColorPicker  inputId="cp-hex" format="hex" v-model="product.hex"/>
+              </div>
             </div>
 
             <!-- <div class="field">

@@ -71,6 +71,7 @@ const formatCurrency = (value) => {
 
 const openNew = () => {
   product.value = {};
+  product.value.status = "ENABLE";
   submitted.value = false;
   productDialog.value = true;
 };

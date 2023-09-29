@@ -76,6 +76,7 @@ const getTags = async (event) => {
 
 const openNew = () => {
   product.value = {};
+  product.value.status = "ENABLE";
   submitted.value = false;
   tagDialog.value = true;
 };
