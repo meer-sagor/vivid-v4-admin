@@ -1,5 +1,6 @@
 import { defineStore } from "pinia"
 import { useApiFetch } from "@/composables/useApiFetch";
+import JwtService from "@/config/JwtService";
 
 type User = {
     id: number;
@@ -15,35 +16,51 @@ type Credentials = {
 }
 
 export const useAuthStore = defineStore('auth', () => {
-        const user = ref<User | null>(null)
+    const loginInUser = ref({});
+    let user = ref<User | null>(null)
 
-        async function logout() {
-            await useApiFetch("/api/logout", { method: "POST" });
-            user.value = null;
-            const authCookie = useCookie('XSRF-TOKEN')
-            authCookie.value = null
-            navigateTo("/auth/login");
-        }
-    
-        async function fetchUser() {
-            const { data } = await useApiFetch("/api/user");
-            user.value = data.value as User;
-        }
-        
-        async function login(credentials: Credentials) {
-             await useApiFetch("/sanctum/csrf-cookie");
-            
-            const login = await useApiFetch("/login", {
-                method: "POST",
-                body: credentials,
-            });
 
-            await fetchUser();
+    const setToken = (access_token:string, userData:any) => {
+        JwtService.saveToken(access_token);
+        JwtService.saveUser(JSON.stringify(userData));
+    }
 
-            return login;
-        }
+    const removeToken = () => {
+        JwtService.destroyToken();
+        JwtService.destroyUser();
+    }
 
-        const isLoggedIn = computed(() => !!user.value)
-        
-        return { user, login, isLoggedIn, fetchUser, logout }
+    async function fetchUser() {
+        console.log('user', JwtService.getToken())
+        const { data, error } = await useApiFetch("/api/user");
+        console.log(data)
+        console.log(error)
+        user.value = data.value as User;
+    }
+
+    async function login(credentials: Credentials) {
+        const login = await useApiFetch("/login", {
+            method: "POST",
+            body: credentials,
+        });
+
+        // await fetchUser()
+        return login;
+    }
+
+    async function logout() {
+        await useApiFetch("/api/logout", { method: "POST" });
+        JwtService.destroyToken();
+        JwtService.destroyUser();
+        navigateTo("/auth/login");
+    }
+
+    const isLoggedIn = computed(() => !!user.value)
+
+    console.log('isLoggedIn: ', isLoggedIn.value)
+
+    return {
+        login, setToken, removeToken, user, isLoggedIn, fetchUser, loginInUser, logout
+    }
+
 })

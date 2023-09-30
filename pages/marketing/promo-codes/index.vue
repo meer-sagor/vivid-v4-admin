@@ -140,6 +140,9 @@ onMounted(async () => {
   await fetchPromoCodes();
 });
 
+// import { environment, baseURL, apiURL } from "@/config/environment"
+// console.log( apiURL + '/**')
+
 const showDeleteDialog = (data) => {
   id.value = data.id;
   promo_code.value.name = data.name;

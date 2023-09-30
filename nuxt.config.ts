@@ -1,5 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import { environment, baseURL } from "./config/environment"
+import { environment, baseURL, apiURL } from "./config/environment"
 
 export default defineNuxtConfig({
     devtools: { enabled: environment === 'dev' ? true : false },
@@ -23,7 +23,7 @@ export default defineNuxtConfig({
         baseURL: baseURL,
         prerender: {
           crawlLinks: true,
-          failOnError: false, 
+          failOnError: false,
         },
     },
     modules: [

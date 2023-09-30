@@ -15,8 +15,6 @@ const router = useRouter();
 const auth = useAuthStore();
 const user = ref(auth.user ? auth.user : null);
 
-console.log("auth.user", auth.user);
-
 onMounted(() => {
   bindOutsideClickListener();
 });

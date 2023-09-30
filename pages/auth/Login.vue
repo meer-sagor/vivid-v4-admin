@@ -3,6 +3,7 @@ import { useLayout } from "@/layouts/composables/layout";
 import { ref, computed } from "vue";
 // import AppConfig from "@/layouts/AppConfig.vue";
 import { useAuthStore } from "@/stores/useAuthStore";
+import JwtService from "~/config/JwtService";
 
 definePageMeta({
   layout: false,
@@ -30,18 +31,26 @@ const form = ref({
 
 async function handleLogin() {
   loading.value = true;
-  console.log("is logged in", auth.isLoggedIn);
   if (auth.isLoggedIn) {
     return navigateTo("/");
   } else {
-    const { error } = await auth.login(form.value);
+    const { data, error } = await auth.login(form.value);
     loading.value = false;
+
+    if(data.value){
+      const data_obj = JSON.parse(JSON.stringify(computed(() => data.value).value))
+
+      if (data_obj.token){
+        auth.setToken(data_obj.token, data_obj.user)
+      }
+    }
 
     errorMessage.value = null;
 
     if (error.value) {
       errorMessage.value = error.value.data.message;
     } else {
+      await auth.fetchUser();
       await navigateTo({ path: "/" });
     }
   }
@@ -94,12 +103,9 @@ function onErrorClose() {
 
           <form @submit.prevent="handleLogin" class="login-form">
             <Message severity="error" v-if="errorMessage" @close="onErrorClose">
-              {{ errorMessage }}</Message
-            >
+              {{ errorMessage }}</Message>
 
-            <label for="email1" class="block text-900 text-xl font-medium mb-2"
-              >Email</label
-            >
+            <label for="email1" class="block text-900 text-xl font-medium mb-2">Email</label>
             <InputText
               id="email1"
               v-model="form.email"
@@ -110,11 +116,7 @@ function onErrorClose() {
               style="padding: 1rem"
             />
 
-            <label
-              for="password1"
-              class="block text-900 font-medium text-xl mb-2"
-              >Password</label
-            >
+            <label for="password1" class="block text-900 font-medium text-xl mb-2">Password</label>
             <Password
               id="password1"
               v-model="form.password"
