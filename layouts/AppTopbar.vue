@@ -14,6 +14,10 @@ const topbarMenuActive = ref(false);
 const router = useRouter();
 const auth = useAuthStore();
 
+definePageMeta({
+  middleware: ["auth"],
+});
+
 console.log("index auth - ", auth.user);
 
 const user = ref(auth.user ? auth.user : null);
@@ -166,9 +170,14 @@ const onSettingsClick = () => {
           align-items: center;
         "
       >
-        {{ greeting }}&nbsp;<strong>
-          {{ user.first_name + " " + user.last_name }}!
-        </strong>
+        <Skeleton
+          v-if="typeof user?.first_name === 'undefined'"
+          class="mb-2"
+        ></Skeleton>
+        <span v-else>
+          {{ greeting }}&nbsp;
+          <strong> {{ user?.first_name + " " + user?.last_name }}! </strong>
+        </span>
       </div>
       <button @click="onSettingsClick()" class="p-link layout-topbar-button">
         <i class="pi pi-cog"></i>

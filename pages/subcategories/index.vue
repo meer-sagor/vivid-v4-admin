@@ -2,15 +2,19 @@
 import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
-import { onMounted, ref ,nextTick,watch, computed} from "vue";
-import {Field, Form, useField, useForm} from 'vee-validate';
+import { onMounted, ref, nextTick, watch, computed } from "vue";
+import { Field, Form, useField, useForm } from "vee-validate";
 import * as Yup from "yup";
-const {handleSubmit, resetForm} = useForm();
+
+const { handleSubmit, resetForm } = useForm();
 const fetching = ref(false);
 const spinner = ref(false);
 const schema = Yup.object({
   name: Yup.string().required().min(2).max(50).label("Name"),
-  order: Yup.number().typeError('Order is number field').required().label("Order"),
+  order: Yup.number()
+    .typeError("Order is number field")
+    .required()
+    .label("Order"),
   status: Yup.mixed().required().label("status"),
   category: Yup.mixed().required().label("category"),
 });
@@ -18,8 +22,8 @@ const imageError = ref(null);
 const toast = useToast();
 const categories = ref([]);
 const subCategories = ref([]);
-const rowsPerPage = ref(0)
-const totalRecords = ref(0)
+const rowsPerPage = ref(0);
+const totalRecords = ref(0);
 const products = ref(null);
 const search = ref(null);
 const status = ref(null);
@@ -46,41 +50,44 @@ const types = ref([
   { label: "Embroidery Design", value: "embroidery_design" },
 ]);
 const onPhotoSelect = ($event) => {
-  product.value.image_id == null
+  product.value.image_id == null;
   imageError.value = null;
   files.value = fileInput.value?.files;
   console.log(files.value[0].objectURL);
 };
-// wathcer 
+// wathcer
 watch(search, (newValue, oldValue) => {
   initialize();
 });
 // Computed
 const searchTerm = computed(() => {
-  return search.value ? '&name=' + search.value : ''
-})
+  return search.value ? "&name=" + search.value : "";
+});
 const statusTerm = computed(() => {
-  if (status.value){
-    return  '&status=' + status.value.value
-  }else{
-    return ''
+  if (status.value) {
+    return "&status=" + status.value.value;
+  } else {
+    return "";
   }
-})
+});
 onMounted(async () => {
   await nextTick();
   await initialize();
   await categoryData();
 });
 const initialize = async (event) => {
-  spinner.value = true
-  let page = 1
-  if (event?.first){
+  spinner.value = true;
+  let page = 1;
+  if (event?.first) {
     page = event.first / event.rows + 1;
   }
-  const { data, error } = await useApiFetch("/api/sub-categories/?page=" + page + searchTerm.value + statusTerm.value, {
-    method: "GET",
-  });
-  spinner.value = false
+  const { data, error } = await useApiFetch(
+    "/api/sub-categories/?page=" + page + searchTerm.value + statusTerm.value,
+    {
+      method: "GET",
+    }
+  );
+  spinner.value = false;
   // errorMessage.value = null;
   if (error.value) {
     toast.add({
@@ -92,11 +99,11 @@ const initialize = async (event) => {
   }
   if (data.value) {
     //   console.log(data.value.brands);
-    fetching.value = true
+    fetching.value = true;
     subCategories.value = data.value.sub_categories.data;
-    rowsPerPage.value = data.value.sub_categories.per_page
-    totalRecords.value = data.value.sub_categories.total
-    
+    rowsPerPage.value = data.value.sub_categories.per_page;
+    totalRecords.value = data.value.sub_categories.total;
+
     //   totalData.value  = data.value.roles.total
   }
 };
@@ -133,27 +140,30 @@ const hideDialog = () => {
 
 const saveProduct = async () => {
   if (product.value.image_id == null && product.value.image_id == undefined) {
-    if(files.value){
+    if (files.value) {
       await uploadHandler();
-    }
-    else{
+    } else {
       imageError.value = "This Feild is required";
     }
   }
   submitted.value = true;
   console.log(product.value);
-  if (product.value.name && product.value.name.trim() && product.value.image_id) {
+  if (
+    product.value.name &&
+    product.value.name.trim() &&
+    product.value.image_id
+  ) {
     product.value.status = product.value.status.value
       ? product.value.status.value
       : product.value.status;
-      // product.value.type = product.value.type.value
-      // ? product.value.type.value.toUpperCase()
-      // : product.value.type.toUpperCase();
+    // product.value.type = product.value.type.value
+    // ? product.value.type.value.toUpperCase()
+    // : product.value.type.toUpperCase();
     if (product.value.id) {
       if (product.value.media == null) {
         await uploadHandler();
       }
-      product.value.status = product.value.status.toUpperCase()
+      product.value.status = product.value.status.toUpperCase();
       // product.value.status = product.value.status.value ? product.value.status.value : product.value.status;
       const { data, error } = await useApiFetch(
         "/api/sub-categories/" + product.value.id,
@@ -232,7 +242,7 @@ const saveProduct = async () => {
   }
 };
 const uploadHandler = async () => {
-  console.log( files.value );
+  console.log(files.value);
   // uploading.value = true;
   const fileUp = files.value[0];
   const body = new FormData();
@@ -246,7 +256,7 @@ const uploadHandler = async () => {
   // console.log(data);
   if (data.value) {
     imageError.value = null;
-    product.value.image_id = data.value.media.id
+    product.value.image_id = data.value.media.id;
     // await auth.fetchUser();
     // uploading.value = false;
     // toast.add({
@@ -260,11 +270,11 @@ const uploadHandler = async () => {
 
 const editProduct = (editProduct) => {
   product.value = { ...editProduct };
-  product.value.status = product.value.status.toUpperCase()
+  product.value.status = product.value.status.toUpperCase();
   productDialog.value = true;
   files.value = null;
   if (product.value.media) {
-    fileData.value =  product.value.media.url
+    fileData.value = product.value.media.url;
   }
 };
 
@@ -274,9 +284,12 @@ const confirmDeleteProduct = (editProduct) => {
 };
 
 const deleteProduct = async () => {
-  const { data, error } = await useApiFetch("/api/sub-categories/" + product.value.id, {
-    method: "DELETE",
-  });
+  const { data, error } = await useApiFetch(
+    "/api/sub-categories/" + product.value.id,
+    {
+      method: "DELETE",
+    }
+  );
   // errorMessage.value = null;
   if (error.value) {
     toast.add({
@@ -294,7 +307,9 @@ const deleteProduct = async () => {
       life: 3000,
     });
   }
-  subCategories.value = subCategories.value.filter((val) => val.id !== product.value.id);
+  subCategories.value = subCategories.value.filter(
+    (val) => val.id !== product.value.id
+  );
   deleteProductDialog.value = false;
   product.value = {};
   // toast.add({
@@ -368,7 +383,7 @@ const onUpload = () => {
       <div class="card">
         <Toast />
         <DataTable
-        ref="dt"
+          ref="dt"
           v-model:selection="selectedProducts"
           :value="subCategories"
           :lazy="true"
@@ -383,7 +398,7 @@ const onUpload = () => {
           currentPageReportTemplate="Total {totalRecords} sub-categories"
           responsiveLayout="scroll"
         >
-        <template #paginatorstart>
+          <template #paginatorstart>
             <Button
               type="button"
               icon="pi pi-refresh"
@@ -472,10 +487,7 @@ const onUpload = () => {
                 </div>
                 <span class="block mt-2 md:mt-0 p-input-icon-left">
                   <i class="pi pi-search" />
-                  <InputText
-                    v-model="search"
-                    placeholder="Search..."
-                  />
+                  <InputText v-model="search" placeholder="Search..." />
                 </span>
                 <Button
                   label="New"
@@ -572,11 +584,26 @@ const onUpload = () => {
           :modal="true"
           class="p-fluid"
         >
-          <Form id="add_category_form" @submit="saveProduct" :validation-schema="schema" v-slot="{ errors }">
+          <Form
+            id="add_category_form"
+            @submit="saveProduct"
+            :validation-schema="schema"
+            v-slot="{ errors }"
+          >
             <div class="field">
               <label for="order">Order</label>
-              <Field v-model="product.order" id="order" name="order" :class="{ 'p-invalid': errors.order }" class="p-inputtext p-component" aria-describedby="category-order-error" placeholder="Sub Category Order"/>
-              <small class="p-error" id="category-order-error">{{ errors.order || '&nbsp;' }}</small>
+              <Field
+                v-model="product.order"
+                id="order"
+                name="order"
+                :class="{ 'p-invalid': errors.order }"
+                class="p-inputtext p-component"
+                aria-describedby="category-order-error"
+                placeholder="Sub Category Order"
+              />
+              <small class="p-error" id="category-order-error">{{
+                errors.order || "&nbsp;"
+              }}</small>
             </div>
 
             <div class="field">
@@ -585,9 +612,9 @@ const onUpload = () => {
                 <Dropdown
                   v-bind="field"
                   v-model="product.category_id"
-                  :options="categories" 
-                  optionLabel="name" 
-                  optionValue="id" 
+                  :options="categories"
+                  optionLabel="name"
+                  optionValue="id"
                   placeholder="Select a Category"
                   display="chip"
                   :class="{ 'p-invalid': errors.category }"
@@ -601,8 +628,18 @@ const onUpload = () => {
 
             <div class="field">
               <label for="name">Name</label>
-              <Field v-model="product.name" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Category name"/>
-              <small class="p-error" id="category-name-error">{{ errors.name || '&nbsp;' }}</small>
+              <Field
+                v-model="product.name"
+                id="name"
+                name="name"
+                :class="{ 'p-invalid': errors.name }"
+                class="p-inputtext p-component"
+                aria-describedby="category-name-error"
+                placeholder="Category name"
+              />
+              <small class="p-error" id="category-name-error">{{
+                errors.name || "&nbsp;"
+              }}</small>
             </div>
 
             <div class="field">
@@ -618,9 +655,17 @@ const onUpload = () => {
 
             <div class="field">
               <label for="name">Image</label>
-              <FileUpload ref="fileInput" mode="basic" name="demo[]" url="/api/upload" accept="image/*" customUpload @select="onPhotoSelect($event)" />
+              <FileUpload
+                ref="fileInput"
+                mode="basic"
+                name="demo[]"
+                url="/api/upload"
+                accept="image/*"
+                customUpload
+                @select="onPhotoSelect($event)"
+              />
               <span class="p-invalid" v-if="imageError">{{ imageError }}</span>
-              <br>
+              <br />
               <img
                 v-if="files"
                 :src="files[0].objectURL"
@@ -658,7 +703,7 @@ const onUpload = () => {
                 errors.status || "&nbsp;"
               }}</small>
             </div>
-            <Button class="" type="submit" label="Submit"  icon="pi pi-check"/>
+            <Button class="" type="submit" label="Submit" icon="pi pi-check" />
           </Form>
         </Dialog>
 
@@ -697,7 +742,7 @@ const onUpload = () => {
     </div>
     <div class="col-12">
       <div class="flex justify-content-center">
-        <ProgressSpinner v-if="spinner"/>
+        <ProgressSpinner v-if="spinner" />
       </div>
     </div>
   </div>

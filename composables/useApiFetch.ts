@@ -1,13 +1,12 @@
 import type { UseFetchOptions } from "nuxt/app";
-import { baseURL, apiURL } from "@/config/environment"
+import { baseURL, apiURL } from "@/config/environment";
 import JwtService from "@/config/JwtService";
 
-export function useApiFetch<T> (path: string, options: UseFetchOptions<T> = {}) {
-
+export function useApiFetch<T>(path: string, options: UseFetchOptions<T> = {}) {
   let headers: any = {
     accept: "application/json",
-    referer: baseURL
-  }
+    referer: baseURL,
+  };
 
   // const token = useCookie("XSRF-TOKEN");
 
@@ -19,20 +18,21 @@ export function useApiFetch<T> (path: string, options: UseFetchOptions<T> = {}) 
   //   headers['X-XSRF-TOKEN'] = token.value as string;
   // }
 
-
-  const token = process.client ? JwtService.getToken() : null
+  // if (process.client) {
+  const token = process.client ? JwtService.getToken() : null;
+  console.log("my tokkkeeen", JwtService.getToken());
 
   if (token) {
-    headers['Authorization'] = 'Bearer ' + token;
-    headers['Content-Type'] = "application/json";
-
+    headers["Authorization"] = "Bearer " + token;
+    headers["Content-Type"] = "application/json";
   }
+  // }
 
   if (process.server) {
     headers = {
       ...headers,
-      ...useRequestHeaders(["referer"])
-    }
+      ...useRequestHeaders(["referer"]),
+    };
   }
 
   // useFetch(apiURL + '/api/verify-auth', {
@@ -52,14 +52,14 @@ export function useApiFetch<T> (path: string, options: UseFetchOptions<T> = {}) 
   //   }
   // })
 
-  console.log('Uzzal: ', headers)
+  console.log("Uzzal: ", headers);
   return useFetch(apiURL + path, {
     credentials: "include",
     watch: false,
     ...options,
     headers: {
       ...headers,
-      ...options?.headers
+      ...options?.headers,
     },
   });
 }

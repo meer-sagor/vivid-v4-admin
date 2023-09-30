@@ -1,73 +1,74 @@
-import { defineStore } from "pinia"
+import { defineStore } from "pinia";
 import { useApiFetch } from "@/composables/useApiFetch";
 import JwtService from "@/config/JwtService";
 
 type User = {
-    id: number;
-    name: string;
-    email: string;
-    role: number;
-    ip: string;
-}
+  id: number;
+  name: string;
+  email: string;
+  role: number;
+  ip: string;
+};
 
 type Credentials = {
-    email: string;
-    password: string;
-}
+  email: string;
+  password: string;
+};
 
-export const useAuthStore = defineStore('auth', () => {
-    const loginInUser = ref({});
-    let user = ref<User | null>(null)
-    user.value = JSON.parse(JwtService.getUser())
+export const useAuthStore = defineStore("auth", () => {
+  const loginInUser = ref({});
+  let user = ref<User | null>(null);
 
+  const setToken = (access_token: string, userData: any) => {
+    JwtService.saveToken(access_token);
+    JwtService.saveUser(JSON.stringify(userData));
+  };
 
-    const setToken = (access_token:string, userData:any) => {
-        JwtService.saveToken(access_token);
-        JwtService.saveUser(JSON.stringify(userData));
+  const removeToken = () => {
+    JwtService.destroyToken();
+    JwtService.destroyUser();
+  };
+
+  async function fetchUser() {
+    if (process.client) {
+      console.log("user", JwtService.getToken());
+      const { data, error } = await useApiFetch("/api/user");
+      console.log(data);
+      console.log(error);
+      user.value = data.value as User;
     }
+  }
 
-    const removeToken = () => {
-        JwtService.destroyToken();
-        JwtService.destroyUser();
-    }
+  async function login(credentials: Credentials) {
+    const login = await useApiFetch("/login", {
+      method: "POST",
+      body: credentials,
+    });
 
-    async function fetchUser() {
-        console.log('user', JwtService.getToken())
-        const { data, error } = await useApiFetch("/api/user");
-        console.log('fetchUser', data)
-        console.log(error)
-        user.value = data.value as User;
-    }
+    // await fetchUser()
+    return login;
+  }
 
-    async function login(credentials: Credentials) {
-        const login = await useApiFetch("/login", {
-            method: "POST",
-            body: credentials,
-        });
+  async function logout() {
+    await useApiFetch("/api/logout", { method: "POST" });
+    JwtService.destroyToken();
+    JwtService.destroyUser();
+    // navigateTo("/auth/login", { replace: true }); // Somehow it doesn't work. Please check.
+    location.replace("/auth/login");
+  }
 
-        // await fetchUser()
-        return login;
-    }
+  const isLoggedIn = computed(() => !!user.value);
 
-    async function logout() {
-        await useApiFetch("/api/logout", { method: "POST" });
-        JwtService.destroyToken();
-        JwtService.destroyUser();
-        navigateTo("/auth/login");
-    }
+  console.log("isLoggedIn: ", isLoggedIn.value);
 
-    // if (!!JwtService.getUser()) {
-    //     user.value = JSON.parse(JwtService.getUser())
-    // }
-
-    const isLoggedIn = computed(() => !!user.value)
-
-    console.log('JwtService user', user.value)
-
-    console.log('isLoggedIn: ', isLoggedIn.value)
-
-    return {
-        login, setToken, removeToken, user, isLoggedIn, fetchUser, loginInUser, logout
-    }
-
-})
+  return {
+    login,
+    setToken,
+    removeToken,
+    user,
+    isLoggedIn,
+    fetchUser,
+    loginInUser,
+    logout,
+  };
+});

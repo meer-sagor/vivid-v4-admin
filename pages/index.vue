@@ -4,9 +4,6 @@ import { ProductService } from "@/service/ProductService";
 import { onMounted, reactive, ref, watch } from "vue";
 const { isDarkTheme } = useLayout();
 
-definePageMeta({
-  middleware: ["auth"],
-});
 const products = ref(null);
 const lineData = reactive({
   labels: ["January", "February", "March", "April", "May", "June", "July"],
