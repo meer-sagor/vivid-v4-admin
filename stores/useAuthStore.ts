@@ -18,6 +18,7 @@ type Credentials = {
 export const useAuthStore = defineStore('auth', () => {
     const loginInUser = ref({});
     let user = ref<User | null>(null)
+    user.value = JSON.parse(JwtService.getUser())
 
 
     const setToken = (access_token:string, userData:any) => {
@@ -33,7 +34,7 @@ export const useAuthStore = defineStore('auth', () => {
     async function fetchUser() {
         console.log('user', JwtService.getToken())
         const { data, error } = await useApiFetch("/api/user");
-        console.log(data)
+        console.log('fetchUser', data)
         console.log(error)
         user.value = data.value as User;
     }
@@ -55,7 +56,13 @@ export const useAuthStore = defineStore('auth', () => {
         navigateTo("/auth/login");
     }
 
+    // if (!!JwtService.getUser()) {
+    //     user.value = JSON.parse(JwtService.getUser())
+    // }
+
     const isLoggedIn = computed(() => !!user.value)
+
+    console.log('JwtService user', user.value)
 
     console.log('isLoggedIn: ', isLoggedIn.value)
 

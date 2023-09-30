@@ -13,6 +13,9 @@ const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
 const router = useRouter();
 const auth = useAuthStore();
+
+console.log("index auth - ", auth.user);
+
 const user = ref(auth.user ? auth.user : null);
 
 onMounted(() => {
