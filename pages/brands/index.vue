@@ -13,7 +13,8 @@ const schema = Yup.object({
   status: Yup.mixed().required().label("status"),
 });
 const toast = useToast();
-
+//filters
+const { $dateFilter } = useNuxtApp();
 const products = ref(null);
 const search = ref(null);
 const brands = ref([]);
@@ -342,10 +343,10 @@ const deleteSelectedProducts = () => {
               >
             </template>
           </Column>
-          <Column field="updated_at" header="Updated_at" :sortable="true">
+          <Column field="created_at" header="Created at" :sortable="true">
             <template #body="slotProps">
-              <span class="p-column-title">Updated_at</span>
-              {{ slotProps.data.updated_at }}
+              <span class="p-column-title">Created at</span>
+              {{  $dateFilter(slotProps.data.created_at)  }}
             </template>
           </Column>
           <Column class="text-right">

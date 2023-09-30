@@ -8,6 +8,8 @@ import * as Yup from "yup";
 const {handleSubmit, resetForm} = useForm();
 const fetching = ref(false);
 const spinner = ref(false);
+//filters
+const { $dateFilter } = useNuxtApp();
 const schema = Yup.object().shape({
   name: Yup.string().required().min(2).max(50).label("This"),
   order: Yup.number().typeError('Order is number field').required().label("Order Reqired"),
@@ -535,10 +537,10 @@ const onUpload = () => {
               >
             </template>
           </Column>
-          <Column field="updated_at" header="Updated_at" :sortable="true">
+          <Column field="created_at" header="Created at" :sortable="true">
             <template #body="slotProps">
-              <span class="p-column-title">Updated_at</span>
-              {{ slotProps.data.updated_at }}
+              <span class="p-column-title">Created at</span>
+              {{  $dateFilter(slotProps.data.created_at)  }}
             </template>
           </Column>
           <Column class="text-right">

@@ -7,6 +7,8 @@ import * as Yup from "yup";
 const {handleSubmit, resetForm} = useForm();
 const fetching = ref(false);
 const spinner = ref(false);
+//filters
+const { $dateFilter } = useNuxtApp();
 const schema = Yup.object({
   name: Yup.string().required().min(2).max(15).label("Name"),
   status: Yup.mixed().required().label("status"),
@@ -300,7 +302,7 @@ const deleteSelectedTag = () => {
           <Column field="created_at" header="Created at" :sortable="true">
             <template #body="slotProps">
               <span class="p-column-title">Created at</span>
-              {{ slotProps.data.created_at }}
+              {{  $dateFilter(slotProps.data.created_at)  }}
             </template>
           </Column>
           <Column class="text-right">

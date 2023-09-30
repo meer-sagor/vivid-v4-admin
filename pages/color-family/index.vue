@@ -6,6 +6,8 @@ import { onMounted, ref,nextTick,watch, computed } from "vue";
 import {Field, Form, useField, useForm} from 'vee-validate';
 import * as Yup from "yup";
 const {handleSubmit, resetForm} = useForm();
+//filters
+const { $dateFilter } = useNuxtApp();
 const fetching = ref(false);
 const spinner = ref(false);
 const schema = Yup.object({
@@ -404,10 +406,10 @@ const onUpload = () => {
               >
             </template>
           </Column>
-          <Column field="updated_at" header="Updated_at" :sortable="true">
+          <Column field="created_at" header="Created at" :sortable="true">
             <template #body="slotProps">
-              <span class="p-column-title">Updated_at</span>
-              {{ slotProps.data.updated_at }}
+              <span class="p-column-title">Created at</span>
+              {{  $dateFilter(slotProps.data.created_at)  }}
             </template>
           </Column>
           <Column class="text-right">
