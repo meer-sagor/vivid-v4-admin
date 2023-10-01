@@ -18,6 +18,8 @@ const schema = Yup.object({
   status: Yup.mixed().required().label("status"),
   category: Yup.mixed().required().label("category"),
 });
+//filters
+const { $dateFilter } = useNuxtApp();
 const imageError = ref(null);
 const toast = useToast();
 const categories = ref([]);
@@ -129,6 +131,7 @@ const formatCurrency = (value) => {
 
 const openNew = () => {
   product.value = {};
+  product.value.status = "ENABLE";
   submitted.value = false;
   productDialog.value = true;
 };
@@ -555,10 +558,10 @@ const onUpload = () => {
               >
             </template>
           </Column>
-          <Column field="updated_at" header="Updated_at" :sortable="true">
+          <Column field="created_at" header="Created at" :sortable="true">
             <template #body="slotProps">
-              <span class="p-column-title">Updated_at</span>
-              {{ slotProps.data.updated_at }}
+              <span class="p-column-title">Created at</span>
+              {{  $dateFilter(slotProps.data.created_at)  }}
             </template>
           </Column>
           <Column class="text-right">

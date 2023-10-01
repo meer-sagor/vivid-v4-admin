@@ -6,6 +6,8 @@ import { onMounted, ref,nextTick,watch, computed } from "vue";
 import {Field, Form, useField, useForm} from 'vee-validate';
 import * as Yup from "yup";
 const {handleSubmit, resetForm} = useForm();
+//filters
+const { $dateFilter } = useNuxtApp();
 const fetching = ref(false);
 const spinner = ref(false);
 const schema = Yup.object({
@@ -101,6 +103,7 @@ const formatCurrency = (value) => {
 
 const openNew = () => {
   product.value = {};
+  product.value.status = "ENABLE";
   submitted.value = false;
   productDialog.value = true;
 };
@@ -403,10 +406,10 @@ const onUpload = () => {
               >
             </template>
           </Column>
-          <Column field="updated_at" header="Updated_at" :sortable="true">
+          <Column field="created_at" header="Created at" :sortable="true">
             <template #body="slotProps">
-              <span class="p-column-title">Updated_at</span>
-              {{ slotProps.data.updated_at }}
+              <span class="p-column-title">Created at</span>
+              {{  $dateFilter(slotProps.data.created_at)  }}
             </template>
           </Column>
           <Column class="text-right">
@@ -441,10 +444,16 @@ const onUpload = () => {
               <small class="p-error" id="category-name-error">{{ errors.name || '&nbsp;' }}</small>
             </div>
 
-            <div class="field">
-              <label for="hex">Hex</label>
-              <Field v-model="product.hex" id="hex" name="hex" :class="{ 'p-invalid': errors.hex }" class="p-inputtext p-component" aria-describedby="category-hex-error" placeholder="Color hex"/>
-              <small class="p-error" id="category-hex-error">{{ errors.hex || '&nbsp;' }}</small>
+            <div class="formgrid grid">
+              <div class="field col">
+                <label for="hex">Hex</label>
+                <Field v-model="product.hex" id="hex" name="hex" :class="{ 'p-invalid': errors.hex }" class="p-inputtext p-component" aria-describedby="category-hex-error" placeholder="Color hex"/> 
+                <small class="p-error" id="category-hex-error">{{ errors.hex || '&nbsp;' }}</small>
+              </div>
+              <div class="field col-3">
+                <label for="color-picker">Pick Color</label>
+                <ColorPicker  inputId="cp-hex" format="hex" v-model="product.hex"/>
+              </div>
             </div>
 
             <!-- <div class="field">

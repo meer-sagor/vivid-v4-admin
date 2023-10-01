@@ -16,7 +16,8 @@ const schema = Yup.object({
 });
 const imageError = ref(null);
 const toast = useToast();
-
+//filters
+const { $dateFilter } = useNuxtApp();
 const products = ref(null);
 const search = ref(null);
 const fileInput = ref(null);
@@ -101,6 +102,7 @@ const formatCurrency = (value) => {
 
 const openNew = () => {
   product.value = {};
+  product.value.status = "ENABLE";
   submitted.value = false;
   productDialog.value = true;
 };
@@ -374,7 +376,7 @@ const onUpload = () => {
           <Column field="name" header="Hex" :sortable="true">
             <template #body="slotProps">
               <span class="p-column-title">Hex</span>
-              {{ slotProps.data.name }}
+              {{ slotProps.data.hex }}
             </template>
           </Column>
           <Column header="Image" headerStyle="width:14%; min-width:10rem;">
@@ -403,10 +405,10 @@ const onUpload = () => {
               >
             </template>
           </Column>
-          <Column field="updated_at" header="Updated_at" :sortable="true">
+          <Column field="created_at" header="Created at" :sortable="true">
             <template #body="slotProps">
-              <span class="p-column-title">Updated_at</span>
-              {{ slotProps.data.updated_at }}
+              <span class="p-column-title">Created at</span>
+              {{  $dateFilter(slotProps.data.created_at)  }}
             </template>
           </Column>
           <Column class="text-right">
@@ -440,11 +442,16 @@ const onUpload = () => {
               <Field v-model="product.name" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Name"/>
               <small class="p-error" id="category-name-error">{{ errors.name || '&nbsp;' }}</small>
             </div>
-
-            <div class="field">
-              <label for="hex">Hex</label>
-              <Field v-model="product.hex" id="hex" name="hex" :class="{ 'p-invalid': errors.hex }" class="p-inputtext p-component" aria-describedby="category-hex-error" placeholder="Color hex"/>
-              <small class="p-error" id="category-hex-error">{{ errors.hex || '&nbsp;' }}</small>
+            <div class="formgrid grid">
+              <div class="field col">
+                <label for="hex">Hex</label>
+                <Field v-model="product.hex" id="hex" name="hex" :class="{ 'p-invalid': errors.hex }" class="p-inputtext p-component" aria-describedby="category-hex-error" placeholder="Color hex"/> 
+                <small class="p-error" id="category-hex-error">{{ errors.hex || '&nbsp;' }}</small>
+              </div>
+              <div class="field col-3">
+                <label for="color-picker">Pick Color</label>
+                <ColorPicker  inputId="cp-hex" format="hex" v-model="product.hex"/>
+              </div>
             </div>
 
             <div class="field">
