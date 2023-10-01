@@ -12,7 +12,6 @@ export function useApiFetch<T>(path: string, options: UseFetchOptions<T> = {}) {
 
   if (token) {
     headers["Authorization"] = "Bearer " + token;
-    headers["Content-Type"] = "application/json";
   }
 
 
@@ -23,24 +22,30 @@ export function useApiFetch<T>(path: string, options: UseFetchOptions<T> = {}) {
     };
   }
 
-  if (token){
-    useFetch(apiURL + '/api/verify-auth', {
-      credentials: "include",
-      watch: false,
-      ...options,
-      headers: {
-        ...headers,
-        ...options?.headers
-      },
-    }) .then(async ({error}) => {
-      const error_data = JSON.parse(JSON.stringify(computed(() => error.value).value))
-      if (error_data?.statusCode === 401){
-        JwtService.destroyToken();
-        JwtService.destroyUser();
-        return navigateTo("/auth/login", { replace: true })
-      }
-    })
-  }
+  // if (token){
+  //   useFetch(apiURL + '/api/verify-auth', {
+  //     method: "GET",
+  //     credentials: "include",
+  //     watch: false,
+  //     ...options,
+  //     headers: {
+  //       ...headers,
+  //       ...options?.headers
+  //     },
+  //   }) .then(async ({error}) => {
+  //     const error_data = JSON.parse(JSON.stringify(computed(() => error.value).value))
+  //     if (error_data?.statusCode === 401){
+  //       JwtService.destroyToken();
+  //       JwtService.destroyUser();
+  //       return navigateTo("/auth/login", { replace: true })
+  //     }
+  //   })
+  // }
+
+  // @ts-ignore
+  // if (!options.headers || !options.headers['Content-Type']) {
+  //   headers['Content-Type'] = 'application/json';
+  // }
 
   return useFetch(apiURL + path, {
     credentials: "include",

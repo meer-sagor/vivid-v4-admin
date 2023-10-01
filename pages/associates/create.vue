@@ -118,19 +118,19 @@ export default defineComponent({
 
     const onSubmit = async (values: any, actions: { setErrors: (arg0: any) => void; }) => {
       loading.value = true
-      const body = new FormData();
-      body.append("first_name", associate.value.first_name);
-      body.append("last_name", associate.value.last_name);
-      body.append("email", associate.value.email);
-      body.append("password", associate.value.password);
-      body.append("roles",  associate.value.roles);
-      body.append("image", imageFile.value);
-
+      const formData = new FormData();
+      formData.append("first_name", associate.value.first_name);
+      formData.append("last_name", associate.value.last_name);
+      formData.append("email", associate.value.email);
+      formData.append("password", associate.value.password);
+      formData.append("roles",  associate.value.roles);
+      formData.append("image", imageFile.value);
 
       const {data, error} = await useApiFetch("/api/associates/store", {
-        method: "POST",
-        body: body,
+        method: 'POST',
+        body: formData,
       });
+
       loading.value = false
       const data_obj = JSON.parse(JSON.stringify(computed(() => data.value).value))
       const error_obj = JSON.parse(JSON.stringify(computed(() => error.value).value))

@@ -37,7 +37,7 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   async function login(credentials: Credentials) {
-    const login = await useApiFetch("/login", {
+    const login = await useApiFetch("/api/login", {
       method: "POST",
       body: credentials,
     });
