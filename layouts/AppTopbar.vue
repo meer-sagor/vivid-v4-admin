@@ -18,8 +18,6 @@ definePageMeta({
   middleware: ["auth"],
 });
 
-console.log("index auth - ", auth.user);
-
 const user = ref(auth.user ? auth.user : null);
 
 onMounted(() => {

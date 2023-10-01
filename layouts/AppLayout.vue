@@ -67,7 +67,6 @@ const isOutsideClicked = (event) => {
   );
 };
 
-console.log("test layout");
 </script>
 
 <template>
