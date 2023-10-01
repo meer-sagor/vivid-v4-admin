@@ -1,11 +1,14 @@
 import { useAuthStore } from "@/stores/useAuthStore"
+import JwtService from "~/config/JwtService";
 
 export default defineNuxtPlugin(async (nuxtApp) => {
     const auth = useAuthStore();
 
-    console.log('loadUser', auth.isLoggedIn)
+    const token = process.client ? JwtService.getToken() : null;
 
-    if (!auth.isLoggedIn) {
-        await auth.fetchUser()
+    if (token){
+        if (!auth.isLoggedIn) {
+            await auth.fetchUser()
+        }
     }
 })

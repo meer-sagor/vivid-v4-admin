@@ -31,10 +31,7 @@ export const useAuthStore = defineStore("auth", () => {
 
   async function fetchUser() {
     if (process.client) {
-      console.log("user", JwtService.getToken());
       const { data, error } = await useApiFetch("/api/user");
-      console.log(data);
-      console.log(error);
       user.value = data.value as User;
     }
   }
@@ -45,7 +42,6 @@ export const useAuthStore = defineStore("auth", () => {
       body: credentials,
     });
 
-    // await fetchUser()
     return login;
   }
 
@@ -58,8 +54,6 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   const isLoggedIn = computed(() => !!user.value);
-
-  console.log("isLoggedIn: ", isLoggedIn.value);
 
   return {
     login,

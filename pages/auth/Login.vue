@@ -1,9 +1,7 @@
 <script setup>
 import { useLayout } from "@/layouts/composables/layout";
 import { ref, computed } from "vue";
-// import AppConfig from "@/layouts/AppConfig.vue";
 import { useAuthStore } from "@/stores/useAuthStore";
-import JwtService from "~/config/JwtService";
 
 definePageMeta({
   layout: false,
