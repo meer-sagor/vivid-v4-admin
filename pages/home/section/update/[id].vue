@@ -2,7 +2,7 @@
   <div class="card">
     <h5>Update Home Section</h5>
     <template v-if="fetching">
-      <Form id="add_home_section_form" @submit="onSubmit" :validation-schema="schema" v-slot="{ errors }">
+      <Form id="add_home_section_form" :initial-values="home_section" @submit="onSubmit" :validation-schema="schema" v-slot="{ errors }">
         <div class="flex flex-column gap-2 mb-1">
           <label for="name">Name</label>
           <Field v-model="home_section.name" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="home-section-name-error" placeholder="Name"/>
@@ -96,7 +96,6 @@ export default defineComponent({
     const schema = Yup.object().shape({
       name: Yup.string().required().min(2).max(100).label("Name"),
       section_title: Yup.string().required().min(2).max(100).label("Section title"),
-      description: Yup.string().required().min(2).max(100).label("Description"),
       view_all_url: Yup.string().url().required().min(2).max(100).label("Url"),
     });
 
@@ -128,7 +127,6 @@ export default defineComponent({
 
 
     const onSubmit = async (values: any, actions: { setErrors: (arg0: any) => void; }) => {
-
       if (home_section.value.description == null || home_section.value.description == '') {
         toast.add({
           severity: "info",
