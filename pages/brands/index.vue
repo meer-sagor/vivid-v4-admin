@@ -8,6 +8,7 @@ import * as Yup from "yup";
 const {handleSubmit, resetForm} = useForm();
 const fetching = ref(false);
 const spinner = ref(false);
+const loading = ref(false);
 const schema = Yup.object({
   name: Yup.string().required().min(2).max(50).label("Name"),
   status: Yup.mixed().required().label("status"),
@@ -91,6 +92,7 @@ const hideDialog = () => {
 const saveProduct = async () => {
   submitted.value = true;
   console.log(product.value);
+  loading.value = true
   if (product.value.name && product.value.name.trim()) {
     product.value.status = product.value.status.value
       ? product.value.status.value
@@ -162,7 +164,7 @@ const saveProduct = async () => {
       //     life: 3000
       // });
     }
-
+    loading.value = false
     productDialog.value = false;
     product.value = {};
   }
@@ -409,7 +411,7 @@ const deleteSelectedProducts = () => {
               errors.status || "&nbsp;"
             }}</small>
           </div>
-          <Button class="" type="submit" label="Submit"  icon="pi pi-check"/>
+          <Button :loading="loading" class="" type="submit" label="Submit"  icon="pi pi-check"/>
         </Form>
           <!-- <template #footer>
             <Button

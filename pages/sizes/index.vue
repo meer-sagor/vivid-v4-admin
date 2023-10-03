@@ -7,6 +7,7 @@ import { onMounted, ref ,nextTick,watch, computed} from "vue";
 const { $dateFilter } = useNuxtApp();
 const fetching = ref(false);
 const spinner = ref(false);
+const loading = ref(false);
 const toast = useToast();
 const sizes = ref([]);
 const rowsPerPage = ref(0)
@@ -85,7 +86,7 @@ const hideDialog = () => {
 
 const saveProduct = async () => {
   submitted.value = true;
-  console.log(product.value);
+  loading.value = true
   if (product.value.name && product.value.name.trim()) {
     product.value.status = product.value.status.value
       ? product.value.status.value
@@ -140,7 +141,7 @@ const saveProduct = async () => {
       }
       await initialize();
     }
-
+    loading.value = false
     productDialog.value = false;
     product.value = {};
   }
@@ -466,6 +467,7 @@ const deleteSelectedProducts = () => {
               @click="hideDialog"
             />
             <Button
+              :loading="loading"
               label="Save"
               icon="pi pi-check"
               class="p-button-text"

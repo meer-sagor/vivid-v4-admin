@@ -9,6 +9,7 @@ import * as Yup from "yup";
 const { handleSubmit, resetForm } = useForm();
 const fetching = ref(false);
 const spinner = ref(false);
+const loading = ref(false);
 const schema = Yup.object({
   name: Yup.string().required().min(2).max(50).label("Name"),
   order: Yup.number()
@@ -154,6 +155,7 @@ const hideDialog = () => {
 };
 
 const saveProduct = async () => {
+  loading.value = true
   if (product.value.image_id == null && product.value.image_id == undefined) {
     if (files.value) {
       await uploadHandler();
@@ -230,12 +232,13 @@ const saveProduct = async () => {
       }
       await initialize();
     }
-
+    loading.value = false
     productDialog.value = false;
     product.value = {};
   }
 };
 const uploadHandler = async () => {
+  loading.value = true
   console.log(files.value);
   // uploading.value = true;
   const fileUp = files.value[0];
@@ -588,6 +591,7 @@ const onUpload = () => {
               <label for="order">Order</label>
               <Field
                 v-model="product.order"
+                type="number"
                 id="order"
                 name="order"
                 :class="{ 'p-invalid': errors.order }"
@@ -716,7 +720,7 @@ const onUpload = () => {
                 errors.status || "&nbsp;"
               }}</small>
             </div>
-            <Button class="" type="submit" label="Submit" icon="pi pi-check" />
+            <Button class="" :loading="loading" type="submit" label="Submit" icon="pi pi-check" />
           </Form>
         </Dialog>
 

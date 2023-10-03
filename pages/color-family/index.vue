@@ -10,6 +10,7 @@ const {handleSubmit, resetForm} = useForm();
 const { $dateFilter } = useNuxtApp();
 const fetching = ref(false);
 const spinner = ref(false);
+const loading = ref(false);
 const schema = Yup.object({
   name: Yup.string().required().min(2).max(50).label("Name"),
   hex: Yup.string().required().min(2).max(50).label("Name"),
@@ -114,6 +115,7 @@ const hideDialog = () => {
 };
 
 const saveProduct = async () => {
+  loading.value = true
   if (product.value.image_id == null && product.value.image_id == undefined) {
     if(files.value){
       await uploadHandler();
@@ -194,7 +196,7 @@ const saveProduct = async () => {
       //   life: 3000,
       // });
     }
-
+    loading.value = false
     productDialog.value = false;
     product.value = {};
   }
@@ -517,7 +519,7 @@ const onUpload = () => {
                 errors.status || "&nbsp;"
               }}</small>
             </div>
-            <Button class="" type="submit" label="Submit"  icon="pi pi-check"/>
+            <Button class="" :loading="loading" type="submit" label="Submit"  icon="pi pi-check"/>
           </Form>
         </Dialog>
 

@@ -8,6 +8,7 @@ import * as Yup from "yup";
 const {handleSubmit, resetForm} = useForm();
 const fetching = ref(false);
 const spinner = ref(false);
+const loading = ref(false);
 const schema = Yup.object({
   name: Yup.string().required().min(2).max(50).label("Name"),
   hex: Yup.string().required().min(2).max(50).label("Name"),
@@ -113,6 +114,7 @@ const hideDialog = () => {
 };
 
 const saveProduct = async () => {
+  loading.value = true
   if (product.value.image_id == null && product.value.image_id == undefined) {
     if(files.value){
       await uploadHandler();
@@ -193,14 +195,13 @@ const saveProduct = async () => {
       //   life: 3000,
       // });
     }
-
+    loading.value = false
     productDialog.value = false;
     product.value = {};
   }
 };
 const uploadHandler = async () => {
-  console.log( files.value );
-  // uploading.value = true;
+  loading.value = true
   const fileUp = files.value[0];
   const body = new FormData();
   body.append("image", fileUp);
@@ -515,7 +516,7 @@ const onUpload = () => {
                 errors.status || "&nbsp;"
               }}</small>
             </div>
-            <Button class="" type="submit" label="Submit"  icon="pi pi-check"/>
+            <Button class="" :loading="loading" type="submit" label="Submit"  icon="pi pi-check"/>
           </Form>
         </Dialog>
 
