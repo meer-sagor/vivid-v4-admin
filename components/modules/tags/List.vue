@@ -161,7 +161,7 @@ const saveTag = async () => {
       //     life: 3000
       // });
     }
-    loading.value = true
+    loading.value = false
     tagDialog.value = false;
     product.value = {};
   }
