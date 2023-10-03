@@ -182,6 +182,32 @@ const sizeChartsValidationSchema = Yup.object().shape({
     }
 );
 
+const price_shirt_chart_from_data = ref({
+  price_shirt_charts: [{
+    sizes: '',
+    range_from: '',
+    range_to: '',
+    price: '',
+  }],
+})
+const priceShirtChartsValidationSchema = Yup.object().shape({
+  price_shirt_charts: Yup
+          .array()
+          .of(
+              Yup.object().shape({
+                    sizes: Yup.string().typeError('Sizes is a required field').required().label("Sizes"),
+                    range_from: Yup.number().typeError('Range from must be a number type').moreThan(0, "Range from cannot be negative").max(1000).min(0).required().label("Range from"),
+                    range_to: Yup.number().typeError('Range to must be a number type').moreThan(0, "Range to cannot be negative").max(1000).min(0).required().label("Range to"),
+                    price: Yup.number().typeError('Price must be a number type').moreThan(0, "Price cannot be negative").max(1000).min(0).required().label("Price"),
+                  },
+                  [
+                    ['sizes', 'range_from', 'range_to', 'price'],
+                  ]
+              )
+          ),
+    }
+);
+
 </script>
 
 <template>
@@ -531,96 +557,98 @@ const sizeChartsValidationSchema = Yup.object().shape({
 
     <div class="col-12">
       <div class="card">
-        <div class="flex justify-content-between flex-column sm:flex-row mb-3">
-          <h4>Price Shirt Chart</h4>
-          <div>
-            <Button label="Add" icon="pi pi-plus" class="mr-2 mb-2"></Button>
-          </div>
-        </div>
+        <Form :initial-values="price_shirt_chart_from_data" :validation-schema="priceShirtChartsValidationSchema" v-slot="{values, errors }">
+          <FieldArray name="price_shirt_charts" v-slot="{ fields, push, remove }">
+            <div class="flex justify-content-between flex-column sm:flex-row mb-3">
+              <h4>Price Shirt Chart</h4>
+              <div>
+                <Button
+                    label="Add"
+                    icon="pi pi-plus"
+                    class="mr-2 mb-2"
+                    @click="push({ sizes: '', range_from: '', range_to: '', price: ''})"
+                ></Button>
+              </div>
+            </div>
+            <div class="field">
+              <div
+                class="formgrid"
+                style="border: 1px solid #e4e4e4;border-radius: 12px;padding: 16px;">
+                <table style="width: 100%; text-align: left">
+                  <thead>
+                    <tr>
+                      <th>Sizes</th>
+                      <th>Range From</th>
+                      <th>Range To</th>
+                      <th>Price</th>
+                      <th>Remove</th>
+                      <th class="text-center">Up/Down</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  <tr  v-for="(field, idx) in fields" :key="idx">
+                    <td>
+                      <div class="flex flex-column gap-2 mb-2">
+                        <Field :id="`sizes_${idx}`" :name="`price_shirt_charts[${idx}].sizes`" v-slot="{ field }">
+                          <input v-bind="field" class="p-inputtext p-component" type="text" v-model="values.price_shirt_charts[idx].sizes"
+                                 :class="{ 'p-invalid': errors[`price_shirt_charts[${idx}].sizes`] }"
+                                 placeholder="Enter sizes"/>
+                        </Field>
+                        <ErrorMessage class="p-error" :name="`price_shirt_charts[${idx}].sizes`"/>
+                      </div>
 
-        <div class="field">
-          <div
-            class="formgrid"
-            style="
-              border: 1px solid #e4e4e4;
-              border-radius: 12px;
-              padding: 16px;
-            "
-          >
-            <table style="width: 100%; text-align: left">
-              <thead>
-                <tr>
-                  <th>Sizes</th>
-                  <th>Range From</th>
-                  <th>Range To</th>
-                  <th>Price</th>
-                  <th>Remove</th>
-                  <th class="text-center">Up/Down</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Infant Colors</td>
-                  <td>
-                    <InputText type="text" placeholder="Default"></InputText>
-                  </td>
-                  <td>
-                    <InputText type="text" placeholder="Default"></InputText>
-                  </td>
-                  <td>
-                    <InputText type="text" placeholder="Default"></InputText>
-                  </td>
-                  <td>
-                    <Button
-                      icon="pi pi-times"
-                      class="p-button-rounded p-button-text mr-2 mb-2"
-                    />
-                  </td>
-                  <td class="text-center">
-                    <Button
-                      icon="pi pi-arrow-up"
-                      class="p-button-rounded p-button-text mr-2 mb-2"
-                    />
+                    </td>
+                    <td>
+                      <div class="flex flex-column gap-2 mb-2">
+                        <Field :id="`range_from_${idx}`" :name="`price_shirt_charts[${idx}].range_from`" v-slot="{ field }">
+                          <input v-bind="field" class="p-inputtext p-component" type="text" v-model="values.price_shirt_charts[idx].range_from"
+                                 :class="{ 'p-invalid': errors[`price_shirt_charts[${idx}].range_from`] }"
+                                 placeholder="Enter range from"/>
+                        </Field>
+                        <ErrorMessage class="p-error" :name="`price_shirt_charts[${idx}].range_from`"/>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="flex flex-column gap-2 mb-2">
+                        <Field :id="`range_to_${idx}`" :name="`price_shirt_charts[${idx}].range_to`" v-slot="{ field }">
+                          <input v-bind="field" class="p-inputtext p-component" type="text" v-model="values.price_shirt_charts[idx].range_to"
+                                 :class="{ 'p-invalid': errors[`price_shirt_charts[${idx}].range_to`] }"
+                                 placeholder="Enter range to"/>
+                        </Field>
+                        <ErrorMessage class="p-error" :name="`price_shirt_charts[${idx}].range_to`"/>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="flex flex-column gap-2 mb-2">
+                        <Field :id="`price_${idx}`" :name="`price_shirt_charts[${idx}].price`" v-slot="{ field }">
+                          <input v-bind="field" class="p-inputtext p-component" type="text" v-model="values.price_shirt_charts[idx].price"
+                                 :class="{ 'p-invalid': errors[`price_shirt_charts[${idx}].price`] }"
+                                 placeholder="Enter price"/>
+                        </Field>
+                        <ErrorMessage class="p-error" :name="`price_shirt_charts[${idx}].price`"/>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="flex flex-column gap-2 mb-2">
+                        <Button v-if="values.price_shirt_charts.length > 1" @click="remove(idx)" icon="pi pi-times" class="p-button-rounded p-button-text mr-2 mb-2"/>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="flex flex-column gap-2 mb-2">
+                        <Button
+                            icon="pi pi-sort-alt"
+                            class="p-button-rounded p-button-text mr-2 mb-2"
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </FieldArray>
+        </Form>
 
-                    <Button
-                      icon="pi pi-arrow-down"
-                      class="p-button-rounded p-button-text mr-2 mb-2"
-                    />
-                  </td>
-                </tr>
-                <tr>
-                  <td>Infant White</td>
-                  <td>
-                    <InputText type="text" placeholder="Default"></InputText>
-                  </td>
-                  <td>
-                    <InputText type="text" placeholder="Default"></InputText>
-                  </td>
-                  <td>
-                    <InputText type="text" placeholder="Default"></InputText>
-                  </td>
-                  <td>
-                    <Button
-                      icon="pi pi-times"
-                      class="p-button-rounded p-button-text mr-2 mb-2"
-                    />
-                  </td>
-                  <td class="text-center">
-                    <Button
-                      icon="pi pi-arrow-up"
-                      class="p-button-rounded p-button-text mr-2 mb-2"
-                    />
-
-                    <Button
-                      icon="pi pi-arrow-down"
-                      class="p-button-rounded p-button-text mr-2 mb-2"
-                    />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
         <div class="field">
           <div
             class="formgrid"
