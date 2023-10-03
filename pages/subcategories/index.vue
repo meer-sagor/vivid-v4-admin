@@ -16,6 +16,7 @@ const schema = Yup.object({
     .required()
     .label("Order"),
   status: Yup.mixed().required().label("status"),
+  type: Yup.mixed().required().label("Type"),
   category: Yup.mixed().required().label("category"),
 });
 //filters
@@ -29,6 +30,7 @@ const totalRecords = ref(0);
 const products = ref(null);
 const search = ref(null);
 const status = ref(null);
+const type = ref(null);
 const fileInput = ref(null);
 const files = ref();
 const fileData = ref();
@@ -50,6 +52,7 @@ const types = ref([
   { label: "Product", value: "product" },
   { label: "Product Design", value: "product_design" },
   { label: "Embroidery Design", value: "embroidery_design" },
+  { label: "Clipart", value: "clipart" },
 ]);
 const onPhotoSelect = ($event) => {
   product.value.image_id == null;
@@ -72,6 +75,14 @@ const statusTerm = computed(() => {
     return "";
   }
 });
+const categorytypeTerm = computed(() => {
+  // console.log(type.value);
+  if (type.value){
+    return  '?type=' + type.value
+  }else{
+    return ''
+  }
+})
 onMounted(async () => {
   await nextTick();
   await initialize();
@@ -84,7 +95,7 @@ const initialize = async (event) => {
     page = event.first / event.rows + 1;
   }
   const { data, error } = await useApiFetch(
-    "/api/sub-categories/?page=" + page + searchTerm.value + statusTerm.value,
+    "/api/sub-categories/?page=" + page + searchTerm.value + statusTerm.value ,
     {
       method: "GET",
     }
@@ -110,7 +121,7 @@ const initialize = async (event) => {
   }
 };
 const categoryData = async () => {
-  const { data, error } = await useApiFetch("/api/categories/", {
+  const { data, error } = await useApiFetch("/api/categories/" + categorytypeTerm.value, {
     method: "GET",
   });
   if (error.value) {
@@ -125,8 +136,9 @@ const categoryData = async () => {
     categories.value = data.value.categories.data;
   }
 };
-const formatCurrency = (value) => {
-  return value.toLocaleString("en-US", { style: "currency", currency: "USD" });
+const sortCategory = async () => {
+  type.value = product.value.type;
+  await categoryData();
 };
 
 const openNew = () => {
@@ -175,10 +187,6 @@ const saveProduct = async () => {
           body: product.value,
         }
       );
-      // errorMessage.value = null;
-      // if (error.value) {
-      // errorMessage.value = error.value.data.message;
-      // }
       if (error.value) {
         toast.add({
           severity: "error",
@@ -198,12 +206,6 @@ const saveProduct = async () => {
       }
       subCategories.value[findIndexById(product.value.id)] = product.value;
       await initialize();
-      // toast.add({
-      //     severity: 'success',
-      //     summary: 'Successful',
-      //     detail: 'Product Updated',
-      //     life: 3000
-      // });
     } else {
       const { data, error } = await useApiFetch("/api/sub-categories", {
         method: "POST",
@@ -227,17 +229,6 @@ const saveProduct = async () => {
         });
       }
       await initialize();
-      // product.value.id = createId();
-      // product.value.code = createId();
-      // product.value.image = 'product-placeholder.svg';
-      // product.value.inventoryStatus = product.value.inventoryStatus ? product.value.inventoryStatus.value : 'Enable';
-      // products.value.push(product.value);
-      // toast.add({
-      //     severity: 'success',
-      //     summary: 'Successful',
-      //     detail: 'Product Created',
-      //     life: 3000
-      // });
     }
 
     productDialog.value = false;
@@ -608,7 +599,26 @@ const onUpload = () => {
                 errors.order || "&nbsp;"
               }}</small>
             </div>
-
+            <div class="field">
+              <label for="Types">Types</label>
+              <Field name="type" v-slot="{ field }">
+                <Dropdown
+                  v-bind="field"
+                  v-model="product.type"
+                  :options="types"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select a Type"
+                  display="chip"
+                  :class="{ 'p-invalid': errors.type }"
+                  aria-describedby="category-code-type-error"
+                  @change="sortCategory"
+                ></Dropdown>
+              </Field>
+              <small class="p-error" id="category-code-type-error">{{
+                errors.type || "&nbsp;"
+              }}</small>
+            </div>
             <div class="field">
               <label for="category" class="mb-3">Category</label>
               <Field name="category" v-slot="{ field }">
