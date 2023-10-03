@@ -3,6 +3,8 @@ import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
 import { onMounted, ref } from "vue";
+import {ErrorMessage, Field, FieldArray, Form} from 'vee-validate';
+import * as Yup from "yup";
 
 const description = ref(null);
 const chartDescription = ref(null);
@@ -22,7 +24,8 @@ const deleteProductsDialog = ref(false);
 const product = ref({});
 const selectedProducts = ref(null);
 const dt = ref(null);
-const switchValue = ref(false);
+const defaultPrinting = ref(false);
+const defaultEmbroidery = ref(false);
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
@@ -153,6 +156,58 @@ const onUpload = () => {
     life: 3000,
   });
 };
+
+const size_chart_from_data = ref({
+  size_charts: [{
+    sizes: '',
+    width: '',
+    length: '',
+  }],
+})
+
+const sizeChartsValidationSchema = Yup.object().shape({
+  size_charts: Yup
+          .array()
+          .of(
+              Yup.object().shape({
+                    sizes: Yup.string().typeError('Sizes is a required field').required().label("Sizes"),
+                    width: Yup.number().typeError('Width must be a number type').moreThan(0, "Width cannot be negative").max(1000).min(0).required().label("Width"),
+                    length: Yup.number().typeError('Length must be a number type').moreThan(0, "Length cannot be negative").max(1000).min(0).required().label("Length"),
+                  },
+                  [
+                    ['width', 'length'],
+                  ]
+              )
+          ),
+    }
+);
+
+const price_shirt_chart_from_data = ref({
+  price_shirt_charts: [{
+    sizes: '',
+    range_from: '',
+    range_to: '',
+    price: '',
+  }],
+})
+const priceShirtChartsValidationSchema = Yup.object().shape({
+  price_shirt_charts: Yup
+          .array()
+          .of(
+              Yup.object().shape({
+                    sizes: Yup.string().typeError('Sizes is a required field').required().label("Sizes"),
+                    range_from: Yup.number().typeError('Range from must be a number type').moreThan(0, "Range from cannot be negative").max(1000).min(0).required().label("Range from"),
+                    range_to: Yup.number().typeError('Range to must be a number type').moreThan(0, "Range to cannot be negative").max(1000).min(0).required().label("Range to"),
+                    price: Yup.number().typeError('Price must be a number type').moreThan(0, "Price cannot be negative").max(1000).min(0).required().label("Price"),
+                  },
+                  [
+                    ['sizes', 'range_from', 'range_to', 'price'],
+                  ]
+              )
+          ),
+    }
+);
+
 </script>
 
 <template>
@@ -181,9 +236,7 @@ const onUpload = () => {
             autofocus
             :class="{ 'p-invalid': submitted && !product.name }"
           />
-          <small v-if="submitted && !product.name" class="p-invalid"
-            >Name is required.</small
-          >
+          <small v-if="submitted && !product.name" class="p-invalid">Name is required.</small>
         </div>
 
         <div class="formgrid grid">
@@ -196,9 +249,7 @@ const onUpload = () => {
               autofocus
               :class="{ 'p-invalid': submitted && !product.name }"
             />
-            <small v-if="submitted && !product.name" class="p-invalid"
-              >Name is required.</small
-            >
+            <small v-if="submitted && !product.name" class="p-invalid">Name is required.</small>
           </div>
           <div class="field col">
             <label for="name" class="mb-3">Style Number</label>
@@ -209,9 +260,7 @@ const onUpload = () => {
               autofocus
               :class="{ 'p-invalid': submitted && !product.name }"
             />
-            <small v-if="submitted && !product.name" class="p-invalid"
-              >Name is required.</small
-            >
+            <small v-if="submitted && !product.name" class="p-invalid">Name is required.</small>
           </div>
         </div>
 
@@ -224,9 +273,7 @@ const onUpload = () => {
               autofocus
               :class="{ 'p-invalid': submitted && !product.name }"
             />
-            <small v-if="submitted && !product.name" class="p-invalid"
-              >Name is required.</small
-            >
+            <small v-if="submitted && !product.name" class="p-invalid">Name is required.</small>
           </div>
           <div class="field col">
             <label for="name" class="mb-3">Quantity</label>
@@ -239,9 +286,7 @@ const onUpload = () => {
               autofocus
               :class="{ 'p-invalid': submitted && !product.name }"
             />
-            <small v-if="submitted && !product.name" class="p-invalid"
-              >Name is required.</small
-            >
+            <small v-if="submitted && !product.name" class="p-invalid">Name is required.</small>
           </div>
         </div>
 
@@ -284,28 +329,19 @@ const onUpload = () => {
           >
             <template #value="slotProps">
               <div v-if="slotProps.value && slotProps.value.value">
-                <span
-                  :class="'product-badge status-' + slotProps.value.value"
-                  >{{ slotProps.value.label }}</span
-                >
+                <span :class="'product-badge status-' + slotProps.value.value">{{ slotProps.value.label }}</span>
               </div>
               <div v-else-if="slotProps.value && !slotProps.value.value">
-                <span
-                  :class="
-                    'product-badge status-' + slotProps.value.toLowerCase()
-                  "
-                  >{{ slotProps.value }}</span
-                >
+                <span :class="'product-badge status-' + slotProps.value.toLowerCase()">{{ slotProps.value }}</span>
               </div>
-              <span v-else>
-                {{ slotProps.placeholder }}
-              </span>
+              <span v-else>{{ slotProps.placeholder }}</span>
             </template>
           </Dropdown>
         </div>
       </div>
     </div>
 
+<!--    LeftSidebar-->
     <div class="col-4">
       <div class="card p-fluid">
         <div class="field">
@@ -344,22 +380,12 @@ const onUpload = () => {
           >
             <template #value="slotProps">
               <div v-if="slotProps.value && slotProps.value.value">
-                <span
-                  :class="'product-badge status-' + slotProps.value.value"
-                  >{{ slotProps.value.label }}</span
-                >
+                <span :class="'product-badge status-' + slotProps.value.value">{{ slotProps.value.label }}</span>
               </div>
               <div v-else-if="slotProps.value && !slotProps.value.value">
-                <span
-                  :class="
-                    'product-badge status-' + slotProps.value.toLowerCase()
-                  "
-                  >{{ slotProps.value }}</span
-                >
+                <span :class="'product-badge status-' + slotProps.value.toLowerCase() ">{{ slotProps.value }}</span>
               </div>
-              <span v-else>
-                {{ slotProps.placeholder }}
-              </span>
+              <span v-else>{{ slotProps.placeholder }}</span>
             </template>
           </Dropdown>
         </div>
@@ -375,22 +401,12 @@ const onUpload = () => {
           >
             <template #value="slotProps">
               <div v-if="slotProps.value && slotProps.value.value">
-                <span
-                  :class="'product-badge status-' + slotProps.value.value"
-                  >{{ slotProps.value.label }}</span
-                >
+                <span :class="'product-badge status-' + slotProps.value.value">{{ slotProps.value.label }}</span>
               </div>
               <div v-else-if="slotProps.value && !slotProps.value.value">
-                <span
-                  :class="
-                    'product-badge status-' + slotProps.value.toLowerCase()
-                  "
-                  >{{ slotProps.value }}</span
-                >
+                <span :class="'product-badge status-' + slotProps.value.toLowerCase()">{{ slotProps.value }}</span>
               </div>
-              <span v-else>
-                {{ slotProps.placeholder }}
-              </span>
+              <span v-else>{{ slotProps.placeholder }}</span>
             </template>
           </Dropdown>
         </div>
@@ -402,26 +418,15 @@ const onUpload = () => {
             v-model="product.inventoryStatus"
             :options="statuses"
             optionLabel="label"
-            placeholder="Select a Fabric"
-          >
+            placeholder="Select a Fabric">
             <template #value="slotProps">
               <div v-if="slotProps.value && slotProps.value.value">
-                <span
-                  :class="'product-badge status-' + slotProps.value.value"
-                  >{{ slotProps.value.label }}</span
-                >
+                <span :class="'product-badge status-' + slotProps.value.value">{{ slotProps.value.label }}</span>
               </div>
               <div v-else-if="slotProps.value && !slotProps.value.value">
-                <span
-                  :class="
-                    'product-badge status-' + slotProps.value.toLowerCase()
-                  "
-                  >{{ slotProps.value }}</span
-                >
+                <span :class="'product-badge status-' + slotProps.value.toLowerCase()">{{ slotProps.value }}</span>
               </div>
-              <span v-else>
-                {{ slotProps.placeholder }}
-              </span>
+              <span v-else>{{ slotProps.placeholder }}</span>
             </template>
           </Dropdown>
         </div>
@@ -437,22 +442,12 @@ const onUpload = () => {
           >
             <template #value="slotProps">
               <div v-if="slotProps.value && slotProps.value.value">
-                <span
-                  :class="'product-badge status-' + slotProps.value.value"
-                  >{{ slotProps.value.label }}</span
-                >
+                <span :class="'product-badge status-' + slotProps.value.value">{{ slotProps.value.label }}</span>
               </div>
               <div v-else-if="slotProps.value && !slotProps.value.value">
-                <span
-                  :class="
-                    'product-badge status-' + slotProps.value.toLowerCase()
-                  "
-                  >{{ slotProps.value }}</span
-                >
+                <span :class="'product-badge status-' + slotProps.value.toLowerCase()">{{ slotProps.value }}</span>
               </div>
-              <span v-else>
-                {{ slotProps.placeholder }}
-              </span>
+              <span v-else>{{ slotProps.placeholder }}</span>
             </template>
           </Dropdown>
         </div>
@@ -472,63 +467,88 @@ const onUpload = () => {
       </div>
     </div>
 
-    <div class="col-8">
+    <div class="col-12">
       <div class="card">
         <div class="field">
           <div
             class="formgrid"
-            style="
-              border: 1px solid #e4e4e4;
-              border-radius: 12px;
-              padding: 16px;
-            "
-          >
+            style="border: 1px solid #e4e4e4;border-radius: 12px;padding: 16px;">
             <div>
-              <div
-                class="flex justify-content-between flex-column sm:flex-row mb-3"
-              >
-                <h4>Size Chart</h4>
-                <div>
-                  <Button
-                    label="Add"
-                    icon="pi pi-plus"
-                    class="mr-2 mb-2"
-                  ></Button>
-                </div>
-              </div>
-              <table style="width: 100%; text-align: left">
-                <thead>
-                  <tr>
-                    <th>Sizes</th>
-                    <th>Width</th>
-                    <th>Length</th>
-                    <th>Remove</th>
-                    <th>Up/Down</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <InputText type="text" placeholder="Default"></InputText>
-                    </td>
-                    <td>
-                      <InputText type="text" placeholder="Default"></InputText>
-                    </td>
-                    <td>
-                      <InputText type="text" placeholder="Default"></InputText>
-                    </td>
-                    <td>
-                      <i class="pi pi-times"></i>
-                    </td>
-                    <td>
+
+              <Form :initial-values="size_chart_from_data" :validation-schema="sizeChartsValidationSchema" v-slot="{values, errors }">
+                <FieldArray name="size_charts" v-slot="{ fields, push, remove }">
+                  <div class="flex justify-content-between flex-column sm:flex-row mb-3">
+                    <h4>Size Chart</h4>
+                    <div>
                       <Button
-                        icon="pi pi-sort-alt"
-                        class="p-button-rounded p-button-text mr-2 mb-2"
-                      />
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                        label="Add"
+                        icon="pi pi-plus"
+                        class="mr-2 mb-2"
+                        @click="push({ sizes: '', width: '', length: ''})"
+                      ></Button>
+                    </div>
+                  </div>
+                  <table style="width: 100%; text-align: left">
+                    <thead>
+                      <tr>
+                        <th>Sizes</th>
+                        <th>Width</th>
+                        <th>Length</th>
+                        <th>Remove</th>
+                        <th>Up/Down</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr  v-for="(field, idx) in fields" :key="idx">
+                        <td>
+                          <div class="flex flex-column gap-2 mb-2">
+                            <Field :id="`sizes_${idx}`" :name="`size_charts[${idx}].sizes`" v-slot="{ field }">
+                              <input v-bind="field" class="p-inputtext p-component" type="text" v-model="values.size_charts[idx].sizes"
+                                     :class="{ 'p-invalid': errors[`size_charts[${idx}].sizes`] }"
+                                     placeholder="Enter sizes"/>
+                            </Field>
+                            <ErrorMessage class="p-error" :name="`size_charts[${idx}].sizes`"/>
+                          </div>
+
+                        </td>
+                        <td>
+                          <div class="flex flex-column gap-2 mb-2">
+                            <Field :id="`width_${idx}`" :name="`size_charts[${idx}].width`" v-slot="{ field }">
+                              <input v-bind="field" class="p-inputtext p-component" type="text" v-model="values.size_charts[idx].width"
+                                     :class="{ 'p-invalid': errors[`size_charts[${idx}].width`] }"
+                                     placeholder="Enter width"/>
+                            </Field>
+                            <ErrorMessage class="p-error" :name="`size_charts[${idx}].width`"/>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="flex flex-column gap-2 mb-2">
+                            <Field :id="`length_${idx}`" :name="`size_charts[${idx}].length`" v-slot="{ field }">
+                              <input v-bind="field" class="p-inputtext p-component" type="text" v-model="values.size_charts[idx].length"
+                                     :class="{ 'p-invalid': errors[`size_charts[${idx}].length`] }"
+                                     placeholder="Enter length"/>
+                            </Field>
+                            <ErrorMessage class="p-error" :name="`size_charts[${idx}].length`"/>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="flex flex-column gap-2 mb-2">
+                            <Button v-if="values.size_charts.length > 1" @click="remove(idx)" icon="pi pi-times" class="p-button-rounded p-button-text mr-2 mb-2"/>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="flex flex-column gap-2 mb-2">
+                            <Button
+                              icon="pi pi-sort-alt"
+                              class="p-button-rounded p-button-text mr-2 mb-2"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </FieldArray>
+              </Form>
             </div>
           </div>
         </div>
@@ -537,96 +557,98 @@ const onUpload = () => {
 
     <div class="col-12">
       <div class="card">
-        <div class="flex justify-content-between flex-column sm:flex-row mb-3">
-          <h4>Price Shirt Chart</h4>
-          <div>
-            <Button label="Add" icon="pi pi-plus" class="mr-2 mb-2"></Button>
-          </div>
-        </div>
+        <Form :initial-values="price_shirt_chart_from_data" :validation-schema="priceShirtChartsValidationSchema" v-slot="{values, errors }">
+          <FieldArray name="price_shirt_charts" v-slot="{ fields, push, remove }">
+            <div class="flex justify-content-between flex-column sm:flex-row mb-3">
+              <h4>Price Shirt Chart</h4>
+              <div>
+                <Button
+                    label="Add"
+                    icon="pi pi-plus"
+                    class="mr-2 mb-2"
+                    @click="push({ sizes: '', range_from: '', range_to: '', price: ''})"
+                ></Button>
+              </div>
+            </div>
+            <div class="field">
+              <div
+                class="formgrid"
+                style="border: 1px solid #e4e4e4;border-radius: 12px;padding: 16px;">
+                <table style="width: 100%; text-align: left">
+                  <thead>
+                    <tr>
+                      <th>Sizes</th>
+                      <th>Range From</th>
+                      <th>Range To</th>
+                      <th>Price</th>
+                      <th>Remove</th>
+                      <th class="text-center">Up/Down</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  <tr  v-for="(field, idx) in fields" :key="idx">
+                    <td>
+                      <div class="flex flex-column gap-2 mb-2">
+                        <Field :id="`sizes_${idx}`" :name="`price_shirt_charts[${idx}].sizes`" v-slot="{ field }">
+                          <input v-bind="field" class="p-inputtext p-component" type="text" v-model="values.price_shirt_charts[idx].sizes"
+                                 :class="{ 'p-invalid': errors[`price_shirt_charts[${idx}].sizes`] }"
+                                 placeholder="Enter sizes"/>
+                        </Field>
+                        <ErrorMessage class="p-error" :name="`price_shirt_charts[${idx}].sizes`"/>
+                      </div>
 
-        <div class="field">
-          <div
-            class="formgrid"
-            style="
-              border: 1px solid #e4e4e4;
-              border-radius: 12px;
-              padding: 16px;
-            "
-          >
-            <table style="width: 100%; text-align: left">
-              <thead>
-                <tr>
-                  <th>Sizes</th>
-                  <th>Range From</th>
-                  <th>Range To</th>
-                  <th>Price</th>
-                  <th>Remove</th>
-                  <th class="text-center">Up/Down</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Infant Colors</td>
-                  <td>
-                    <InputText type="text" placeholder="Default"></InputText>
-                  </td>
-                  <td>
-                    <InputText type="text" placeholder="Default"></InputText>
-                  </td>
-                  <td>
-                    <InputText type="text" placeholder="Default"></InputText>
-                  </td>
-                  <td>
-                    <Button
-                      icon="pi pi-times"
-                      class="p-button-rounded p-button-text mr-2 mb-2"
-                    />
-                  </td>
-                  <td class="text-center">
-                    <Button
-                      icon="pi pi-arrow-up"
-                      class="p-button-rounded p-button-text mr-2 mb-2"
-                    />
+                    </td>
+                    <td>
+                      <div class="flex flex-column gap-2 mb-2">
+                        <Field :id="`range_from_${idx}`" :name="`price_shirt_charts[${idx}].range_from`" v-slot="{ field }">
+                          <input v-bind="field" class="p-inputtext p-component" type="text" v-model="values.price_shirt_charts[idx].range_from"
+                                 :class="{ 'p-invalid': errors[`price_shirt_charts[${idx}].range_from`] }"
+                                 placeholder="Enter range from"/>
+                        </Field>
+                        <ErrorMessage class="p-error" :name="`price_shirt_charts[${idx}].range_from`"/>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="flex flex-column gap-2 mb-2">
+                        <Field :id="`range_to_${idx}`" :name="`price_shirt_charts[${idx}].range_to`" v-slot="{ field }">
+                          <input v-bind="field" class="p-inputtext p-component" type="text" v-model="values.price_shirt_charts[idx].range_to"
+                                 :class="{ 'p-invalid': errors[`price_shirt_charts[${idx}].range_to`] }"
+                                 placeholder="Enter range to"/>
+                        </Field>
+                        <ErrorMessage class="p-error" :name="`price_shirt_charts[${idx}].range_to`"/>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="flex flex-column gap-2 mb-2">
+                        <Field :id="`price_${idx}`" :name="`price_shirt_charts[${idx}].price`" v-slot="{ field }">
+                          <input v-bind="field" class="p-inputtext p-component" type="text" v-model="values.price_shirt_charts[idx].price"
+                                 :class="{ 'p-invalid': errors[`price_shirt_charts[${idx}].price`] }"
+                                 placeholder="Enter price"/>
+                        </Field>
+                        <ErrorMessage class="p-error" :name="`price_shirt_charts[${idx}].price`"/>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="flex flex-column gap-2 mb-2">
+                        <Button v-if="values.price_shirt_charts.length > 1" @click="remove(idx)" icon="pi pi-times" class="p-button-rounded p-button-text mr-2 mb-2"/>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="flex flex-column gap-2 mb-2">
+                        <Button
+                            icon="pi pi-sort-alt"
+                            class="p-button-rounded p-button-text mr-2 mb-2"
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </FieldArray>
+        </Form>
 
-                    <Button
-                      icon="pi pi-arrow-down"
-                      class="p-button-rounded p-button-text mr-2 mb-2"
-                    />
-                  </td>
-                </tr>
-                <tr>
-                  <td>Infant White</td>
-                  <td>
-                    <InputText type="text" placeholder="Default"></InputText>
-                  </td>
-                  <td>
-                    <InputText type="text" placeholder="Default"></InputText>
-                  </td>
-                  <td>
-                    <InputText type="text" placeholder="Default"></InputText>
-                  </td>
-                  <td>
-                    <Button
-                      icon="pi pi-times"
-                      class="p-button-rounded p-button-text mr-2 mb-2"
-                    />
-                  </td>
-                  <td class="text-center">
-                    <Button
-                      icon="pi pi-arrow-up"
-                      class="p-button-rounded p-button-text mr-2 mb-2"
-                    />
-
-                    <Button
-                      icon="pi pi-arrow-down"
-                      class="p-button-rounded p-button-text mr-2 mb-2"
-                    />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
         <div class="field">
           <div
             class="formgrid"
