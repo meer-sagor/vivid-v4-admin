@@ -369,6 +369,7 @@ const deleteSelectedProducts = () => {
             <InputNumber
               id="order"
               v-model.trim="product.order"
+              :disabled="loading"
               mode="decimal"
               required="true"
               showButtons 
@@ -384,6 +385,7 @@ const deleteSelectedProducts = () => {
           <div class="field">
             <label for="name">Name</label>
             <InputText
+              :disabled="loading"
               id="name"
               v-model.trim="product.name"
               required="true"
@@ -399,6 +401,7 @@ const deleteSelectedProducts = () => {
             <div class="field col">
               <label for="price">Width</label>
               <InputNumber
+                :disabled="loading"
                 id="price"
                 v-model="product.width"
                 :class="{ 'p-invalid': submitted && !product.width }"
@@ -412,6 +415,7 @@ const deleteSelectedProducts = () => {
               <label for="quantity">Length</label>
               <InputNumber
                 id="quantity"
+                :disabled="loading"
                 v-model="product.length"
                 :class="{ 'p-invalid': submitted && !product.length }"
                 :required="true"
@@ -426,6 +430,7 @@ const deleteSelectedProducts = () => {
           <div class="field">
             <label for="inventoryStatus" class="mb-3">Status</label>
             <Dropdown
+              :disabled="loading"
               id="inventoryStatus"
               v-model="product.status"
               :options="statuses"

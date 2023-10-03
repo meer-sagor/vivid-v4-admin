@@ -343,7 +343,7 @@ const deleteSelectedTag = () => {
               <small v-if="submitted && !product.name" class="p-invalid">Name is required.</small>
             </div> -->
             <div class="field">
-              <Field v-model="product.name" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Tags name"/>
+              <Field v-model="product.name" :disabled="loading" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Tags name"/>
               <small class="p-error" id="brnad-name-error">{{ errors.name || '&nbsp;' }}</small>
             </div>
 
@@ -374,6 +374,7 @@ const deleteSelectedTag = () => {
                   v-bind="field"
                   v-model="product.status"
                   :options="statuses"
+                  :disabled="loading"
                   optionLabel="label"
                   optionValue="value"
                   placeholder="Select a status"

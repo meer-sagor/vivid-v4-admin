@@ -442,14 +442,14 @@ const onUpload = () => {
             
             <div class="field">
               <label for="name">Name</label>
-              <Field v-model="product.name" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Name"/>
+              <Field v-model="product.name" :disabled="loading" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Name"/>
               <small class="p-error" id="category-name-error">{{ errors.name || '&nbsp;' }}</small>
             </div>
 
             <div class="formgrid grid">
               <div class="field col">
                 <label for="hex">Hex</label>
-                <Field v-model="product.hex" id="hex" name="hex" :class="{ 'p-invalid': errors.hex }" class="p-inputtext p-component" aria-describedby="category-hex-error" placeholder="Color hex"/> 
+                <Field v-model="product.hex" :disabled="loading" id="hex" name="hex" :class="{ 'p-invalid': errors.hex }" class="p-inputtext p-component" aria-describedby="category-hex-error" placeholder="Color hex"/> 
                 <small class="p-error" id="category-hex-error">{{ errors.hex || '&nbsp;' }}</small>
               </div>
               <div class="field col-3">
@@ -504,6 +504,7 @@ const onUpload = () => {
               <label for="status" class="mb-3">Status</label>
               <Field name="status" v-slot="{ field }">
                 <Dropdown
+                  :disabled="loading"
                   v-bind="field"
                   v-model="product.status"
                   :options="statuses"

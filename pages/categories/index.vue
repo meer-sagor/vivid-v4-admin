@@ -563,19 +563,20 @@ const onUpload = () => {
           <Form id="add_role_form" @submit="saveProduct"  :initial-values="product" :validation-schema="schema" v-slot="{ errors }">
             <div class="field">
               <label for="name">Order</label>
-              <Field v-model="product.order" type="number" id="order" name="order" :class="{ 'p-invalid': errors.order }" class="p-inputtext p-component" aria-describedby="category-order-error" placeholder="Category Order"/>
+              <Field v-model="product.order" type="number" :disabled="loading"  id="order" name="order" :class="{ 'p-invalid': errors.order }" class="p-inputtext p-component" aria-describedby="category-order-error" placeholder="Category Order"/>
               <small class="p-error" id="category-order-error">{{ errors.order || '&nbsp;' }}</small>
             </div>
 
             <div class="field">
               <label for="description">Name</label>
-              <Field v-model="product.name" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Category name"/>
+              <Field v-model="product.name" id="name" :disabled="loading" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Category name"/>
               <small class="p-error" id="category-name-error">{{ errors.name || '&nbsp;' }}</small>
             </div>
 
             <div class="field">
               <label for="description">Description</label>
               <Textarea
+                :disabled="loading"
                 id="description"
                 v-model="product.description"
                 required="true"
@@ -611,6 +612,7 @@ const onUpload = () => {
               <label for="Types">Types</label>
               <Field name="type" v-slot="{ field }">
                 <Dropdown
+                  :disabled="loading"
                   v-bind="field"
                   v-model="product.type"
                   :options="types"
@@ -631,6 +633,7 @@ const onUpload = () => {
               <label for="inventoryStatus" class="mb-3">Status</label>
               <Field name="status" v-slot="{ field }">
                 <Dropdown
+                  :disabled="loading"
                   v-bind="field"
                   v-model="product.status"
                   :options="statuses"

@@ -368,13 +368,13 @@ const deleteSelectedProducts = () => {
         >
           <Form id="add_brands_form" @submit="saveProduct" :validation-schema="schema" v-slot="{ errors }">
             <div class="field">
-              <Field v-model="product.name" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Fabrics name"/>
+              <Field v-model="product.name" id="name" name="name" :disabled="loading" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Fabrics name"/>
               <small class="p-error" id="brnad-name-error">{{ errors.name || '&nbsp;' }}</small>
             </div>
 
             <div class="field">
               <label for="quality">Quality</label>
-              <Field v-model="product.quality" id="quality" name="quality" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="brnad-quality-error" placeholder="Fabrics Quality"/>
+              <Field v-model="product.quality" id="quality" :disabled="loading" name="quality" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="brnad-quality-error" placeholder="Fabrics Quality"/>
               <small class="p-error" id="brnad-quality-error">{{ errors.quality || '&nbsp;' }}</small>
               <!-- <InputText
                 id="quality"
@@ -395,6 +395,7 @@ const deleteSelectedProducts = () => {
                   v-bind="field"
                   v-model="product.status"
                   :options="statuses"
+                  :disabled="loading"
                   optionLabel="label"
                   optionValue="value"
                   placeholder="Select a status"

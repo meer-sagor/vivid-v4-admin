@@ -591,6 +591,7 @@ const onUpload = () => {
               <label for="order">Order</label>
               <Field
                 v-model="product.order"
+                :disabled="loading"
                 type="number"
                 id="order"
                 name="order"
@@ -607,6 +608,7 @@ const onUpload = () => {
               <label for="Types">Types</label>
               <Field name="type" v-slot="{ field }">
                 <Dropdown
+                  :disabled="loading"
                   v-bind="field"
                   v-model="product.type"
                   :options="types"
@@ -627,6 +629,7 @@ const onUpload = () => {
               <label for="category" class="mb-3">Category</label>
               <Field name="category" v-slot="{ field }">
                 <Dropdown
+                  :disabled="loading"
                   v-bind="field"
                   v-model="product.category_id"
                   :options="categories"
@@ -646,6 +649,7 @@ const onUpload = () => {
             <div class="field">
               <label for="name">Name</label>
               <Field
+                :disabled="loading"
                 v-model="product.name"
                 id="name"
                 name="name"
@@ -662,6 +666,7 @@ const onUpload = () => {
             <div class="field">
               <label for="description">Description</label>
               <Textarea
+                :disabled="loading"
                 id="description"
                 v-model="product.description"
                 required="true"
@@ -705,6 +710,7 @@ const onUpload = () => {
               <label for="status" class="mb-3">Status</label>
               <Field name="status" v-slot="{ field }">
                 <Dropdown
+                  :disabled="loading"
                   v-bind="field"
                   v-model="product.status"
                   :options="statuses"
