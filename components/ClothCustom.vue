@@ -19,7 +19,7 @@
         <div class="col-12 md:col-12">
             <h4 class='mb-0'>Print Area</h4>
         </div>
-        <div class="col-12 md:col-3">
+        <div class="col-12 md:col-5">
             <div class="card p-3">
                 <h5>Select Side</h5>
                 <Dropdown v-model="dropdownValue" :options="dropdownValues" optionLabel="name" placeholder="Select" />
@@ -118,7 +118,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 md:col-5">
+        <div class="col-12 md:col-7">
             <div class="card">
                 <div class="canvas-customs-section">
                     <div class='canvas-print-data' 
