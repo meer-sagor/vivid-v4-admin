@@ -316,6 +316,7 @@ const onUpload = () => {
             accept="image/*"
             :maxFileSize="1000000"
             customUpload
+            class="p-button-outlined"
           />
         </div>
 
@@ -328,6 +329,7 @@ const onUpload = () => {
             accept="image/*"
             :maxFileSize="1000000"
             customUpload
+            class="p-button-outlined"
           />
         </div>
 
@@ -470,7 +472,7 @@ const onUpload = () => {
       </div>
     </div>
 
-    <div class="col-12">
+    <div class="col-8">
       <div class="card">
         <div class="field">
           <div
@@ -530,6 +532,101 @@ const onUpload = () => {
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="card">
+        <div class="flex justify-content-between flex-column sm:flex-row mb-3">
+          <h4>Price Shirt Chart</h4>
+          <div>
+            <Button label="Add" icon="pi pi-plus" class="mr-2 mb-2"></Button>
+          </div>
+        </div>
+
+        <div class="field">
+          <div
+            class="formgrid"
+            style="
+              border: 1px solid #e4e4e4;
+              border-radius: 12px;
+              padding: 16px;
+            "
+          >
+            <table style="width: 100%; text-align: left">
+              <thead>
+                <tr>
+                  <th>Sizes</th>
+                  <th>Range From</th>
+                  <th>Range To</th>
+                  <th>Price</th>
+                  <th>Remove</th>
+                  <th class="text-center">Up/Down</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Infant Colors</td>
+                  <td>
+                    <InputText type="text" placeholder="Default"></InputText>
+                  </td>
+                  <td>
+                    <InputText type="text" placeholder="Default"></InputText>
+                  </td>
+                  <td>
+                    <InputText type="text" placeholder="Default"></InputText>
+                  </td>
+                  <td>
+                    <Button
+                      icon="pi pi-times"
+                      class="p-button-rounded p-button-text mr-2 mb-2"
+                    />
+                  </td>
+                  <td class="text-center">
+                    <Button
+                      icon="pi pi-arrow-up"
+                      class="p-button-rounded p-button-text mr-2 mb-2"
+                    />
+
+                    <Button
+                      icon="pi pi-arrow-down"
+                      class="p-button-rounded p-button-text mr-2 mb-2"
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td>Infant White</td>
+                  <td>
+                    <InputText type="text" placeholder="Default"></InputText>
+                  </td>
+                  <td>
+                    <InputText type="text" placeholder="Default"></InputText>
+                  </td>
+                  <td>
+                    <InputText type="text" placeholder="Default"></InputText>
+                  </td>
+                  <td>
+                    <Button
+                      icon="pi pi-times"
+                      class="p-button-rounded p-button-text mr-2 mb-2"
+                    />
+                  </td>
+                  <td class="text-center">
+                    <Button
+                      icon="pi pi-arrow-up"
+                      class="p-button-rounded p-button-text mr-2 mb-2"
+                    />
+
+                    <Button
+                      icon="pi pi-arrow-down"
+                      class="p-button-rounded p-button-text mr-2 mb-2"
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
         <div class="field">
           <div
             class="formgrid"
@@ -543,71 +640,150 @@ const onUpload = () => {
               <div
                 class="flex justify-content-between flex-column sm:flex-row mb-3"
               >
-                <h4>Price Shirt Chart</h4>
                 <div>
-                  <Button
-                    label="Add"
-                    icon="pi pi-plus"
-                    class="mr-2 mb-2"
-                  ></Button>
+                  <h4 class="mb-0">Select and add picture for print area</h4>
                 </div>
               </div>
-              <table style="width: 100%; text-align: left">
-                <thead>
-                  <tr>
-                    <th>Sizes</th>
-                    <th>Range From</th>
-                    <th>Range To</th>
-                    <th>Price</th>
-                    <th>Remove</th>
-                    <th>Up/Down</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Infant Colors</td>
-                    <td>
-                      <InputText type="text" placeholder="Default"></InputText>
-                    </td>
-                    <td>
-                      <InputText type="text" placeholder="Default"></InputText>
-                    </td>
-                    <td>
-                      <InputText type="text" placeholder="Default"></InputText>
-                    </td>
-                    <td>
-                      <i class="pi pi-times"></i>
-                    </td>
-                    <td>
-                      <Button
-                        icon="pi pi-sort-alt"
-                        class="p-button-rounded p-button-text mr-2 mb-2"
-                      />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Infant White</td>
-                    <td>
-                      <InputText type="text" placeholder="Default"></InputText>
-                    </td>
-                    <td>
-                      <InputText type="text" placeholder="Default"></InputText>
-                    </td>
-                    <td>
-                      <InputText type="text" placeholder="Default"></InputText>
-                    </td>
-                    <td>
-                      <i class="pi pi-times"></i>
-                    </td>
-                    <td>
-                      <Button
-                        icon="pi pi-sort-alt"
-                        class="p-button-rounded p-button-text mr-2 mb-2"
-                      />
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="grid p-fluid">
+                <div class="col-12 md:col-12">
+                  <div class="grid p-fluid text-center">
+                    <div class="col-12 md:col-3">
+                      <div class="card">
+                        <h5 class="mb-4">Front Side</h5>
+                        <div class="mb-3">
+                          <img
+                            src="http://3.15.163.57:3001/img/product/Hanes/42BA/42ba_ltsteel-navy_back.jpg"
+                            alt=""
+                            height="100"
+                          />
+                        </div>
+                        <div class="flex justify-content-center gap-3">
+                          <div class="field-checkbox mb-0">
+                            <Checkbox
+                              id="checkOption1"
+                              v-model="checkboxValue1"
+                              name="option"
+                              value="Chicago"
+                            />
+                          </div>
+                          <FileUpload
+                            mode="basic"
+                            name="demo[]"
+                            accept="image/*"
+                            :maxFileSize="1000000"
+                            @uploader="onUpload"
+                            customUpload
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12 md:col-3">
+                      <div class="card">
+                        <h5 class="mb-4">Right Side</h5>
+                        <div class="mb-3">
+                          <img
+                            src="http://3.15.163.57:3001/img/product/Hanes/42BA/42ba_ltsteel-navy_back.jpg"
+                            alt=""
+                            height="100"
+                          />
+                        </div>
+                        <div class="flex justify-content-center gap-3">
+                          <div class="field-checkbox mb-0">
+                            <Checkbox
+                              id="checkOption1"
+                              v-model="checkboxValue1"
+                              name="option"
+                              value="Chicago"
+                            />
+                          </div>
+                          <FileUpload
+                            mode="basic"
+                            name="demo[]"
+                            accept="image/*"
+                            :maxFileSize="1000000"
+                            @uploader="onUpload"
+                            customUpload
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12 md:col-3">
+                      <div class="card">
+                        <h5 class="mb-4">Back Side</h5>
+                        <div class="mb-3">
+                          <img
+                            src="http://3.15.163.57:3001/img/product/Hanes/42BA/42ba_ltsteel-navy_back.jpg"
+                            alt=""
+                            height="100"
+                          />
+                        </div>
+                        <div class="flex justify-content-center gap-3">
+                          <div class="field-checkbox mb-0">
+                            <Checkbox
+                              id="checkOption1"
+                              v-model="checkboxValue1"
+                              name="option"
+                              value="Chicago"
+                            />
+                          </div>
+                          <FileUpload
+                            mode="basic"
+                            name="demo[]"
+                            accept="image/*"
+                            :maxFileSize="1000000"
+                            @uploader="onUpload"
+                            customUpload
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12 md:col-3">
+                      <div class="card">
+                        <h5 class="mb-4">Left Side</h5>
+                        <div class="mb-3">
+                          <img
+                            src="http://3.15.163.57:3001/img/product/Hanes/42BA/42ba_ltsteel-navy_back.jpg"
+                            alt=""
+                            height="100"
+                          />
+                        </div>
+                        <div class="flex justify-content-center gap-3">
+                          <div class="field-checkbox mb-0">
+                            <Checkbox
+                              id="checkOption1"
+                              v-model="checkboxValue1"
+                              name="option"
+                              value="Chicago"
+                            />
+                          </div>
+                          <FileUpload
+                            mode="basic"
+                            name="demo[]"
+                            accept="image/*"
+                            :maxFileSize="1000000"
+                            @uploader="onUpload"
+                            customUpload
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div
+            class="formgrid"
+            style="
+              border: 1px solid #e4e4e4;
+              border-radius: 12px;
+              padding: 16px;
+            "
+          >
+            <div>
+              <ClothCustom />
             </div>
           </div>
         </div>
