@@ -190,7 +190,6 @@ const onUpload = () => {
                 class="flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3"
               >
                 <div class="flex gap-2 md:align-items-center">
-                  <label for="inventoryStatus" class="mb-0">Brand</label>
                   <Dropdown
                     id="inventoryStatus"
                     v-model="product.inventoryStatus"
@@ -225,7 +224,6 @@ const onUpload = () => {
                   </Dropdown>
                 </div>
                 <div class="flex gap-2 md:align-items-center">
-                  <label for="inventoryStatus" class="mb-0">Category</label>
                   <Dropdown
                     id="inventoryStatus"
                     v-model="product.inventoryStatus"
@@ -260,7 +258,6 @@ const onUpload = () => {
                   </Dropdown>
                 </div>
                 <div class="flex gap-2 md:align-items-center">
-                  <label for="inventoryStatus" class="mb-0">Subcategory</label>
                   <Dropdown
                     id="inventoryStatus"
                     v-model="product.inventoryStatus"
@@ -295,7 +292,6 @@ const onUpload = () => {
                   </Dropdown>
                 </div>
                 <div class="flex gap-2 md:align-items-center">
-                  <label for="inventoryStatus" class="mb-0">Status</label>
                   <Dropdown
                     id="inventoryStatus"
                     v-model="product.inventoryStatus"

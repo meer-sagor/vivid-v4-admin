@@ -43,12 +43,14 @@
           <Column field="id" header="ID" style="width: 5%"></Column>
           <Column field="name" header="Name" style="width: 10%"></Column>
           <Column field="section_title" header="Section Title" style="width: 15%"></Column>
-          <Column field="description" header="Description" style="width: 25%">
+          <Column field="category" header="Category" style="width: 15%">
             <template #body="slotProps">
-              <span v-html="slotProps.data.description"></span>
+              <span v-for="(category, index) in slotProps.data.home_section_categories" :key="index">
+                <Badge :value="category.name"></Badge>
+              </span>
             </template>
           </Column>
-          <Column field="view_all_url" header="Url" style="width: 15%"></Column>
+          <Column field="view_all_url" header="Url" style="width: 25%"></Column>
           <Column field="status" header="Status" style="width: 10%">
             <template #body="slotProps">
               <div class="flex d-flex">

@@ -1,4 +1,7 @@
 <script setup>
+definePageMeta({
+  middleware: ["auth"],
+});
 import { computed, watch, ref } from "vue";
 import AppTopbar from "./AppTopbar.vue";
 import AppFooter from "./AppFooter.vue";
