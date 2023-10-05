@@ -84,6 +84,11 @@ const model = ref([
         icon: "pi pi-fw pi-id-card",
         to: "/tags",
       },
+      {
+        label: "Price Category",
+        icon: "pi pi-fw pi-id-card",
+        to: "/price-categories",
+      },
       // {
       //   label: "Sides",
       //   icon: "pi pi-fw pi-id-card",
