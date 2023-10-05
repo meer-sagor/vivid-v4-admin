@@ -1,4 +1,4 @@
-export const environment = "prod";
+export const environment = "dev";
 const apiDev = "http://localhost:8000";
 const apiProd = "http://18.217.130.231";
 
