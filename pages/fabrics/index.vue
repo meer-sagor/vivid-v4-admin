@@ -9,6 +9,7 @@ import * as Yup from "yup";
 const {handleSubmit, resetForm} = useForm();
 const fetching = ref(false);
 const spinner = ref(false);
+const loading = ref(false);
 const schema = Yup.object({
   name: Yup.string().required().min(2).max(50).label("Name"),
   quality: Yup.string().required().min(2).max(50).label("Quality"),
@@ -94,7 +95,7 @@ const hideDialog = () => {
 
 const saveProduct = async () => {
   submitted.value = true;
-  console.log(product.value);
+  loading.value = true
   if (product.value.name && product.value.name.trim()) {
     product.value.status = product.value.status.value
       ? product.value.status.value
@@ -154,7 +155,7 @@ const saveProduct = async () => {
       }
       await initialize();
     }
-
+    loading.value = false
     productDialog.value = false;
     product.value = {};
   }
@@ -367,13 +368,13 @@ const deleteSelectedProducts = () => {
         >
           <Form id="add_brands_form" @submit="saveProduct" :validation-schema="schema" v-slot="{ errors }">
             <div class="field">
-              <Field v-model="product.name" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Fabrics name"/>
+              <Field v-model="product.name" id="name" name="name" :disabled="loading" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Fabrics name"/>
               <small class="p-error" id="brnad-name-error">{{ errors.name || '&nbsp;' }}</small>
             </div>
 
             <div class="field">
               <label for="quality">Quality</label>
-              <Field v-model="product.quality" id="quality" name="quality" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="brnad-quality-error" placeholder="Fabrics Quality"/>
+              <Field v-model="product.quality" id="quality" :disabled="loading" name="quality" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="brnad-quality-error" placeholder="Fabrics Quality"/>
               <small class="p-error" id="brnad-quality-error">{{ errors.quality || '&nbsp;' }}</small>
               <!-- <InputText
                 id="quality"
@@ -394,6 +395,7 @@ const deleteSelectedProducts = () => {
                   v-bind="field"
                   v-model="product.status"
                   :options="statuses"
+                  :disabled="loading"
                   optionLabel="label"
                   optionValue="value"
                   placeholder="Select a status"
@@ -406,7 +408,7 @@ const deleteSelectedProducts = () => {
                 errors.status || "&nbsp;"
               }}</small>
             </div>
-            <Button class="" type="submit" label="Submit"  icon="pi pi-check"/>
+            <Button class="" :loading="loading" type="submit" label="Submit"  icon="pi pi-check"/>
           </Form>
           <!-- <template #footer>
             <Button

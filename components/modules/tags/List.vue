@@ -7,6 +7,7 @@ import * as Yup from "yup";
 const {handleSubmit, resetForm} = useForm();
 const fetching = ref(false);
 const spinner = ref(false);
+const loading = ref(false);
 //filters
 const { $dateFilter } = useNuxtApp();
 const schema = Yup.object({
@@ -89,6 +90,7 @@ const hideDialog = () => {
 };
 
 const saveTag = async () => {
+  loading.value = true
   submitted.value = true;
   console.log(product.value);
   if (product.value.name && product.value.name.trim()) {
@@ -151,7 +153,7 @@ const saveTag = async () => {
           life: 3000,
         });
       }
-      tags.value.push(product.value);
+      // tags.value.push(product.value);
       // toast.add({
       //     severity: 'success',
       //     summary: 'Successful',
@@ -159,7 +161,7 @@ const saveTag = async () => {
       //     life: 3000
       // });
     }
-
+    loading.value = false
     tagDialog.value = false;
     product.value = {};
   }
@@ -341,7 +343,7 @@ const deleteSelectedTag = () => {
               <small v-if="submitted && !product.name" class="p-invalid">Name is required.</small>
             </div> -->
             <div class="field">
-              <Field v-model="product.name" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Tags name"/>
+              <Field v-model="product.name" :disabled="loading" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Tags name"/>
               <small class="p-error" id="brnad-name-error">{{ errors.name || '&nbsp;' }}</small>
             </div>
 
@@ -372,6 +374,7 @@ const deleteSelectedTag = () => {
                   v-bind="field"
                   v-model="product.status"
                   :options="statuses"
+                  :disabled="loading"
                   optionLabel="label"
                   optionValue="value"
                   placeholder="Select a status"
@@ -384,7 +387,7 @@ const deleteSelectedTag = () => {
                 errors.status || "&nbsp;"
               }}</small>
             </div>
-            <Button class="" type="submit" label="Submit"  icon="pi pi-check"/>
+            <Button class="" :loading="loading" type="submit" label="Submit"  icon="pi pi-check"/>
           </Form>
         </Dialog>
 

@@ -10,6 +10,7 @@ const {handleSubmit, resetForm} = useForm();
 const { $dateFilter } = useNuxtApp();
 const fetching = ref(false);
 const spinner = ref(false);
+const loading = ref(false);
 const schema = Yup.object({
   name: Yup.string().required().min(2).max(50).label("Name"),
   hex: Yup.string().required().min(2).max(50).label("Name"),
@@ -114,6 +115,7 @@ const hideDialog = () => {
 };
 
 const saveProduct = async () => {
+  loading.value = true
   if (product.value.image_id == null && product.value.image_id == undefined) {
     if(files.value){
       await uploadHandler();
@@ -194,7 +196,7 @@ const saveProduct = async () => {
       //   life: 3000,
       // });
     }
-
+    loading.value = false
     productDialog.value = false;
     product.value = {};
   }
@@ -440,14 +442,14 @@ const onUpload = () => {
             
             <div class="field">
               <label for="name">Name</label>
-              <Field v-model="product.name" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Name"/>
+              <Field v-model="product.name" :disabled="loading" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Name"/>
               <small class="p-error" id="category-name-error">{{ errors.name || '&nbsp;' }}</small>
             </div>
 
             <div class="formgrid grid">
               <div class="field col">
                 <label for="hex">Hex</label>
-                <Field v-model="product.hex" id="hex" name="hex" :class="{ 'p-invalid': errors.hex }" class="p-inputtext p-component" aria-describedby="category-hex-error" placeholder="Color hex"/> 
+                <Field v-model="product.hex" :disabled="loading" id="hex" name="hex" :class="{ 'p-invalid': errors.hex }" class="p-inputtext p-component" aria-describedby="category-hex-error" placeholder="Color hex"/> 
                 <small class="p-error" id="category-hex-error">{{ errors.hex || '&nbsp;' }}</small>
               </div>
               <div class="field col-3">
@@ -502,6 +504,7 @@ const onUpload = () => {
               <label for="status" class="mb-3">Status</label>
               <Field name="status" v-slot="{ field }">
                 <Dropdown
+                  :disabled="loading"
                   v-bind="field"
                   v-model="product.status"
                   :options="statuses"
@@ -517,7 +520,7 @@ const onUpload = () => {
                 errors.status || "&nbsp;"
               }}</small>
             </div>
-            <Button class="" type="submit" label="Submit"  icon="pi pi-check"/>
+            <Button class="" :loading="loading" type="submit" label="Submit"  icon="pi pi-check"/>
           </Form>
         </Dialog>
 

@@ -8,6 +8,7 @@ import * as Yup from "yup";
 const {handleSubmit, resetForm} = useForm();
 const fetching = ref(false);
 const spinner = ref(false);
+const loading = ref(false);
 const schema = Yup.object({
   name: Yup.string().required().min(2).max(50).label("Name"),
   status: Yup.mixed().required().label("status"),
@@ -91,6 +92,7 @@ const hideDialog = () => {
 const saveProduct = async () => {
   submitted.value = true;
   console.log(product.value);
+  loading.value = true
   if (product.value.name && product.value.name.trim()) {
     product.value.status = product.value.status.value
       ? product.value.status.value
@@ -162,7 +164,7 @@ const saveProduct = async () => {
       //     life: 3000
       // });
     }
-
+    loading.value = false
     productDialog.value = false;
     product.value = {};
   }
@@ -375,13 +377,14 @@ const deleteSelectedProducts = () => {
         >
         <Form id="add_brands_form" @submit="saveProduct" :validation-schema="schema" v-slot="{ errors }">
           <div class="field">
-            <Field v-model="product.name" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Category name"/>
+            <Field v-model="product.name" :disabled="loading" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Category name"/>
             <small class="p-error" id="brnad-name-error">{{ errors.name || '&nbsp;' }}</small>
           </div>
 
           <div class="field">
             <label for="description">Description</label>
             <Textarea
+              :disabled="loading"
               id="description"
               v-model="product.description"
               required="true"
@@ -394,6 +397,7 @@ const deleteSelectedProducts = () => {
             <label for="status" class="mb-3">Status</label>
             <Field name="status" v-slot="{ field }">
               <Dropdown
+                :disabled="loading"
                 v-bind="field"
                 v-model="product.status"
                 :options="statuses"
@@ -409,7 +413,7 @@ const deleteSelectedProducts = () => {
               errors.status || "&nbsp;"
             }}</small>
           </div>
-          <Button class="" type="submit" label="Submit"  icon="pi pi-check"/>
+          <Button :loading="loading" class="" type="submit" label="Submit"  icon="pi pi-check"/>
         </Form>
           <!-- <template #footer>
             <Button

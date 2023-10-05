@@ -8,6 +8,7 @@ import * as Yup from "yup";
 const {handleSubmit, resetForm} = useForm();
 const fetching = ref(false);
 const spinner = ref(false);
+const loading = ref(false);
 //filters
 const { $dateFilter } = useNuxtApp();
 const schema = Yup.object().shape({
@@ -144,6 +145,7 @@ const saveProduct = async () => {
   }
   submitted.value = true;
   console.log(product.value);
+  loading.value = true
   if (product.value.name && product.value.name.trim() && product.value.image_id) {
     product.value.status = product.value.status.value
       ? product.value.status.value
@@ -225,14 +227,13 @@ const saveProduct = async () => {
       //     life: 3000
       // });
     }
-
+    loading.value = false
     productDialog.value = false;
     product.value = {};
   }
 };
 const uploadHandler = async () => {
-  console.log( files.value );
-  // uploading.value = true;
+  loading.value = true
   const fileUp = files.value[0];
   const body = new FormData();
   body.append("image", fileUp);
@@ -242,18 +243,9 @@ const uploadHandler = async () => {
     method: "POST",
     body: body,
   });
-  // console.log(data);
   if (data.value) {
     product.value.image_id = data.value.media.id
     imageError.value = null;
-    // await auth.fetchUser();
-    // uploading.value = false;
-    // toast.add({
-    //   severity: "info",
-    //   summary: "Success",
-    //   detail: "File Uploaded",
-    //   life: 3000,
-    // });
   }
 };
 const editProduct = (editProduct) => {
@@ -571,19 +563,20 @@ const onUpload = () => {
           <Form id="add_role_form" @submit="saveProduct"  :initial-values="product" :validation-schema="schema" v-slot="{ errors }">
             <div class="field">
               <label for="name">Order</label>
-              <Field v-model="product.order" id="order" name="order" :class="{ 'p-invalid': errors.order }" class="p-inputtext p-component" aria-describedby="category-order-error" placeholder="Category Order"/>
+              <Field v-model="product.order" type="number" :disabled="loading"  id="order" name="order" :class="{ 'p-invalid': errors.order }" class="p-inputtext p-component" aria-describedby="category-order-error" placeholder="Category Order"/>
               <small class="p-error" id="category-order-error">{{ errors.order || '&nbsp;' }}</small>
             </div>
 
             <div class="field">
               <label for="description">Name</label>
-              <Field v-model="product.name" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Category name"/>
+              <Field v-model="product.name" id="name" :disabled="loading" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Category name"/>
               <small class="p-error" id="category-name-error">{{ errors.name || '&nbsp;' }}</small>
             </div>
 
             <div class="field">
               <label for="description">Description</label>
               <Textarea
+                :disabled="loading"
                 id="description"
                 v-model="product.description"
                 required="true"
@@ -619,6 +612,7 @@ const onUpload = () => {
               <label for="Types">Types</label>
               <Field name="type" v-slot="{ field }">
                 <Dropdown
+                  :disabled="loading"
                   v-bind="field"
                   v-model="product.type"
                   :options="types"
@@ -639,6 +633,7 @@ const onUpload = () => {
               <label for="inventoryStatus" class="mb-3">Status</label>
               <Field name="status" v-slot="{ field }">
                 <Dropdown
+                  :disabled="loading"
                   v-bind="field"
                   v-model="product.status"
                   :options="statuses"
@@ -657,6 +652,7 @@ const onUpload = () => {
 
               <Button
                 class="" type="submit" label="Submit"
+                :loading="loading"
                 icon="pi pi-check"
               />
             <!-- </template> -->

@@ -7,6 +7,7 @@ import { onMounted, ref ,nextTick,watch, computed} from "vue";
 const { $dateFilter } = useNuxtApp();
 const fetching = ref(false);
 const spinner = ref(false);
+const loading = ref(false);
 const toast = useToast();
 const sizes = ref([]);
 const rowsPerPage = ref(0)
@@ -85,7 +86,7 @@ const hideDialog = () => {
 
 const saveProduct = async () => {
   submitted.value = true;
-  console.log(product.value);
+  loading.value = true
   if (product.value.name && product.value.name.trim()) {
     product.value.status = product.value.status.value
       ? product.value.status.value
@@ -140,7 +141,7 @@ const saveProduct = async () => {
       }
       await initialize();
     }
-
+    loading.value = false
     productDialog.value = false;
     product.value = {};
   }
@@ -368,6 +369,7 @@ const deleteSelectedProducts = () => {
             <InputNumber
               id="order"
               v-model.trim="product.order"
+              :disabled="loading"
               mode="decimal"
               required="true"
               showButtons 
@@ -383,6 +385,7 @@ const deleteSelectedProducts = () => {
           <div class="field">
             <label for="name">Name</label>
             <InputText
+              :disabled="loading"
               id="name"
               v-model.trim="product.name"
               required="true"
@@ -398,6 +401,7 @@ const deleteSelectedProducts = () => {
             <div class="field col">
               <label for="price">Width</label>
               <InputNumber
+                :disabled="loading"
                 id="price"
                 v-model="product.width"
                 :class="{ 'p-invalid': submitted && !product.width }"
@@ -411,6 +415,7 @@ const deleteSelectedProducts = () => {
               <label for="quantity">Length</label>
               <InputNumber
                 id="quantity"
+                :disabled="loading"
                 v-model="product.length"
                 :class="{ 'p-invalid': submitted && !product.length }"
                 :required="true"
@@ -425,6 +430,7 @@ const deleteSelectedProducts = () => {
           <div class="field">
             <label for="inventoryStatus" class="mb-3">Status</label>
             <Dropdown
+              :disabled="loading"
               id="inventoryStatus"
               v-model="product.status"
               :options="statuses"
@@ -466,6 +472,7 @@ const deleteSelectedProducts = () => {
               @click="hideDialog"
             />
             <Button
+              :loading="loading"
               label="Save"
               icon="pi pi-check"
               class="p-button-text"

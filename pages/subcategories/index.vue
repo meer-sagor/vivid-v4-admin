@@ -9,6 +9,7 @@ import * as Yup from "yup";
 const { handleSubmit, resetForm } = useForm();
 const fetching = ref(false);
 const spinner = ref(false);
+const loading = ref(false);
 const schema = Yup.object({
   name: Yup.string().required().min(2).max(50).label("Name"),
   order: Yup.number()
@@ -154,6 +155,7 @@ const hideDialog = () => {
 };
 
 const saveProduct = async () => {
+  loading.value = true
   if (product.value.image_id == null && product.value.image_id == undefined) {
     if (files.value) {
       await uploadHandler();
@@ -230,12 +232,13 @@ const saveProduct = async () => {
       }
       await initialize();
     }
-
+    loading.value = false
     productDialog.value = false;
     product.value = {};
   }
 };
 const uploadHandler = async () => {
+  loading.value = true
   console.log(files.value);
   // uploading.value = true;
   const fileUp = files.value[0];
@@ -588,6 +591,8 @@ const onUpload = () => {
               <label for="order">Order</label>
               <Field
                 v-model="product.order"
+                :disabled="loading"
+                type="number"
                 id="order"
                 name="order"
                 :class="{ 'p-invalid': errors.order }"
@@ -603,6 +608,7 @@ const onUpload = () => {
               <label for="Types">Types</label>
               <Field name="type" v-slot="{ field }">
                 <Dropdown
+                  :disabled="loading"
                   v-bind="field"
                   v-model="product.type"
                   :options="types"
@@ -623,6 +629,7 @@ const onUpload = () => {
               <label for="category" class="mb-3">Category</label>
               <Field name="category" v-slot="{ field }">
                 <Dropdown
+                  :disabled="loading"
                   v-bind="field"
                   v-model="product.category_id"
                   :options="categories"
@@ -642,6 +649,7 @@ const onUpload = () => {
             <div class="field">
               <label for="name">Name</label>
               <Field
+                :disabled="loading"
                 v-model="product.name"
                 id="name"
                 name="name"
@@ -658,6 +666,7 @@ const onUpload = () => {
             <div class="field">
               <label for="description">Description</label>
               <Textarea
+                :disabled="loading"
                 id="description"
                 v-model="product.description"
                 required="true"
@@ -701,6 +710,7 @@ const onUpload = () => {
               <label for="status" class="mb-3">Status</label>
               <Field name="status" v-slot="{ field }">
                 <Dropdown
+                  :disabled="loading"
                   v-bind="field"
                   v-model="product.status"
                   :options="statuses"
@@ -716,7 +726,7 @@ const onUpload = () => {
                 errors.status || "&nbsp;"
               }}</small>
             </div>
-            <Button class="" type="submit" label="Submit" icon="pi pi-check" />
+            <Button class="" :loading="loading" type="submit" label="Submit" icon="pi pi-check" />
           </Form>
         </Dialog>
 
