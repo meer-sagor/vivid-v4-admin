@@ -57,3 +57,14 @@ input:checked + .slider:before {
 .slider.round:before {
     border-radius: 50%;
 }
+
+.p-datatable .p-datatable-header {
+    border: 0;
+}
+
+.file-upload-btn {
+  background-color: #e4e4e4;
+  border: 0;
+  color: #202326;
+  font-size: 12px;
+}
