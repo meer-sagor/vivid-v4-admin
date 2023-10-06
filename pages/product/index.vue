@@ -180,167 +180,183 @@ const onUpload = () => {
           responsiveLayout="scroll"
         >
           <template #header>
-            <div class="col-12 mb-4">
-              <h3 class="m-0">Product</h3>
-            </div>
-            <div
-              class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
-            >
-              <div
-                class="flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3"
-              >
-                <div class="flex gap-2 md:align-items-center">
-                  <Dropdown
-                    id="inventoryStatus"
-                    v-model="product.inventoryStatus"
-                    :options="statuses"
-                    optionLabel="label"
-                    placeholder="Select a Brand"
-                  >
-                    <template #value="slotProps">
-                      <div v-if="slotProps.value && slotProps.value.value">
-                        <span
-                          :class="
-                            'product-badge status-' + slotProps.value.value
-                          "
-                          >{{ slotProps.value.label }}</span
-                        >
-                      </div>
-                      <div
-                        v-else-if="slotProps.value && !slotProps.value.value"
-                      >
-                        <span
-                          :class="
-                            'product-badge status-' +
-                            slotProps.value.toLowerCase()
-                          "
-                          >{{ slotProps.value }}</span
-                        >
-                      </div>
-                      <span v-else>
-                        {{ slotProps.placeholder }}
-                      </span>
-                    </template>
-                  </Dropdown>
-                </div>
-                <div class="flex gap-2 md:align-items-center">
-                  <Dropdown
-                    id="inventoryStatus"
-                    v-model="product.inventoryStatus"
-                    :options="statuses"
-                    optionLabel="label"
-                    placeholder="Select a Category"
-                  >
-                    <template #value="slotProps">
-                      <div v-if="slotProps.value && slotProps.value.value">
-                        <span
-                          :class="
-                            'product-badge status-' + slotProps.value.value
-                          "
-                          >{{ slotProps.value.label }}</span
-                        >
-                      </div>
-                      <div
-                        v-else-if="slotProps.value && !slotProps.value.value"
-                      >
-                        <span
-                          :class="
-                            'product-badge status-' +
-                            slotProps.value.toLowerCase()
-                          "
-                          >{{ slotProps.value }}</span
-                        >
-                      </div>
-                      <span v-else>
-                        {{ slotProps.placeholder }}
-                      </span>
-                    </template>
-                  </Dropdown>
-                </div>
-                <div class="flex gap-2 md:align-items-center">
-                  <Dropdown
-                    id="inventoryStatus"
-                    v-model="product.inventoryStatus"
-                    :options="statuses"
-                    optionLabel="label"
-                    placeholder="Select a Subcategory"
-                  >
-                    <template #value="slotProps">
-                      <div v-if="slotProps.value && slotProps.value.value">
-                        <span
-                          :class="
-                            'product-badge status-' + slotProps.value.value
-                          "
-                          >{{ slotProps.value.label }}</span
-                        >
-                      </div>
-                      <div
-                        v-else-if="slotProps.value && !slotProps.value.value"
-                      >
-                        <span
-                          :class="
-                            'product-badge status-' +
-                            slotProps.value.toLowerCase()
-                          "
-                          >{{ slotProps.value }}</span
-                        >
-                      </div>
-                      <span v-else>
-                        {{ slotProps.placeholder }}
-                      </span>
-                    </template>
-                  </Dropdown>
-                </div>
-                <div class="flex gap-2 md:align-items-center">
-                  <Dropdown
-                    id="inventoryStatus"
-                    v-model="product.inventoryStatus"
-                    :options="statuses"
-                    optionLabel="label"
-                    placeholder="Select a Status"
-                  >
-                    <template #value="slotProps">
-                      <div v-if="slotProps.value && slotProps.value.value">
-                        <span
-                          :class="
-                            'product-badge status-' + slotProps.value.value
-                          "
-                          >{{ slotProps.value.label }}</span
-                        >
-                      </div>
-                      <div
-                        v-else-if="slotProps.value && !slotProps.value.value"
-                      >
-                        <span
-                          :class="
-                            'product-badge status-' +
-                            slotProps.value.toLowerCase()
-                          "
-                          >{{ slotProps.value }}</span
-                        >
-                      </div>
-                      <span v-else>
-                        {{ slotProps.placeholder }}
-                      </span>
-                    </template>
-                  </Dropdown>
-                </div>
-                <span class="block mt-2 md:mt-0 p-input-icon-left">
-                  <i class="pi pi-search" />
-                  <InputText
-                    v-model="filters['global'].value"
-                    placeholder="Search..."
-                  />
-                </span>
+            <div class="col-12"></div>
 
-                <NuxtLink to="/product/create">
-                  <Button
-                    label="New"
-                    icon="pi pi-plus"
-                    class="p-button-primary mr-2"
-                  />
-                </NuxtLink>
+            <div class="flex flex-column">
+              <div class="flex align-items-center justify-content-between m-2">
+                <h3 class="m-0">Product</h3>
+
+                <div class="flex align-items-center justify-content-end m-2">
+                  <span class="block mt-2 md:mt-0 p-input-icon-left mr-2">
+                    <i class="pi pi-search" />
+                    <InputText
+                      v-model="filters['global'].value"
+                      placeholder="Search..."
+                    />
+                  </span>
+
+                  <NuxtLink to="/product/create">
+                    <Button
+                      label="New"
+                      icon="pi pi-plus"
+                      class="p-button-primary mr-2"
+                    />
+                  </NuxtLink>
+                </div>
               </div>
+
+              <Accordion :activeIndex="0">
+                <AccordionTab header="Filters">
+                  <div
+                    class="flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3"
+                  >
+                    <div class="flex gap-2 md:align-items-center">
+                      <Dropdown
+                        id="inventoryStatus"
+                        v-model="product.inventoryStatus"
+                        :options="statuses"
+                        optionLabel="label"
+                        placeholder="Select a Brand"
+                      >
+                        <template #value="slotProps">
+                          <div v-if="slotProps.value && slotProps.value.value">
+                            <span
+                              :class="
+                                'product-badge status-' + slotProps.value.value
+                              "
+                              >{{ slotProps.value.label }}</span
+                            >
+                          </div>
+                          <div
+                            v-else-if="
+                              slotProps.value && !slotProps.value.value
+                            "
+                          >
+                            <span
+                              :class="
+                                'product-badge status-' +
+                                slotProps.value.toLowerCase()
+                              "
+                              >{{ slotProps.value }}</span
+                            >
+                          </div>
+                          <span v-else>
+                            {{ slotProps.placeholder }}
+                          </span>
+                        </template>
+                      </Dropdown>
+                    </div>
+                    <div class="flex gap-2 md:align-items-center">
+                      <Dropdown
+                        id="inventoryStatus"
+                        v-model="product.inventoryStatus"
+                        :options="statuses"
+                        optionLabel="label"
+                        placeholder="Select a Category"
+                      >
+                        <template #value="slotProps">
+                          <div v-if="slotProps.value && slotProps.value.value">
+                            <span
+                              :class="
+                                'product-badge status-' + slotProps.value.value
+                              "
+                              >{{ slotProps.value.label }}</span
+                            >
+                          </div>
+                          <div
+                            v-else-if="
+                              slotProps.value && !slotProps.value.value
+                            "
+                          >
+                            <span
+                              :class="
+                                'product-badge status-' +
+                                slotProps.value.toLowerCase()
+                              "
+                              >{{ slotProps.value }}</span
+                            >
+                          </div>
+                          <span v-else>
+                            {{ slotProps.placeholder }}
+                          </span>
+                        </template>
+                      </Dropdown>
+                    </div>
+                    <div class="flex gap-2 md:align-items-center">
+                      <Dropdown
+                        id="inventoryStatus"
+                        v-model="product.inventoryStatus"
+                        :options="statuses"
+                        optionLabel="label"
+                        placeholder="Select a Subcategory"
+                      >
+                        <template #value="slotProps">
+                          <div v-if="slotProps.value && slotProps.value.value">
+                            <span
+                              :class="
+                                'product-badge status-' + slotProps.value.value
+                              "
+                              >{{ slotProps.value.label }}</span
+                            >
+                          </div>
+                          <div
+                            v-else-if="
+                              slotProps.value && !slotProps.value.value
+                            "
+                          >
+                            <span
+                              :class="
+                                'product-badge status-' +
+                                slotProps.value.toLowerCase()
+                              "
+                              >{{ slotProps.value }}</span
+                            >
+                          </div>
+                          <span v-else>
+                            {{ slotProps.placeholder }}
+                          </span>
+                        </template>
+                      </Dropdown>
+                    </div>
+                    <div class="flex gap-2 md:align-items-center">
+                      <Dropdown
+                        id="inventoryStatus"
+                        v-model="product.inventoryStatus"
+                        :options="statuses"
+                        optionLabel="label"
+                        placeholder="Select a Status"
+                      >
+                        <template #value="slotProps">
+                          <div v-if="slotProps.value && slotProps.value.value">
+                            <span
+                              :class="
+                                'product-badge status-' + slotProps.value.value
+                              "
+                              >{{ slotProps.value.label }}</span
+                            >
+                          </div>
+                          <div
+                            v-else-if="
+                              slotProps.value && !slotProps.value.value
+                            "
+                          >
+                            <span
+                              :class="
+                                'product-badge status-' +
+                                slotProps.value.toLowerCase()
+                              "
+                              >{{ slotProps.value }}</span
+                            >
+                          </div>
+                          <span v-else>
+                            {{ slotProps.placeholder }}
+                          </span>
+                        </template>
+                      </Dropdown>
+                    </div>
+                  </div>
+                </AccordionTab>
+              </Accordion>
             </div>
           </template>
 
