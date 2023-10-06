@@ -4,9 +4,8 @@ import { defineComponent, nextTick, onMounted, ref} from "vue";
 import {ErrorMessage, Field, FieldArray, Form, useForm} from 'vee-validate';
 import * as Yup from "yup";
 import {useApiFetch} from "~/composables/useApiFetch";
-import add_product_validation from "@/pages/product/components/add_product_validation";
+import add_product_validation from "@/pages/product/validation/add_product_validation";
 import {useRouter} from "vue-router";
-import ignore from "ignore";
 
 export default defineComponent({
   components: {Form, Field, ErrorMessage, FieldArray},

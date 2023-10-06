@@ -118,7 +118,7 @@ const deleteAssociate = async () => {
           </template>
 
           <Column field="id" header="ID" style="width: 5%"></Column>
-          <Column header="Full Name" style="width: 10%">
+          <Column header="Image" style="width: 10%">
             <template #body="slotProps">
               <Image :src="slotProps.data.media?.url" alt="image" width="80" class="w-6rem shadow-2 border-round" preview />
             </template>
