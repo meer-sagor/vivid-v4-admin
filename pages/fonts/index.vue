@@ -29,7 +29,7 @@
           <Column field="id" header="ID" style="width: 5%"></Column>
           <Column field="name" header="Name" style="width: 15%"></Column>
           <Column field="size" header="Size" style="width: 15%"></Column>
-          <Column field="file" header="File" style="width: 20%"></Column>
+          <Column field="file_type" header="File Type" style="width: 20%"></Column>
           <Column field="font_category_id" header="Font Category" style="width: 15%">
             <template #body="slotProps">
               {{ slotProps.data.font_category?.name }}
