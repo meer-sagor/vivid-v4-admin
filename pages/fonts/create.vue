@@ -3,7 +3,6 @@
     <h5>Add Font Category</h5>
     <template v-if="fetching">
       <Form id="add_font_form" :initial-values="font" @submit="onSubmit" :validation-schema="schema" v-slot="{ errors }">
-
         <div class="flex flex-row gap-3">
           <div class="col-6 mb-0">
             <div class="flex flex-column gap-2 mb-0">
@@ -39,22 +38,22 @@
         <div class="flex flex-row gap-3">
           <div class="col-6 mb-0">
             <div class="flex flex-column gap-2 mb-0">
-              <label for="file">Upload Font</label>
-              <Field name="file" v-slot="{ field }">
+              <label for="file_type">Font Type</label>
+              <Field name="file_type" v-slot="{ field }">
                 <Dropdown
                     v-bind="field"
-                    v-model="font.file"
+                    v-model="font.file_type"
                     :options="font_file_type_enums"
                     optionLabel="name"
                     optionValue="name"
                     placeholder="Select a file type"
                     display="chip"
-                    :class="{ 'p-invalid': errors.file }"
+                    :class="{ 'p-invalid': errors.file_type }"
                     aria-describedby="promo-file-error"
                 ></Dropdown>
               </Field>
 
-              <small class="p-error" id="font-file-error">{{errors.file || "&nbsp;"}}</small>
+              <small class="p-error" id="font-file-error">{{errors.file_type || "&nbsp;"}}</small>
             </div>
           </div>
           <div class="col-6 mb-0">
@@ -78,6 +77,13 @@
           </div>
         </div>
         <div class="flex flex-row gap-3">
+          <div class="col-6 mb-0">
+            <div class="flex flex-column gap-2 mb-0">
+              <label for="file">File</label>
+              <Field type="file" id="file" name="file" @change="handleImageSelected" class="form-control" :class="{ 'p-invalid': errors.file }" aria-describedby="font-file-error" placeholder="Select file"/>
+              <small class="p-error" id="font-file-error">{{errors.file || "&nbsp;"}}</small>
+            </div>
+          </div>
           <div class="col-6 mb-0">
             <div class="flex flex-column gap-2 mb-0">
               <label for="status">Status</label>
@@ -114,6 +120,7 @@ import { ref, defineComponent, nextTick, onMounted } from "vue";
 import * as Yup from "yup";
 import { useApiFetch } from "~/composables/useApiFetch";
 import {useRouter} from "vue-router";
+import {useImageUpload} from "~/components/image/useImageUpload";
 
 export default defineComponent({
   components: { Form, Field },
@@ -127,11 +134,12 @@ export default defineComponent({
     const font_file_type_enums = ref([]);
     const font_categories = ref([]);
     const router = useRouter();
+    let {imageFile, imageUrl, handleImageSelected} = useImageUpload();
 
     const font = ref({
       name: "",
       size: "",
-      file: "",
+      file_type: "",
       font_category_id: "",
       status: "ENABLE",
     });
@@ -169,17 +177,26 @@ export default defineComponent({
     const schema = Yup.object().shape({
       name: Yup.string().required().min(2).max(100).label("Name"),
       size: Yup.number().typeError('Size must be a number field.').required().min(2).max(2000).label("Size"),
-      file: Yup.mixed().required().label("Upload font"),
-      font_category_id: Yup.mixed().required().label("Font category"),
+      file_type: Yup.mixed().required().typeError('File type is a required field').label("Font type"),
+      font_category_id: Yup.mixed().required().typeError('Font category is a required field').label("Font category"),
+      file: Yup.mixed().required().label("File"),
       status: Yup.mixed().required().label("Status"),
     });
 
     const onSubmit = async (values: any, actions: { setErrors: (arg0: any) => void }) => {
       loading.value = true;
 
+      const formData = new FormData();
+      formData.append("name", font.value.name);
+      formData.append("size", font.value.size);
+      formData.append("file_type", font.value.file_type);
+      formData.append("font_category_id", font.value.font_category_id);
+      formData.append("status",  font.value.status);
+      formData.append("image", imageFile.value);
+
       const {data, error} = await useApiFetch("/api/fonts", {
         method: "POST",
-        body: font.value,
+        body: formData,
       });
       loading.value = false;
       const data_obj = JSON.parse(JSON.stringify(computed(() => data.value).value));
@@ -225,7 +242,7 @@ export default defineComponent({
       status_enums,
       font_file_type_enums,
       font_categories,
-      status_enums,
+      handleImageSelected,
     };
   },
 });
