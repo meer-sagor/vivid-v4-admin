@@ -44,7 +44,9 @@ const productDialog = ref(false);
 const deleteProductDialog = ref(false);
 const mediaModal = ref(false);
 const deleteProductsDialog = ref(false);
-const product = ref({});
+let product = ref({
+  order: 0,
+});
 const selectedProducts = ref(null);
 const dt = ref(null);
 
@@ -102,6 +104,7 @@ onMounted(async () => {
   await nextTick();
   await initialize();
 });
+
 const initialize = async (event) => {
   spinner.value = true;
   let page = 1;
@@ -136,26 +139,29 @@ const initialize = async (event) => {
     totalRecords.value = data.value.categories.total;
     //   totalData.value  = data.value.roles.total
   }
+
 };
 const formatCurrency = (value) => {
   return value.toLocaleString("en-US", { style: "currency", currency: "USD" });
 };
 
 const openNew = () => {
-  product.value = {};
+  // product.value = {};
   product.value.status = "ENABLE";
   submitted.value = false;
   productDialog.value = true;
+  product.value.order = totalRecords.value + 1;
 };
 
 const openMedia = () => {
   mediaModal.value = true;
 };
 
-const hideDialog = () => {
-  productDialog.value = false;
-  submitted.value = false;
-};
+watch(productDialog, (value) => {
+  if (!value) {
+    product.value = {};
+  }
+});
 
 const saveProduct = async () => {
   // if (product.value.image_id == null && product.value.image_id == undefined) {
@@ -380,6 +386,10 @@ const deleteSelectedProducts = () => {
     life: 3000,
   });
 };
+
+// const defaultOrderNumber = computed(() => {
+//   return categories.length + 1;
+// });
 
 const onUpload = () => {
   toast.add({

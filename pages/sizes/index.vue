@@ -2,7 +2,7 @@
 import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
-import { onMounted, ref ,nextTick,watch, computed} from "vue";
+import { onMounted, ref, nextTick, watch, computed } from "vue";
 //filters
 const { $dateFilter } = useNuxtApp();
 const fetching = ref(false);
@@ -10,8 +10,8 @@ const spinner = ref(false);
 const loading = ref(false);
 const toast = useToast();
 const sizes = ref([]);
-const rowsPerPage = ref(0)
-const totalRecords = ref(0)
+const rowsPerPage = ref(0);
+const totalRecords = ref(0);
 const products = ref(null);
 const productDialog = ref(false);
 const deleteProductDialog = ref(false);
@@ -28,29 +28,32 @@ const statuses = ref([
   { label: "Enable", value: "ENABLE" },
   { label: "Disable", value: "DISABLE" },
 ]);
-// wathcer 
+// wathcer
 watch(search, (newValue, oldValue) => {
   initialize();
 });
 // Computed
 const searchTerm = computed(() => {
-  return search.value ? '&name=' + search.value : ''
-})
+  return search.value ? "&name=" + search.value : "";
+});
 onMounted(async () => {
   // ProductService.getProducts().then((data) => (products.value = data));
   await nextTick();
   await initialize();
 });
 const initialize = async (event) => {
-  spinner.value = true
-  let page = 1
-  if (event?.first){
+  spinner.value = true;
+  let page = 1;
+  if (event?.first) {
     page = event.first / event.rows + 1;
   }
-  const { data, error } = await useApiFetch("/api/sizes/?page=" + page + searchTerm.value, {
-    method: "GET",
-  });
-  spinner.value = false
+  const { data, error } = await useApiFetch(
+    "/api/sizes/?page=" + page + searchTerm.value,
+    {
+      method: "GET",
+    }
+  );
+  spinner.value = false;
   if (error.value) {
     toast.add({
       severity: "error",
@@ -60,11 +63,11 @@ const initialize = async (event) => {
     });
   }
   if (data.value) {
-    fetching.value = true
+    fetching.value = true;
     sizes.value = data.value.sizes.data;
     console.log(data.value.sizes);
-    rowsPerPage.value = data.value.sizes.per_page
-    totalRecords.value = data.value.sizes.total
+    rowsPerPage.value = data.value.sizes.per_page;
+    totalRecords.value = data.value.sizes.total;
     //   totalData.value  = data.value.roles.total
   }
 };
@@ -72,11 +75,17 @@ const formatCurrency = (value) => {
   return value.toLocaleString("en-US", { style: "currency", currency: "USD" });
 };
 
+watch(productDialog, (value) => {
+  if (!value) {
+    product.value = {};
+  }
+});
+
 const openNew = () => {
-  product.value = {};
   product.value.status = "ENABLE";
   submitted.value = false;
   productDialog.value = true;
+  product.value.order = totalRecords.value + 1;
 };
 
 const hideDialog = () => {
@@ -86,13 +95,13 @@ const hideDialog = () => {
 
 const saveProduct = async () => {
   submitted.value = true;
-  loading.value = true
+  loading.value = true;
   if (product.value.name && product.value.name.trim()) {
     product.value.status = product.value.status.value
       ? product.value.status.value
       : product.value.status;
     if (product.value.id) {
-      product.value.status = product.value.status.toUpperCase()
+      product.value.status = product.value.status.toUpperCase();
       const { data, error } = await useApiFetch(
         "/api/sizes/" + product.value.id,
         {
@@ -141,7 +150,7 @@ const saveProduct = async () => {
       }
       await initialize();
     }
-    loading.value = false
+    loading.value = false;
     productDialog.value = false;
     product.value = {};
   }
@@ -149,7 +158,7 @@ const saveProduct = async () => {
 
 const editProduct = (editProduct) => {
   product.value = { ...editProduct };
-  product.value.status = product.value.status.toUpperCase()
+  product.value.status = product.value.status.toUpperCase();
   console.log(product);
   productDialog.value = true;
 };
@@ -275,10 +284,7 @@ const deleteSelectedProducts = () => {
               >
                 <span class="block mt-2 md:mt-0 p-input-icon-left">
                   <i class="pi pi-search" />
-                  <InputText
-                    v-model="search"
-                    placeholder="Search..."
-                  />
+                  <InputText v-model="search" placeholder="Search..." />
                 </span>
                 <Button
                   label="New"
@@ -337,7 +343,7 @@ const deleteSelectedProducts = () => {
           <Column field="created_at" header="Created at" :sortable="true">
             <template #body="slotProps">
               <span class="p-column-title">Created at</span>
-              {{  $dateFilter(slotProps.data.created_at)  }}
+              {{ $dateFilter(slotProps.data.created_at) }}
             </template>
           </Column>
           <Column class="text-right">
@@ -372,9 +378,8 @@ const deleteSelectedProducts = () => {
               :disabled="loading"
               mode="decimal"
               required="true"
-              showButtons 
+              showButtons
               :min="0"
-              autofocus
               :class="{ 'p-invalid': submitted && !product.order }"
             />
             <small v-if="submitted && !product.order" class="p-invalid"
@@ -389,7 +394,6 @@ const deleteSelectedProducts = () => {
               id="name"
               v-model.trim="product.name"
               required="true"
-              autofocus
               :class="{ 'p-invalid': submitted && !product.name }"
             />
             <small v-if="submitted && !product.name" class="p-invalid"
@@ -460,8 +464,8 @@ const deleteSelectedProducts = () => {
               </template>
             </Dropdown>
             <small v-if="submitted && !product.status" class="p-invalid"
-                >Status is required.</small
-              >
+              >Status is required.</small
+            >
           </div>
 
           <template #footer>
@@ -516,7 +520,7 @@ const deleteSelectedProducts = () => {
     </div>
     <div class="col-12">
       <div class="flex justify-content-center">
-        <ProgressSpinner v-if="spinner"/>
+        <ProgressSpinner v-if="spinner" />
       </div>
     </div>
   </div>

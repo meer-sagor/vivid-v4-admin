@@ -191,7 +191,7 @@ const onUpload = () => {
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
           responsiveLayout="scroll"
         >
-          <h3 class="mb-4">Child Product</h3>
+          <h3 class="mb-4">Child Products</h3>
           <template #header>
             <div
               class="flex flex-column md:flex-row md:justify-content-end md:align-items-center"
@@ -260,7 +260,7 @@ const onUpload = () => {
               {{ slotProps.data.name }}
             </template>
           </Column>
-          <Column header="Image" headerStyle="width:14%; min-width:10rem;">
+          <Column header="Image">
             <template #body="slotProps">
               <span class="p-column-title">Image</span>
               <img
@@ -271,7 +271,7 @@ const onUpload = () => {
               />
             </template>
           </Column>
-          <Column field="name" header="Style Numer" :sortable="true">
+          <Column field="name" header="Style Numer">
             <template #body="slotProps">
               <span class="p-column-title">Style Numer</span>
               {{ slotProps.data.name }}
@@ -283,19 +283,19 @@ const onUpload = () => {
               {{ slotProps.data.name }}
             </template>
           </Column>
-          <Column field="name" header="Sub Category" :sortable="true">
+          <Column field="name" header="Sub Category">
             <template #body="slotProps">
               <span class="p-column-title">Sub Category</span>
               {{ slotProps.data.name }}
             </template>
           </Column>
-          <Column field="name" header="Brand" :sortable="true">
+          <Column field="name" header="Brand">
             <template #body="slotProps">
               <span class="p-column-title">Brand</span>
               {{ slotProps.data.name }}
             </template>
           </Column>
-          <Column field="name" header="Childs" :sortable="true">
+          <Column field="name" header="Childs">
             <template #body="slotProps">
               <span class="p-column-title">Childs</span>
               {{ slotProps.data.name }}
@@ -321,7 +321,7 @@ const onUpload = () => {
               {{ slotProps.data.updated_at }}
             </template>
           </Column>
-          <Column class="text-right" style="min-width: 270px">
+          <Column class="text-right">
             <template #body="slotProps">
               <!-- <NuxtLink :to="{ path: '/product/child' }" class="mr-4">
                 View Child

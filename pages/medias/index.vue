@@ -35,7 +35,6 @@
                   <InputText
                       id="name"
                       v-model.trim="search_data.name"
-                      autofocus
                       placeholder="Enter name"
                   />
                 </div>

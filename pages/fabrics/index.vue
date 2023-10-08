@@ -380,7 +380,6 @@ const deleteSelectedProducts = () => {
                 id="quality"
                 v-model.trim="product.quality"
                 required="true"
-                autofocus
                 :class="{ 'p-invalid': submitted && !product.quality }"
               />
               <small v-if="submitted && !product.quality" class="p-invalid"

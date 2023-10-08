@@ -3,9 +3,9 @@ import { useToast } from "primevue/usetoast";
 import { defineComponent, nextTick, onMounted, ref } from "vue";
 import { ErrorMessage, Field, FieldArray, Form, useForm } from "vee-validate";
 import * as Yup from "yup";
-import {useApiFetch} from "~/composables/useApiFetch";
+import { useApiFetch } from "~/composables/useApiFetch";
 import add_product_validation from "@/pages/product/validation/add_product_validation";
-import {useRouter} from "vue-router";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   components: { Form, Field, ErrorMessage, FieldArray },
@@ -77,21 +77,30 @@ export default defineComponent({
     };
 
     // @ts-ignore
-    const onSubmit = async (values, actions: { setErrors: (arg0: any) => void }) => {
-      if (product.value.description == null || product.value.description == '') {
+    const onSubmit = async (
+      values,
+      actions: { setErrors: (arg0: any) => void }
+    ) => {
+      if (
+        product.value.description == null ||
+        product.value.description == ""
+      ) {
         toast.add({
           severity: "info",
           summary: "Danger",
-          detail: 'Description is a required field',
+          detail: "Description is a required field",
           life: 3000,
         });
         return;
       }
-      if (product.value.size_chart_description == null || product.value.size_chart_description == '') {
+      if (
+        product.value.size_chart_description == null ||
+        product.value.size_chart_description == ""
+      ) {
         toast.add({
           severity: "info",
           summary: "Danger",
-          detail: 'Size chart description is a required field',
+          detail: "Size chart description is a required field",
           life: 3000,
         });
         return;
@@ -505,9 +514,8 @@ export default defineComponent({
                         <h4>Size Chart</h4>
                         <div>
                           <Button
-                            label="Add"
                             icon="pi pi-plus"
-                            class="mr-2 mb-2"
+                            class="mr-2 mb-2 p-button-icon-only"
                             @click="
                               push({ size_id: '', width: '', length: '' })
                             "
@@ -520,8 +528,6 @@ export default defineComponent({
                             <th>Sizes</th>
                             <th>Width</th>
                             <th>Length</th>
-                            <th>Remove</th>
-                            <th>Up/Down</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -620,7 +626,15 @@ export default defineComponent({
                             <td>
                               <div class="flex flex-column gap-2 mb-2">
                                 <Button
-                                  icon="pi pi-sort-alt"
+                                  icon="pi pi-chevron-up"
+                                  class="p-button-rounded p-button-text mr-2 mb-2"
+                                />
+                              </div>
+                            </td>
+                            <td>
+                              <div class="flex flex-column gap-2 mb-2">
+                                <Button
+                                  icon="pi pi-chevron-down"
                                   class="p-button-rounded p-button-text mr-2 mb-2"
                                 />
                               </div>
@@ -647,9 +661,8 @@ export default defineComponent({
                   <h4>Price Shirt Chart</h4>
                   <div>
                     <Button
-                      label="Add"
                       icon="pi pi-plus"
-                      class="mr-2 mb-2"
+                      class="mr-2 mb-2 p-button-icon-only"
                       @click="
                         push({
                           price_category_id: '',
@@ -677,8 +690,6 @@ export default defineComponent({
                           <th>Range From</th>
                           <th>Range To</th>
                           <th>Price</th>
-                          <th>Remove</th>
-                          <th class="text-center">Up/Down</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -810,7 +821,15 @@ export default defineComponent({
                           <td>
                             <div class="flex flex-column gap-2 mb-2">
                               <Button
-                                icon="pi pi-sort-alt"
+                                icon="pi pi-chevron-up"
+                                class="p-button-rounded p-button-text mr-2 mb-2"
+                              />
+                            </div>
+                          </td>
+                          <td>
+                            <div class="flex flex-column gap-2 mb-2">
+                              <Button
+                                icon="pi pi-chevron-down"
                                 class="p-button-rounded p-button-text mr-2 mb-2"
                               />
                             </div>
@@ -821,7 +840,7 @@ export default defineComponent({
                   </div>
                 </div>
               </FieldArray>
-              <div class="field">
+              <!-- <div class="field">
                 <div
                   class="formgrid"
                   style="
@@ -830,159 +849,19 @@ export default defineComponent({
                     padding: 16px;
                   "
                 >
-                  <div>
-                    <div
-                      class="flex justify-content-between flex-column sm:flex-row mb-3"
-                    >
-                      <div>
-                        <h4 class="mb-0">
-                          Select and add picture for print area
-                        </h4>
-                      </div>
-                    </div>
-                    <div class="grid p-fluid">
-                      <div class="col-12 md:col-12">
-                        <div class="grid p-fluid text-center">
-                          <div class="col-12 md:col-3">
-                            <div class="card">
-                              <h5 class="mb-4">Front Side</h5>
-                              <div class="mb-3">
-                                <img
-                                  src="http://3.15.163.57:3001/img/product/Hanes/42BA/42ba_ltsteel-navy_back.jpg"
-                                  alt=""
-                                  height="100"
-                                />
-                              </div>
-                              <div class="flex justify-content-center gap-3">
-                                <div class="field-checkbox mb-0">
-                                  <Checkbox
-                                    id="checkOption1"
-                                    name="option"
-                                    value="Chicago"
-                                  />
-                                </div>
-                                <FileUpload
-                                  class="file-upload-btn"
-                                  mode="basic"
-                                  name="demo[]"
-                                  accept="image/*"
-                                  :maxFileSize="1000000"
-                                  @uploader="onUpload"
-                                  customUpload
-                                />
-                              </div>
-                            </div>
-                          </div>
-                          <div class="col-12 md:col-3">
-                            <div class="card">
-                              <h5 class="mb-4">Right Side</h5>
-                              <div class="mb-3">
-                                <img
-                                  src="http://3.15.163.57:3001/img/product/Hanes/42BA/42ba_ltsteel-navy_back.jpg"
-                                  alt=""
-                                  height="100"
-                                />
-                              </div>
-                              <div class="flex justify-content-center gap-3">
-                                <div class="field-checkbox mb-0">
-                                  <Checkbox
-                                    id="checkOption1"
-                                    name="option"
-                                    value="Chicago"
-                                  />
-                                </div>
-                                <FileUpload
-                                  class="file-upload-btn"
-                                  mode="basic"
-                                  name="demo[]"
-                                  accept="image/*"
-                                  :maxFileSize="1000000"
-                                  @uploader="onUpload"
-                                  customUpload
-                                />
-                              </div>
-                            </div>
-                          </div>
-                          <div class="col-12 md:col-3">
-                            <div class="card">
-                              <h5 class="mb-4">Back Side</h5>
-                              <div class="mb-3">
-                                <img
-                                  src="http://3.15.163.57:3001/img/product/Hanes/42BA/42ba_ltsteel-navy_back.jpg"
-                                  alt=""
-                                  height="100"
-                                />
-                              </div>
-                              <div class="flex justify-content-center gap-3">
-                                <div class="field-checkbox mb-0">
-                                  <Checkbox
-                                    id="checkOption1"
-                                    name="option"
-                                    value="Chicago"
-                                  />
-                                </div>
-                                <FileUpload
-                                  class="file-upload-btn"
-                                  mode="basic"
-                                  name="demo[]"
-                                  accept="image/*"
-                                  :maxFileSize="1000000"
-                                  @uploader="onUpload"
-                                  customUpload
-                                />
-                              </div>
-                            </div>
-                          </div>
-                          <div class="col-12 md:col-3">
-                            <div class="card">
-                              <h5 class="mb-4">Left Side</h5>
-                              <div class="mb-3">
-                                <img
-                                  src="http://3.15.163.57:3001/img/product/Hanes/42BA/42ba_ltsteel-navy_back.jpg"
-                                  alt=""
-                                  height="100"
-                                />
-                              </div>
-                              <div class="flex justify-content-center gap-3">
-                                <div class="field-checkbox mb-0">
-                                  <Checkbox
-                                    id="checkOption1"
-                                    name="option"
-                                    value="Chicago"
-                                  />
-                                </div>
-                                <FileUpload
-                                  class="file-upload-btn"
-                                  mode="basic"
-                                  name="demo[]"
-                                  accept="image/*"
-                                  :maxFileSize="1000000"
-                                  @uploader="onUpload"
-                                  customUpload
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  
                 </div>
-              </div>
-              <div class="field">
-                <div
-                  class="formgrid"
-                  style="
-                    border: 1px solid #e4e4e4;
-                    border-radius: 12px;
-                    padding: 16px;
-                  "
-                >
-                  <div>
-                    <ClothCustom />
-                  </div>
-                </div>
-              </div>
+              </div> -->
+
+              <!-- <ClothCustom /> -->
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="card">
+              <FieldArray name="price_shirt_charts">
+                <ClothCustom />
+              </FieldArray>
             </div>
           </div>
 

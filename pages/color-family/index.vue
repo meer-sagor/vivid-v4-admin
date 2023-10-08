@@ -2,10 +2,10 @@
 import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
-import { onMounted, ref,nextTick,watch, computed } from "vue";
-import {Field, Form, useField, useForm} from 'vee-validate';
+import { onMounted, ref, nextTick, watch, computed } from "vue";
+import { Field, Form, useField, useForm } from "vee-validate";
 import * as Yup from "yup";
-const {handleSubmit, resetForm} = useForm();
+const { handleSubmit, resetForm } = useForm();
 //filters
 const { $dateFilter } = useNuxtApp();
 const fetching = ref(false);
@@ -27,8 +27,8 @@ const files = ref();
 const fileData = ref();
 const colors = ref([]);
 const colorFamilies = ref([]);
-const rowsPerPage = ref(0)
-const totalRecords = ref(0)
+const rowsPerPage = ref(0);
+const totalRecords = ref(0);
 const productDialog = ref(false);
 const deleteProductDialog = ref(false);
 const deleteProductsDialog = ref(false);
@@ -45,19 +45,19 @@ const statuses = ref([
 ]);
 
 const onPhotoSelect = ($event) => {
-  product.value.image_id == null
+  product.value.image_id == null;
   imageError.value = null;
   files.value = fileInput.value?.files;
   console.log(files.value[0].objectURL);
 };
-// wathcer 
+// wathcer
 watch(search, (newValue, oldValue) => {
   initialize();
 });
 // Computed
 const searchTerm = computed(() => {
-  return search.value ? '&name=' + search.value : ''
-})
+  return search.value ? "&name=" + search.value : "";
+});
 onMounted(async () => {
   // ProductService.getProducts().then((data) => (products.value = data));
   await nextTick();
@@ -65,15 +65,18 @@ onMounted(async () => {
   await colorFamilyData();
 });
 const initialize = async (event) => {
-  spinner.value = true
-  let page = 1
-  if (event?.first){
+  spinner.value = true;
+  let page = 1;
+  if (event?.first) {
     page = event.first / event.rows + 1;
   }
-  const { data, error } = await useApiFetch("/api/color-families/?page=" + page + searchTerm.value, {
-    method: "GET",
-  });
-  spinner.value = false
+  const { data, error } = await useApiFetch(
+    "/api/color-families/?page=" + page + searchTerm.value,
+    {
+      method: "GET",
+    }
+  );
+  spinner.value = false;
   if (error.value) {
     toast.add({
       severity: "error",
@@ -83,10 +86,10 @@ const initialize = async (event) => {
     });
   }
   if (data.value) {
-    fetching.value = true
+    fetching.value = true;
     colors.value = data.value.color_families.data;
-    rowsPerPage.value = data.value.color_families.per_page
-    totalRecords.value = data.value.color_families.total
+    rowsPerPage.value = data.value.color_families.per_page;
+    totalRecords.value = data.value.color_families.total;
     //   totalData.value  = data.value.roles.total
   }
 };
@@ -115,12 +118,11 @@ const hideDialog = () => {
 };
 
 const saveProduct = async () => {
-  loading.value = true
+  loading.value = true;
   if (product.value.image_id == null && product.value.image_id == undefined) {
-    if(files.value){
+    if (files.value) {
       await uploadHandler();
-    }
-    else{
+    } else {
       imageError.value = "This Feild is required";
     }
   }
@@ -134,7 +136,7 @@ const saveProduct = async () => {
       if (product.value.media == null) {
         await uploadHandler();
       }
-      product.value.status = product.value.status.toUpperCase()
+      product.value.status = product.value.status.toUpperCase();
       console.log(product.value.status);
       const { data, error } = await useApiFetch(
         "/api/color-families/" + product.value.id,
@@ -196,13 +198,13 @@ const saveProduct = async () => {
       //   life: 3000,
       // });
     }
-    loading.value = false
+    loading.value = false;
     productDialog.value = false;
     product.value = {};
   }
 };
 const uploadHandler = async () => {
-  console.log( files.value );
+  console.log(files.value);
   // uploading.value = true;
   const fileUp = files.value[0];
   const body = new FormData();
@@ -216,7 +218,7 @@ const uploadHandler = async () => {
   // console.log(data);
   if (data.value) {
     imageError.value = null;
-    product.value.image_id = data.value.media.id
+    product.value.image_id = data.value.media.id;
     // await auth.fetchUser();
     // uploading.value = false;
     // toast.add({
@@ -229,11 +231,11 @@ const uploadHandler = async () => {
 };
 const editProduct = (editProduct) => {
   product.value = { ...editProduct };
-  product.value.status = product.value.status.toUpperCase()
+  product.value.status = product.value.status.toUpperCase();
   productDialog.value = true;
   files.value = null;
   if (product.value.media) {
-    fileData.value =  product.value.media.url
+    fileData.value = product.value.media.url;
   }
 };
 
@@ -243,9 +245,12 @@ const confirmDeleteProduct = (editProduct) => {
 };
 
 const deleteProduct = async () => {
-  const { data, error } = await useApiFetch("/api/color-families/" + product.value.id, {
-    method: "DELETE",
-  });
+  const { data, error } = await useApiFetch(
+    "/api/color-families/" + product.value.id,
+    {
+      method: "DELETE",
+    }
+  );
   // errorMessage.value = null;
   // if (error.value) {
   //   errorMessage.value = error.value.data.message;
@@ -354,10 +359,7 @@ const onUpload = () => {
               >
                 <span class="block mt-2 md:mt-0 p-input-icon-left">
                   <i class="pi pi-search" />
-                  <InputText
-                    v-model="search"
-                    placeholder="Search..."
-                  />
+                  <InputText v-model="search" placeholder="Search..." />
                 </span>
                 <Button
                   label="New"
@@ -411,7 +413,7 @@ const onUpload = () => {
           <Column field="created_at" header="Created at" :sortable="true">
             <template #body="slotProps">
               <span class="p-column-title">Created at</span>
-              {{  $dateFilter(slotProps.data.created_at)  }}
+              {{ $dateFilter(slotProps.data.created_at) }}
             </template>
           </Column>
           <Column class="text-right">
@@ -438,23 +440,54 @@ const onUpload = () => {
           :modal="true"
           class="p-fluid"
         >
-          <Form id="add_category_form" @submit="saveProduct" :validation-schema="schema" v-slot="{ errors }">
-            
+          <Form
+            id="add_category_form"
+            @submit="saveProduct"
+            :validation-schema="schema"
+            v-slot="{ errors }"
+          >
             <div class="field">
               <label for="name">Name</label>
-              <Field v-model="product.name" :disabled="loading" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Name"/>
-              <small class="p-error" id="category-name-error">{{ errors.name || '&nbsp;' }}</small>
+              <Field
+                v-model="product.name"
+                :disabled="loading"
+                id="name"
+                name="name"
+                :class="{ 'p-invalid': errors.name }"
+                class="p-inputtext p-component"
+                aria-describedby="category-name-error"
+                placeholder="Name"
+              />
+              <small class="p-error" id="category-name-error">{{
+                errors.name || "&nbsp;"
+              }}</small>
             </div>
 
             <div class="formgrid grid">
-              <div class="field col">
+              <div class="field col-9">
                 <label for="hex">Hex</label>
-                <Field v-model="product.hex" :disabled="loading" id="hex" name="hex" :class="{ 'p-invalid': errors.hex }" class="p-inputtext p-component" aria-describedby="category-hex-error" placeholder="Color hex"/> 
-                <small class="p-error" id="category-hex-error">{{ errors.hex || '&nbsp;' }}</small>
+                <Field
+                  v-model="product.hex"
+                  :disabled="loading"
+                  id="hex"
+                  name="hex"
+                  :class="{ 'p-invalid': errors.hex }"
+                  class="p-inputtext p-component"
+                  aria-describedby="category-hex-error"
+                  placeholder="Color hex"
+                />
+                <small class="p-error" id="category-hex-error">{{
+                  errors.hex || "&nbsp;"
+                }}</small>
               </div>
               <div class="field col-3">
                 <label for="color-picker">Pick Color</label>
-                <ColorPicker  inputId="cp-hex" format="hex" v-model="product.hex"/>
+                <ColorPicker
+                  class="mt-2"
+                  inputId="cp-hex"
+                  format="hex"
+                  v-model="product.hex"
+                />
               </div>
             </div>
 
@@ -479,9 +512,17 @@ const onUpload = () => {
             </div> -->
             <div class="field">
               <label for="name">Image</label>
-              <FileUpload ref="fileInput" mode="basic" name="demo[]" url="/api/upload" accept="image/*" customUpload @select="onPhotoSelect($event)" />
+              <FileUpload
+                ref="fileInput"
+                mode="basic"
+                name="demo[]"
+                url="/api/upload"
+                accept="image/*"
+                customUpload
+                @select="onPhotoSelect($event)"
+              />
               <span class="p-invalid" v-if="imageError">{{ imageError }}</span>
-              <br>
+              <br />
               <img
                 v-if="files"
                 :src="files[0].objectURL"
@@ -520,7 +561,13 @@ const onUpload = () => {
                 errors.status || "&nbsp;"
               }}</small>
             </div>
-            <Button class="" :loading="loading" type="submit" label="Submit"  icon="pi pi-check"/>
+            <Button
+              class=""
+              :loading="loading"
+              type="submit"
+              label="Submit"
+              icon="pi pi-check"
+            />
           </Form>
         </Dialog>
 
@@ -559,7 +606,7 @@ const onUpload = () => {
     </div>
     <div class="col-12">
       <div class="flex justify-content-center">
-        <ProgressSpinner v-if="spinner"/>
+        <ProgressSpinner v-if="spinner" />
       </div>
     </div>
   </div>
