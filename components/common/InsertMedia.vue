@@ -56,19 +56,19 @@
                   <Image
                     src="/demo/images/galleria/galleria11.jpg"
                     alt="Image"
-                    width="300"
+                    width="280"
                     preview
                   />
                   <div
-                    style="max-width: 300px"
+                    style="max-width: 280px"
                     class="flex align-items-center justify-content-between mt-2"
                   >
                     <Button
                       icon="pi pi-copy"
-                      class="p-button-rounded p-button-outlined"
+                      class="p-button-rounded p-button-outlined mr-2"
                     />
                     <Button
-                      style="min-width: 250px"
+                      style="min-width: 200px"
                       label="Select"
                       class="p-button-outlined"
                     />
@@ -78,23 +78,46 @@
                   <Image
                     src="/demo/images/galleria/galleria11.jpg"
                     alt="Image"
-                    width="300"
+                    width="280"
                     preview
                   />
                   <div
-                    style="max-width: 300px"
+                    style="max-width: 280px"
                     class="flex align-items-center justify-content-between mt-2"
                   >
                     <Button
                       icon="pi pi-copy"
-                      class="p-button-rounded p-button-outlined"
+                      class="p-button-rounded p-button-outlined mr-2"
                     />
                     <Button
-                      style="min-width: 250px"
+                      style="min-width: 200px"
                       class="p-button-outlined p-button-success"
                       label="Selected"
                       icon="pi pi-check"
                     ></Button>
+                  </div>
+                </div>
+
+                <div class="col-4">
+                  <Image
+                    src="/demo/images/galleria/galleria11.jpg"
+                    alt="Image"
+                    width="280"
+                    preview
+                  />
+                  <div
+                    style="max-width: 280px"
+                    class="flex align-items-center justify-content-between mt-2"
+                  >
+                    <Button
+                      icon="pi pi-copy"
+                      class="p-button-rounded p-button-outlined mr-2"
+                    />
+                    <Button
+                      style="min-width: 200px"
+                      label="Select"
+                      class="p-button-outlined"
+                    />
                   </div>
                 </div>
               </div>
