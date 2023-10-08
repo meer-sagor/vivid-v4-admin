@@ -196,23 +196,23 @@ const model = ref([
   // {
   //   label: "Manage Pages",
   //   icon: "pi pi-fw pi-briefcase",
-    // items: [
-    //   {
-    //     label: "Pages",
-    //     icon: "pi pi-fw pi-circle-off",
-    //     to: "/dummy",
-    //   },
-    //   {
-    //     label: "Page Components",
-    //     icon: "pi pi-fw pi-circle-off",
-    //     to: "/dummy",
-    //   },
-    //   {
-    //     label: "Comments",
-    //     icon: "pi pi-fw pi-exclamation-circle",
-    //     to: "/dummy",
-    //   },
-    // ],
+  // items: [
+  //   {
+  //     label: "Pages",
+  //     icon: "pi pi-fw pi-circle-off",
+  //     to: "/dummy",
+  //   },
+  //   {
+  //     label: "Page Components",
+  //     icon: "pi pi-fw pi-circle-off",
+  //     to: "/dummy",
+  //   },
+  //   {
+  //     label: "Comments",
+  //     icon: "pi pi-fw pi-exclamation-circle",
+  //     to: "/dummy",
+  //   },
+  // ],
   // },
   {
     label: "Settings",
@@ -222,6 +222,11 @@ const model = ref([
         label: "Media",
         icon: "pi pi-fw pi-exclamation-circle",
         to: "/medias",
+      },
+      {
+        label: "File Manager",
+        icon: "pi pi-fw pi-folder",
+        to: "/file-manager",
       },
       // {
       //   label: "Analytics",

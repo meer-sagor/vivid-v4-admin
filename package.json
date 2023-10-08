@@ -28,7 +28,6 @@
     "vue": "latest"
   },
   "dependencies": {
-    "@nuxtjs/critters": "^0.5.1",
     "@pinia/nuxt": "^0.4.11",
     "@tiptap/extension-highlight": "^2.1.11",
     "@tiptap/extension-text-align": "^2.1.11",
