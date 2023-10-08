@@ -35,8 +35,8 @@ const search = ref(null);
 const status = ref(null);
 const type = ref(null);
 const fileInput = ref(null);
-const files = ref();
-const fileData = ref();
+// const files = ref();
+// const fileData = ref();
 const categories = ref([]);
 const rowsPerPage = ref(0);
 const totalRecords = ref(0);
@@ -47,6 +47,7 @@ const deleteProductsDialog = ref(false);
 const product = ref({});
 const selectedProducts = ref(null);
 const dt = ref(null);
+
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
@@ -60,23 +61,23 @@ const types = ref([
   { label: "Product Design", value: "product_design" },
   { label: "Embroidery Design", value: "embroidery_design" },
 ]);
-const onPhotoSelect = ($event) => {
-  product.value.image_id == null;
-  files.value = fileInput.value?.files;
-  imageError.value = null;
-  console.log(files.value[0].objectURL);
-};
+// const onPhotoSelect = ($event) => {
+//   product.value.image_id == null;
+//   files.value = fileInput.value?.files;
+//   imageError.value = null;
+//   console.log(files.value[0].objectURL);
+// };
 // wathcer
 watch(search, (newValue, oldValue) => {
   initialize();
 });
 
-watch(mediaModal, (newValue, oldValue) => {
-  if (!newValue) {
-    fileData.value = null;
-    files.value = "";
-  }
-});
+// watch(mediaModal, (newValue, oldValue) => {
+//   if (!newValue) {
+//     fileData.value = null;
+//     files.value = "";
+//   }
+// });
 // Computed
 const searchTerm = computed(() => {
   return search.value ? "&name=" + search.value : "";
@@ -157,13 +158,13 @@ const hideDialog = () => {
 };
 
 const saveProduct = async () => {
-  if (product.value.image_id == null && product.value.image_id == undefined) {
-    if (files.value) {
-      await uploadHandler();
-    } else {
-      imageError.value = "This Feild is required";
-    }
-  }
+  // if (product.value.image_id == null && product.value.image_id == undefined) {
+  //   if (files.value) {
+  //     await uploadHandler();
+  //   } else {
+  //     imageError.value = "This Feild is required";
+  //   }
+  // }
   submitted.value = true;
   console.log(product.value);
   loading.value = true;
@@ -257,9 +258,14 @@ const saveProduct = async () => {
     product.value = {};
   }
 };
+
+const closeMedia = () => {
+  mediaModal.value = false;
+};
+
 const uploadHandler = async () => {
   loading.value = true;
-  const fileUp = files.value[0];
+  // const fileUp = files.value[0];
   const body = new FormData();
   body.append("image", fileUp);
   body.append("type", "CATEGORY");
@@ -287,10 +293,10 @@ const editProduct = (editProduct) => {
   console.log(product.value.status);
   product.value.status = product.value.status.toUpperCase();
   productDialog.value = true;
-  files.value = null;
-  if (product.value.media) {
-    fileData.value = product.value.media.url;
-  }
+  // files.value = null;
+  // if (product.value.media) {
+  //   fileData.value = product.value.media.url;
+  // }
 };
 
 const confirmDeleteProduct = (editProduct) => {
@@ -766,140 +772,7 @@ const onUpload = () => {
           </template>
         </Dialog>
 
-        <Dialog
-          v-model:visible="mediaModal"
-          :style="{ width: '60vw' }"
-          header="Insert Media "
-          :modal="true"
-        >
-          <TabView>
-            <TabPanel header="Upload Files">
-              <div class="field">
-                <FileUpload
-                  ref="fileInput"
-                  mode="basic"
-                  name="demo[]"
-                  url="/api/upload"
-                  accept="image/*"
-                  customUpload
-                  @select="onPhotoSelect($event)"
-                />
-
-                <span class="p-invalid" v-if="imageError">{{
-                  imageError
-                }}</span>
-                <br />
-                <img
-                  v-if="files"
-                  :src="files[0].objectURL"
-                  :alt="files[0].objectURL"
-                  class="shadow-2"
-                  width="200"
-                />
-                <img
-                  v-else-if="fileData"
-                  :src="fileData"
-                  :alt="fileData"
-                  class="shadow-2"
-                  width="200"
-                />
-              </div>
-            </TabPanel>
-
-            <TabPanel header="Media Library">
-              <div class="grid">
-                <div class="col-12">
-                  <div class="formgroup-inline d-flex justify-content-end">
-                    <div class="field">
-                      <label for="lastname1" class="p-sr-only">Search</label>
-                      <InputText
-                        id="lastname1"
-                        type="text"
-                        placeholder="Search"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div class="col-12">
-                  <div class="card">
-                    <Button
-                      label="Image"
-                      icon="pi pi-folder"
-                      class="p-button p-component p-button-secondary mr-2 mb-2"
-                      style="
-                        min-height: 60px;
-                        background-color: rgb(233, 233, 233);
-                        border: 0;
-                        color: #5e5e5e;
-                      "
-                    />
-                    <Button
-                      label="Image"
-                      icon="pi pi-folder"
-                      class="p-button p-component p-button-secondary mr-2 mb-2"
-                      style="
-                        min-height: 60px;
-                        background-color: rgb(233, 233, 233);
-                        border: 0;
-                        color: #5e5e5e;
-                      "
-                    />
-                    <Button
-                      label="Image"
-                      icon="pi pi-folder"
-                      class="p-button p-component p-button-secondary mr-2 mb-2"
-                      style="
-                        min-height: 60px;
-                        background-color: rgb(233, 233, 233);
-                        border: 0;
-                        color: #5e5e5e;
-                      "
-                    />
-                    <Button
-                      label="Image"
-                      icon="pi pi-folder"
-                      class="p-button p-component p-button-secondary mr-2 mb-2"
-                      style="
-                        min-height: 60px;
-                        background-color: rgb(233, 233, 233);
-                        border: 0;
-                        color: #5e5e5e;
-                      "
-                    />
-                    <Button
-                      label="Image"
-                      icon="pi pi-folder"
-                      class="p-button p-component p-button-secondary mr-2 mb-2"
-                      style="
-                        min-height: 60px;
-                        background-color: rgb(233, 233, 233);
-                        border: 0;
-                        color: #5e5e5e;
-                      "
-                    />
-                    <Button
-                      label="Image"
-                      icon="pi pi-folder"
-                      class="p-button p-component p-button-secondary mr-2 mb-2"
-                      style="
-                        min-height: 60px;
-                        background-color: rgb(233, 233, 233);
-                        border: 0;
-                        color: #5e5e5e;
-                      "
-                    />
-                  </div>
-                </div>
-              </div>
-            </TabPanel>
-          </TabView>
-          <template #footer>
-            <Button
-              label="Insert into post"
-              class="p-button p-component p-button-primary mr-2 mb-2"
-            />
-          </template>
-        </Dialog>
+        <CommonInsertMedia :mediaModal="mediaModal" @close="closeMedia" />
       </div>
     </div>
     <div class="col-12">
@@ -912,4 +785,13 @@ const onUpload = () => {
 
 <style scoped lang="scss">
 @import "@/assets/demo/styles/badges.scss";
+</style>
+
+<style lang="scss">
+.media-file-folders {
+  .p-listbox-list-wrapper {
+    max-height: 150px;
+    overflow-y: auto;
+  }
+}
 </style>
