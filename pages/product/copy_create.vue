@@ -359,7 +359,6 @@ export default defineComponent({
               id="name"
               v-model.trim="product.name"
               required="true"
-              autofocus
               :class="{ 'p-invalid': submitted && !product.name }"
           />
           <small v-if="submitted && !product.name" class="p-invalid">Name is required.</small>

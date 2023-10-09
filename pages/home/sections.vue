@@ -3,17 +3,17 @@
     <div class="col-12">
       <div class="card">
         <DataTable
-            :value="home_sections"
-            data-key="id"
-            index="id"
-            tableStyle="min-width: 50rem"
+          :value="home_sections"
+          data-key="id"
+          index="id"
+          tableStyle="min-width: 50rem"
         >
           <template #paginatorstart>
             <Button
-                type="button"
-                icon="pi pi-refresh"
-                text
-                @click="fetchHomeSections"
+              type="button"
+              icon="pi pi-refresh"
+              text
+              @click="fetchHomeSections"
             />
           </template>
           <template #paginatorend>
@@ -21,19 +21,27 @@
           </template>
 
           <template #header>
-            <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+            <div
+              class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
+            >
               <h3 class="m-0">Home Sections</h3>
-              <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3">
+              <div
+                class="flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3"
+              >
                 <span class="block mt-2 md:mt-0 p-input-icon-left">
                   <i class="pi pi-search" />
                   <InputText v-model="search" placeholder="Search..." />
                 </span>
                 <NuxtLink
-                    type="button"
-                    icon="pi pi-plus"
-                    class="p-button p-component p-button-primary mr-2"
-                    :to="{ path: '/home/section/create' }">
-                  <span class="p-button-icon p-button-icon-left pi pi-plus" data-pc-section="icon"></span>
+                  type="button"
+                  icon="pi pi-plus"
+                  class="p-button p-component p-button-primary mr-2"
+                  :to="{ path: '/home/section/create' }"
+                >
+                  <span
+                    class="p-button-icon p-button-icon-left pi pi-plus"
+                    data-pc-section="icon"
+                  ></span>
                   Add Home Section
                 </NuxtLink>
               </div>
@@ -42,10 +50,18 @@
 
           <Column field="id" header="ID" style="width: 5%"></Column>
           <Column field="name" header="Name" style="width: 10%"></Column>
-          <Column field="section_title" header="Section Title" style="width: 15%"></Column>
+          <Column
+            field="section_title"
+            header="Section Title"
+            style="width: 15%"
+          ></Column>
           <Column field="category" header="Category" style="width: 15%">
             <template #body="slotProps">
-              <span v-for="(category, index) in slotProps.data.home_section_categories" :key="index">
+              <span
+                v-for="(category, index) in slotProps.data
+                  .home_section_categories"
+                :key="index"
+              >
                 <Badge :value="category.name"></Badge>
               </span>
             </template>
@@ -54,64 +70,79 @@
           <Column field="status" header="Status" style="width: 10%">
             <template #body="slotProps">
               <div class="flex d-flex">
-                <div style="margin-right: 4px !important; margin-top: 3px !important;">
+                <div
+                  style="
+                    margin-right: 4px !important;
+                    margin-top: 3px !important;
+                  "
+                >
                   <span v-if="slotProps.data.status == 'enable'">Enable</span>
                   <span v-if="slotProps.data.status == 'disable'">Disable</span>
                 </div>
                 <label class="switch">
-                  <input type="checkbox"
-                         :checked="slotProps.data.status == 'enable'"
-                         :id="'checkbox_' + slotProps.data.id"
-                         :name="'checkbox_' + slotProps.data.id"
-                         @change="updateStatus(slotProps.data)"
-                  >
+                  <input
+                    type="checkbox"
+                    :checked="slotProps.data.status == 'enable'"
+                    :id="'checkbox_' + slotProps.data.id"
+                    :name="'checkbox_' + slotProps.data.id"
+                    @change="updateStatus(slotProps.data)"
+                  />
                   <span class="slider round"></span>
                 </label>
-
               </div>
             </template>
           </Column>
           <Column :exportable="false" style="min-width: 8rem">
             <template #body="slotProps">
               <NuxtLink
-                  type="button"
-                  icon="pi pi-plus"
-                  class="p-button p-component p-button-icon-only p-button-primary p-button-rounded p-button-outlined mr-2"
-                  :to="{ path: '/home/section/update/' + slotProps.data.id }"
+                type="button"
+                icon="pi pi-plus"
+                class="p-button p-component p-button-icon-only p-button-primary p-button-rounded p-button-outlined mr-2"
+                :to="{ path: '/home/section/update/' + slotProps.data.id }"
               >
-                <span class="p-button-icon p-button-icon-left pi pi-pencil" data-pc-section="icon"></span>
+                <span
+                  class="p-button-icon p-button-icon-left pi pi-pencil"
+                  data-pc-section="icon"
+                ></span>
               </NuxtLink>
               <Button
-                  icon="pi pi-trash"
-                  outlined
-                  rounded
-                  severity="danger"
-                  @click="showDeleteDialog(slotProps.data)"
+                icon="pi pi-trash"
+                outlined
+                rounded
+                severity="danger"
+                @click="showDeleteDialog(slotProps.data)"
               />
             </template>
           </Column>
         </DataTable>
         <Dialog
-            v-model:visible="deleteHomeSectionDialog"
-            :style="{ width: '450px' }"
-            header="Confirm"
-            :modal="true">
+          v-model:visible="deleteHomeSectionDialog"
+          :style="{ width: '450px' }"
+          header="Confirm"
+          :modal="true"
+        >
           <div class="flex align-items-center justify-content-center">
-            <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"/>
-            <span v-if="home_section">Are you sure you want to delete <b>{{ home_section.name }}</b>?</span>
+            <i
+              class="pi pi-exclamation-triangle mr-3"
+              style="font-size: 2rem"
+            />
+            <span v-if="home_section"
+              >Are you sure you want to delete <b>{{ home_section.name }}</b
+              >?</span
+            >
           </div>
           <template #footer>
             <Button
-                label="No"
-                icon="pi pi-times"
-                class="p-button-text"
-                @click="deleteHomeSectionDialog = false"
+              label="No"
+              icon="pi pi-times"
+              class="p-button-text"
+              @click="deleteHomeSectionDialog = false"
             />
             <Button
-                label="Yes"
-                icon="pi pi-check"
-                class="p-button-text"
-                @click="deleteHomeSection"
+              label="Yes"
+              icon="pi pi-check"
+              class="p-button-text"
+              @click="deleteHomeSection"
             />
           </template>
         </Dialog>
@@ -121,14 +152,13 @@
 </template>
 
 <script setup>
-import {ref, onMounted, nextTick} from "vue";
+import { ref, onMounted, nextTick } from "vue";
 import { useRolesStore } from "@/stores/useRolesStore";
 import { useApiFetch } from "@/composables/useApiFetch";
 import { useToast } from "primevue/usetoast";
-import {useHomeSectionStore} from "~/stores/useHomeSectionStore";
-import '@/assets/custom.css';
+import { useHomeSectionStore } from "@/stores/useHomeSectionStore";
 
-const { $swal } = useNuxtApp()
+const { $swal } = useNuxtApp();
 const toast = useToast();
 const HomeSectionStore = useHomeSectionStore();
 const search = ref(null);
@@ -141,7 +171,6 @@ const home_sections = ref([]);
 const errorMessage = ref("");
 
 const checked = ref(false);
-
 
 const fetchHomeSections = async () => {
   await HomeSectionStore.getHomeSections();
@@ -175,37 +204,37 @@ const deleteHomeSection = async () => {
       detail: data.value.message,
       life: 3000,
     });
-    deleteHomeSectionDialog.value = false
-    await fetchHomeSections()
+    deleteHomeSectionDialog.value = false;
+    await fetchHomeSections();
   }
 };
 
 const updateStatus = (home_section) => {
-  $swal.fire({
-    title: "Confirm",
-    text: `Are you sure to update "${home_section.name}" status?`,
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#F85606',
-    cancelButtonColor: '#525252',
-    confirmButtonText: 'Yes, Changed it!',
-    cancelButtonText: 'No, cancel!',
-    buttonsStyling: true
-  }).then(async function (isConfirm) {
-    if (isConfirm.value === true) {
-      await useApiFetch("/api/home-section/status" , {
-        method: "POST",
-        body: {
-          id: home_section.id,
-          status: home_section.status.toUpperCase(),
-        },
-      });
-      await fetchHomeSections()
-    } else  {
-      location.reload();
-    }
-  });
-}
-
+  $swal
+    .fire({
+      title: "Confirm",
+      text: `Are you sure to update "${home_section.name}" status?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#F85606",
+      cancelButtonColor: "#525252",
+      confirmButtonText: "Yes, Changed it!",
+      cancelButtonText: "No, cancel!",
+      buttonsStyling: true,
+    })
+    .then(async function (isConfirm) {
+      if (isConfirm.value === true) {
+        await useApiFetch("/api/home-section/status", {
+          method: "POST",
+          body: {
+            id: home_section.id,
+            status: home_section.status.toUpperCase(),
+          },
+        });
+        await fetchHomeSections();
+      } else {
+        location.reload();
+      }
+    });
+};
 </script>
-

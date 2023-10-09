@@ -208,7 +208,7 @@ const onUpload = () => {
               <Accordion :activeIndex="0">
                 <AccordionTab header="Filters">
                   <div
-                    class="flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3"
+                    class="flex flex-column md:flex-row md:justify-content-left md:align-items-center gap-3"
                   >
                     <div class="flex gap-2 md:align-items-center">
                       <Dropdown
@@ -360,14 +360,14 @@ const onUpload = () => {
             </div>
           </template>
 
-          <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
+          <Column selectionMode="multiple"></Column>
           <Column field="name" header="Name" :sortable="true">
             <template #body="slotProps">
               <span class="p-column-title">Name</span>
               {{ slotProps.data.name }}
             </template>
           </Column>
-          <Column header="Image" headerStyle="width:14%; min-width:10rem;">
+          <Column header="Image">
             <template #body="slotProps">
               <span class="p-column-title">Image</span>
               <img
@@ -422,9 +422,9 @@ const onUpload = () => {
               >
             </template>
           </Column>
-          <Column field="updated_at" header="Updated_at" :sortable="true">
+          <Column field="updated_at" header="Updated" :sortable="true">
             <template #body="slotProps">
-              <span class="p-column-title">Updated_at</span>
+              <span class="p-column-title">Updated</span>
               {{ slotProps.data.updated_at }}
             </template>
           </Column>
@@ -433,8 +433,8 @@ const onUpload = () => {
               <NuxtLink :to="{ path: '/product/child' }" class="mr-4">
                 <Button
                   severity="default"
-                  label="View Child"
-                  class="p-button-info p-button-text"
+                  label="View Colors"
+                  class="p-button p-component p-button-outlined"
                 />
               </NuxtLink>
               <span class="p-buttonset">

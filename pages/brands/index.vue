@@ -2,10 +2,10 @@
 import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
-import { onMounted, ref , nextTick,watch, computed} from "vue";
-import {Field, Form, useField, useForm} from 'vee-validate';
+import { onMounted, ref, nextTick, watch, computed } from "vue";
+import { Field, Form, useField, useForm } from "vee-validate";
 import * as Yup from "yup";
-const {handleSubmit, resetForm} = useForm();
+const { handleSubmit, resetForm } = useForm();
 const fetching = ref(false);
 const spinner = ref(false);
 const loading = ref(false);
@@ -19,8 +19,8 @@ const { $dateFilter } = useNuxtApp();
 const products = ref(null);
 const search = ref(null);
 const brands = ref([]);
-const rowsPerPage = ref(0)
-const totalRecords = ref(0)
+const rowsPerPage = ref(0);
+const totalRecords = ref(0);
 const productDialog = ref(false);
 const deleteProductDialog = ref(false);
 const deleteProductsDialog = ref(false);
@@ -35,28 +35,31 @@ const statuses = ref([
   { label: "Enable", value: "ENABLE" },
   { label: "Disable", value: "DISABLE" },
 ]);
-// wathcer 
+// wathcer
 watch(search, (newValue, oldValue) => {
   initialize();
 });
 // Computed
 const searchTerm = computed(() => {
-  return search.value ? '&name=' + search.value : ''
-})
+  return search.value ? "&name=" + search.value : "";
+});
 onMounted(async () => {
   await nextTick();
   await initialize();
 });
 const initialize = async (event) => {
-  spinner.value = true
-  let page = 1
-  if (event?.first){
+  spinner.value = true;
+  let page = 1;
+  if (event?.first) {
     page = event.first / event.rows + 1;
   }
-  const { data, error } = await useApiFetch("/api/brands/?page=" + page + searchTerm.value, {
-    method: "GET",
-  });
-  spinner.value = false
+  const { data, error } = await useApiFetch(
+    "/api/brands/?page=" + page + searchTerm.value,
+    {
+      method: "GET",
+    }
+  );
+  spinner.value = false;
   if (error.value) {
     toast.add({
       severity: "error",
@@ -66,10 +69,10 @@ const initialize = async (event) => {
     });
   }
   if (data.value) {
-    fetching.value = true
+    fetching.value = true;
     brands.value = data.value.brands.data;
-    rowsPerPage.value = data.value.brands.per_page
-    totalRecords.value = data.value.brands.total
+    rowsPerPage.value = data.value.brands.per_page;
+    totalRecords.value = data.value.brands.total;
     //   totalData.value  = data.value.roles.total
   }
 };
@@ -92,13 +95,13 @@ const hideDialog = () => {
 const saveProduct = async () => {
   submitted.value = true;
   console.log(product.value);
-  loading.value = true
+  loading.value = true;
   if (product.value.name && product.value.name.trim()) {
     product.value.status = product.value.status.value
       ? product.value.status.value
       : product.value.status;
     if (product.value.id) {
-      product.value.status = product.value.status.toUpperCase()
+      product.value.status = product.value.status.toUpperCase();
       const { data, error } = await useApiFetch(
         "/api/brands/" + product.value.id,
         {
@@ -164,7 +167,7 @@ const saveProduct = async () => {
       //     life: 3000
       // });
     }
-    loading.value = false
+    loading.value = false;
     productDialog.value = false;
     product.value = {};
   }
@@ -172,7 +175,7 @@ const saveProduct = async () => {
 
 const editProduct = (editProduct) => {
   product.value = { ...editProduct };
-  product.value.status = product.value.status.toUpperCase()
+  product.value.status = product.value.status.toUpperCase();
   console.log(product);
   productDialog.value = true;
 };
@@ -303,10 +306,7 @@ const deleteSelectedProducts = () => {
               >
                 <span class="block mt-2 md:mt-0 p-input-icon-left">
                   <i class="pi pi-search" />
-                  <InputText
-                    v-model="search"
-                    placeholder="Search..."
-                  />
+                  <InputText v-model="search" placeholder="Search..." />
                 </span>
                 <Button
                   label="New"
@@ -348,7 +348,7 @@ const deleteSelectedProducts = () => {
           <Column field="created_at" header="Created at" :sortable="true">
             <template #body="slotProps">
               <span class="p-column-title">Created at</span>
-              {{  $dateFilter(slotProps.data.created_at)  }}
+              {{ $dateFilter(slotProps.data.created_at) }}
             </template>
           </Column>
           <Column class="text-right">
@@ -375,46 +375,68 @@ const deleteSelectedProducts = () => {
           :modal="true"
           class="p-fluid"
         >
-        <Form id="add_brands_form" @submit="saveProduct" :validation-schema="schema" v-slot="{ errors }">
-          <div class="field">
-            <Field v-model="product.name" :disabled="loading" id="name" name="name" :class="{ 'p-invalid': errors.name }" class="p-inputtext p-component" aria-describedby="category-name-error" placeholder="Category name"/>
-            <small class="p-error" id="brnad-name-error">{{ errors.name || '&nbsp;' }}</small>
-          </div>
-
-          <div class="field">
-            <label for="description">Description</label>
-            <Textarea
-              :disabled="loading"
-              id="description"
-              v-model="product.description"
-              required="true"
-              rows="3"
-              cols="20"
-            />
-          </div>
-
-          <div class="field">
-            <label for="status" class="mb-3">Status</label>
-            <Field name="status" v-slot="{ field }">
-              <Dropdown
+          <Form
+            id="add_brands_form"
+            @submit="saveProduct"
+            :validation-schema="schema"
+            v-slot="{ errors }"
+          >
+            <div class="field">
+              <Field
+                v-model="product.name"
                 :disabled="loading"
-                v-bind="field"
-                v-model="product.status"
-                :options="statuses"
-                optionLabel="label"
-                optionValue="value"
-                placeholder="Select a status"
-                display="chip"
-                :class="{ 'p-invalid': errors.status }"
-                aria-describedby="brand-code-status-error"
-              ></Dropdown>
-            </Field>
-            <small class="p-error" id="brand-code-status-error">{{
-              errors.status || "&nbsp;"
-            }}</small>
-          </div>
-          <Button :loading="loading" class="" type="submit" label="Submit"  icon="pi pi-check"/>
-        </Form>
+                id="name"
+                name="name"
+                :class="{ 'p-invalid': errors.name }"
+                class="p-inputtext p-component"
+                aria-describedby="category-name-error"
+                placeholder="Category name"
+              />
+              <small class="p-error" id="brnad-name-error">{{
+                errors.name || "&nbsp;"
+              }}</small>
+            </div>
+
+            <div class="field">
+              <label for="description">Description</label>
+              <Textarea
+                :disabled="loading"
+                id="description"
+                v-model="product.description"
+                required="true"
+                rows="3"
+                cols="20"
+              />
+            </div>
+
+            <div class="field">
+              <label for="status" class="mb-3">Status</label>
+              <Field name="status" v-slot="{ field }">
+                <Dropdown
+                  :disabled="loading"
+                  v-bind="field"
+                  v-model="product.status"
+                  :options="statuses"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select a status"
+                  display="chip"
+                  :class="{ 'p-invalid': errors.status }"
+                  aria-describedby="brand-code-status-error"
+                ></Dropdown>
+              </Field>
+              <small class="p-error" id="brand-code-status-error">{{
+                errors.status || "&nbsp;"
+              }}</small>
+            </div>
+            <Button
+              :loading="loading"
+              class=""
+              type="submit"
+              label="Submit"
+              icon="pi pi-check"
+            />
+          </Form>
           <!-- <template #footer>
             <Button
               label="Cancel"
@@ -466,7 +488,7 @@ const deleteSelectedProducts = () => {
     </div>
     <div class="col-12">
       <div class="flex justify-content-center">
-        <ProgressSpinner v-if="spinner"/>
+        <ProgressSpinner v-if="spinner" />
       </div>
     </div>
   </div>

@@ -78,12 +78,12 @@ const statusTerm = computed(() => {
 });
 const categorytypeTerm = computed(() => {
   // console.log(type.value);
-  if (type.value){
-    return  '?type=' + type.value
-  }else{
-    return ''
+  if (type.value) {
+    return "?type=" + type.value;
+  } else {
+    return "";
   }
-})
+});
 onMounted(async () => {
   await nextTick();
   await initialize();
@@ -96,7 +96,7 @@ const initialize = async (event) => {
     page = event.first / event.rows + 1;
   }
   const { data, error } = await useApiFetch(
-    "/api/sub-categories/?page=" + page + searchTerm.value + statusTerm.value ,
+    "/api/sub-categories/?page=" + page + searchTerm.value + statusTerm.value,
     {
       method: "GET",
     }
@@ -122,9 +122,12 @@ const initialize = async (event) => {
   }
 };
 const categoryData = async () => {
-  const { data, error } = await useApiFetch("/api/categories/" + categorytypeTerm.value, {
-    method: "GET",
-  });
+  const { data, error } = await useApiFetch(
+    "/api/categories/" + categorytypeTerm.value,
+    {
+      method: "GET",
+    }
+  );
   if (error.value) {
     toast.add({
       severity: "error",
@@ -147,6 +150,7 @@ const openNew = () => {
   product.value.status = "ENABLE";
   submitted.value = false;
   productDialog.value = true;
+  product.value.order = totalRecords.value + 1;
 };
 
 const hideDialog = () => {
@@ -155,7 +159,7 @@ const hideDialog = () => {
 };
 
 const saveProduct = async () => {
-  loading.value = true
+  loading.value = true;
   if (product.value.image_id == null && product.value.image_id == undefined) {
     if (files.value) {
       await uploadHandler();
@@ -232,13 +236,13 @@ const saveProduct = async () => {
       }
       await initialize();
     }
-    loading.value = false
+    loading.value = false;
     productDialog.value = false;
     product.value = {};
   }
 };
 const uploadHandler = async () => {
-  loading.value = true
+  loading.value = true;
   console.log(files.value);
   // uploading.value = true;
   const fileUp = files.value[0];
@@ -555,7 +559,7 @@ const onUpload = () => {
           <Column field="created_at" header="Created at" :sortable="true">
             <template #body="slotProps">
               <span class="p-column-title">Created at</span>
-              {{  $dateFilter(slotProps.data.created_at)  }}
+              {{ $dateFilter(slotProps.data.created_at) }}
             </template>
           </Column>
           <Column class="text-right">
@@ -726,7 +730,13 @@ const onUpload = () => {
                 errors.status || "&nbsp;"
               }}</small>
             </div>
-            <Button class="" :loading="loading" type="submit" label="Submit" icon="pi pi-check" />
+            <Button
+              class=""
+              :loading="loading"
+              type="submit"
+              label="Submit"
+              icon="pi pi-check"
+            />
           </Form>
         </Dialog>
 
