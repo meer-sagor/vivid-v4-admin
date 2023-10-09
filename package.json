@@ -37,6 +37,7 @@
     "@vee-validate/rules": "^4.8.2",
     "@vueup/vue-quill": "^1.2.0",
     "chart.js": "^4.3.3",
+    "laravel-file-manager": "^3.0.3",
     "moment": "^2.29.4",
     "nuxt-sweetalert2": "^1.0.0",
     "pinia": "^2.1.6",

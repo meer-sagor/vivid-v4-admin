@@ -39,7 +39,7 @@
               <span v-if="slotProps.data.status == 'disable'">Disable</span>
             </template>
           </Column>
-          <Column :exportable="false" style="min-width: 8rem">
+          <Column :exportable="false" header="Actions" style="min-width: 8rem">
             <template #body="slotProps">
               <NuxtLink
                   type="button"
