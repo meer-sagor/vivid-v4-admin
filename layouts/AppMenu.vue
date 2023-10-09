@@ -37,6 +37,21 @@ const model = ref([
     ],
   },
   {
+    label: "Page Management",
+    items: [
+      {
+        label: "FAQs",
+        icon: "pi pi-fw pi-id-card",
+        to: "/pages/faqs",
+      },
+      {
+        label: "Banners",
+        icon: "pi pi-fw pi-id-card",
+        to: "/pages/banners",
+      },
+    ],
+  },
+  {
     label: "Products Section",
     items: [
       {
@@ -45,14 +60,30 @@ const model = ref([
         to: "/product",
       },
       {
-        label: "Categories",
+        label: "All Categories",
         icon: "pi pi-fw pi-id-card",
-        to: "/categories",
-      },
-      {
-        label: "Subcategories",
-        icon: "pi pi-fw pi-id-card",
-        to: "/subcategories",
+        items: [
+          {
+            label: "Product Categories",
+            icon: "pi pi-fw pi-id-card",
+            to: "/categories",
+          },
+          {
+            label: "Product Subcategories",
+            icon: "pi pi-fw pi-id-card",
+            to: "/subcategories",
+          },
+          {
+            label: "Price Category",
+            icon: "pi pi-fw pi-id-card",
+            to: "/price-categories",
+          },
+          {
+            label: "Size Category",
+            icon: "pi pi-fw pi-id-card",
+            to: "/sizescategories",
+          },
+        ],
       },
       {
         label: "Brands",
@@ -75,11 +106,6 @@ const model = ref([
         to: "/colors",
       },
       {
-        label: "Size Category",
-        icon: "pi pi-fw pi-id-card",
-        to: "/sizescategories",
-      },
-      {
         label: "Sizes",
         icon: "pi pi-fw pi-id-card",
         to: "/sizes",
@@ -88,16 +114,6 @@ const model = ref([
         label: "Tags",
         icon: "pi pi-fw pi-id-card",
         to: "/tags",
-      },
-      {
-        label: "Price Category",
-        icon: "pi pi-fw pi-id-card",
-        to: "/price-categories",
-      },
-      {
-        label: "Clipart",
-        icon: "pi pi-fw pi-id-card",
-        to: "/cliparts",
       },
       // {
       //   label: "Sides",
@@ -126,6 +142,12 @@ const model = ref([
       //   url: "https://www.primefaces.org/primeblocks-vue",
       //   target: "_blank",
       // },
+
+      {
+        label: "Clipart",
+        icon: "pi pi-fw pi-id-card",
+        to: "/cliparts",
+      },
       {
         label: "Font Categories",
         icon: "pi pi-fw pi-globe",
