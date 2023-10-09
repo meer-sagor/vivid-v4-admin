@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@pinia/nuxt": "^0.4.11",
+    "@syncfusion/ej2-vue-filemanager": "^23.1.39",
     "@tiptap/extension-highlight": "^2.1.11",
     "@tiptap/extension-text-align": "^2.1.11",
     "@tiptap/starter-kit": "^2.1.11",
@@ -44,6 +45,7 @@
     "primeicons": "^6.0.1",
     "primevue": "^3.32.0",
     "vee-validate": "^4.8.2",
+    "vuefinder": "^1.2.5",
     "yup": "^1.2.0"
   }
 }
