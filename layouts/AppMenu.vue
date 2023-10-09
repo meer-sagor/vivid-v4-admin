@@ -75,6 +75,11 @@ const model = ref([
         to: "/colors",
       },
       {
+        label: "Size Category",
+        icon: "pi pi-fw pi-id-card",
+        to: "/sizescategories",
+      },
+      {
         label: "Sizes",
         icon: "pi pi-fw pi-id-card",
         to: "/sizes",
