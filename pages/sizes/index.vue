@@ -3,6 +3,7 @@ import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
 import { onMounted, ref, nextTick, watch, computed } from "vue";
+import {useApiFetch} from "~/composables/useApiFetch";
 //filters
 const { $dateFilter } = useNuxtApp();
 const fetching = ref(false);
@@ -24,10 +25,8 @@ const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 const submitted = ref(false);
-const statuses = ref([
-  { label: "Enable", value: "ENABLE" },
-  { label: "Disable", value: "DISABLE" },
-]);
+const statuses = ref([]);
+const size_categories = ref([]);
 // wathcer
 watch(search, (newValue, oldValue) => {
   initialize();
@@ -40,6 +39,8 @@ onMounted(async () => {
   // ProductService.getProducts().then((data) => (products.value = data));
   await nextTick();
   await initialize();
+  await fetchEnums();
+  await fetchSizeCategories();
 });
 const initialize = async (event) => {
   spinner.value = true;
@@ -69,6 +70,27 @@ const initialize = async (event) => {
     rowsPerPage.value = data.value.sizes.per_page;
     totalRecords.value = data.value.sizes.total;
     //   totalData.value  = data.value.roles.total
+  }
+};
+
+const fetchEnums = async () => {
+  const {data, error} = await useApiFetch("/api/getEnums", {
+    method: "GET",
+  });
+  if (data.value) {
+    const getEnums = JSON.parse(JSON.stringify(computed(() => data.value).value));
+    statuses.value = getEnums.statuses;
+  }
+};
+
+const fetchSizeCategories = async () => {
+  const {data, error} = await useApiFetch("/api/size/codes", {
+    method: "GET",
+  });
+  spinner.value = false;
+  if (data.value) {
+    const getSizeCategories = JSON.parse(JSON.stringify(computed(() => data.value).value));
+    size_categories.value = getSizeCategories.size_categories;
   }
 };
 const formatCurrency = (value) => {
@@ -314,6 +336,12 @@ const deleteSelectedProducts = () => {
               {{ slotProps.data.name }}
             </template>
           </Column>
+          <Column field="size_category" header="Size Category" :sortable="true">
+            <template #body="slotProps">
+              <span class="p-column-title">Name</span>
+              {{ slotProps.data.size_category?.category_name }}
+            </template>
+          </Column>
           <Column field="description" header="Width" :sortable="true">
             <template #body="slotProps">
               <span class="p-column-title">Width</span>
@@ -346,7 +374,7 @@ const deleteSelectedProducts = () => {
               {{ $dateFilter(slotProps.data.created_at) }}
             </template>
           </Column>
-          <Column class="text-right">
+          <Column field="actions" header="Actions" class="text-right">
             <template #body="slotProps">
               <Button
                 icon="pi pi-pencil"
@@ -386,7 +414,24 @@ const deleteSelectedProducts = () => {
               >order is required.</small
             >
           </div>
-
+          <div class="field">
+            <label for="size_category_id" class="mb-3">Size Category</label>
+            <Dropdown
+                :disabled="loading"
+                id="size_category_id"
+                v-model="product.size_category_id"
+                :options="size_categories"
+                optionLabel="category_name"
+                optionValue="id"
+                placeholder="Select a size category"
+                :class="{ 'p-invalid': submitted && !product.size_category_id }"
+                :required="true"
+            >
+            </Dropdown>
+            <small v-if="submitted && !product.size_category_id" class="p-invalid"
+            >Size category is required.</small
+            >
+          </div>
           <div class="field">
             <label for="name">Name</label>
             <InputText
@@ -432,36 +477,18 @@ const deleteSelectedProducts = () => {
           </div>
 
           <div class="field">
-            <label for="inventoryStatus" class="mb-3">Status</label>
+            <label for="status" class="mb-3">Status</label>
             <Dropdown
               :disabled="loading"
-              id="inventoryStatus"
+              id="status"
               v-model="product.status"
               :options="statuses"
-              optionLabel="label"
+              optionLabel="name"
+              optionValue="name"
               placeholder="Select a Status"
               :class="{ 'p-invalid': submitted && !product.status }"
               :required="true"
             >
-              <template #value="slotProps">
-                <div v-if="slotProps.value && slotProps.value.value">
-                  <span
-                    :class="'product-badge status-' + slotProps.value.value"
-                    >{{ slotProps.value.label }}</span
-                  >
-                </div>
-                <div v-else-if="slotProps.value && !slotProps.value.value">
-                  <span
-                    :class="
-                      'product-badge status-' + slotProps.value.toLowerCase()
-                    "
-                    >{{ slotProps.value }}</span
-                  >
-                </div>
-                <span v-else>
-                  {{ slotProps.placeholder }}
-                </span>
-              </template>
             </Dropdown>
             <small v-if="submitted && !product.status" class="p-invalid"
               >Status is required.</small
