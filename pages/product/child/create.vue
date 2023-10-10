@@ -19,18 +19,11 @@ const dropdownValues = ref([
   { name: "Paris", code: "PRS" },
 ]);
 
-const selectedCountry = ref();
-const countries = ref([
-  { name: "Australia", code: "AU" },
-  { name: "Brazil", code: "BR" },
-  { name: "China", code: "CN" },
-  { name: "Egypt", code: "EG" },
-  { name: "France", code: "FR" },
-  { name: "Germany", code: "DE" },
-  { name: "India", code: "IN" },
-  { name: "Japan", code: "JP" },
-  { name: "Spain", code: "ES" },
-  { name: "United States", code: "US" },
+const selectedColor = ref();
+const colors = ref([
+  { name: "Red", code: "red" },
+  { name: "Green", code: "green" },
+  { name: "Blue", code: "blue" },
 ]);
 
 const statusOptions = ref([
@@ -49,39 +42,39 @@ const multiselectValues = ref([
 </script>
 
 <template>
+  <div
+    class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
+  >
+    <NuxtLink to="/product">
+      <Button
+        icon="pi pi-angle-left"
+        label="Go Back"
+        class="p-button-text mr-2 mb-2"
+      />
+    </NuxtLink>
+  </div>
   <div class="card mb-4">
     <h5>Filters</h5>
     <div class="flex justify-content-between flex-column sm:flex-row gap-3">
       <Dropdown
         style="min-width: 250px"
-        v-model="selectedCountry"
-        :options="countries"
+        v-model="selectedColor"
+        :options="colors"
         optionLabel="name"
         placeholder="Color"
         class="w-full md:w-14rem"
       >
-        <template #value="slotProps">
-          <div v-if="slotProps.value" class="flex align-items-center">
-            <img
-              :alt="slotProps.value.label"
-              src="https://primefaces.org/cdn/primevue/images/flag/flag_placeholder.png"
-              :class="`mr-2 flag flag-${slotProps.value.code.toLowerCase()}`"
-              style="width: 18px"
-            />
-            <div>{{ slotProps.value.name }}</div>
-          </div>
-          <span v-else>
-            {{ slotProps.placeholder }}
-          </span>
-        </template>
         <template #option="slotProps">
           <div class="flex align-items-center">
-            <img
-              :alt="slotProps.option.label"
-              src="https://primefaces.org/cdn/primevue/images/flag/flag_placeholder.png"
-              :class="`mr-2 flag flag-${slotProps.option.code.toLowerCase()}`"
-              style="width: 18px"
-            />
+            <div
+              :style="{
+                'background-color': slotProps.option.code,
+                width: '20px',
+                height: '20px',
+                'border-radius': '50px',
+                'margin-right': '10px',
+              }"
+            ></div>
             <div>{{ slotProps.option.name }}</div>
           </div>
         </template>
@@ -243,15 +236,8 @@ const multiselectValues = ref([
 
     <div class="col-12">
       <div
-        class="card flex flex-column md:flex-row md:justify-content-between md:align-items-center"
+        class="card flex flex-column md:flex-row md:justify-content-end md:align-items-center"
       >
-        <div class="field">
-          <Button
-            style="min-width: 150px"
-            label="Cancel"
-            class="p-button-text"
-          />
-        </div>
         <div class="field">
           <Button type="submit" style="min-width: 150px" label="Save" />
         </div>

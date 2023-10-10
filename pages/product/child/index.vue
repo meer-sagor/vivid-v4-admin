@@ -277,27 +277,28 @@ const onUpload = () => {
               {{ slotProps.data.name }}
             </template>
           </Column>
-          <Column field="name" header="Quantity" :sortable="true">
+          <Column field="name" header="Min Quantity" :sortable="true">
             <template #body="slotProps">
-              <span class="p-column-title">Quantity</span>
+              <span class="p-column-title">Min Quantity</span>
               {{ slotProps.data.name }}
             </template>
           </Column>
-          <Column field="name" header="Sub Category">
-            <template #body="slotProps">
-              <span class="p-column-title">Sub Category</span>
-              {{ slotProps.data.name }}
+          <Column field="name" header="Color">
+            <template #body>
+              <span class="p-column-title">Color</span>
+              <div
+                style="
+                  background-color: rgb(177, 4, 4);
+                  width: 30px;
+                  height: 30px;
+                  border-radius: 50px;
+                "
+              ></div>
             </template>
           </Column>
-          <Column field="name" header="Brand">
+          <Column field="name" header="Fabric">
             <template #body="slotProps">
-              <span class="p-column-title">Brand</span>
-              {{ slotProps.data.name }}
-            </template>
-          </Column>
-          <Column field="name" header="Childs">
-            <template #body="slotProps">
-              <span class="p-column-title">Childs</span>
+              <span class="p-column-title">Fabric</span>
               {{ slotProps.data.name }}
             </template>
           </Column>
