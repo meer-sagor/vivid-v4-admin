@@ -271,33 +271,28 @@ const onUpload = () => {
               />
             </template>
           </Column>
-          <Column field="name" header="Style Numer">
+          <Column field="name" header="Min Quantity" :sortable="true">
             <template #body="slotProps">
-              <span class="p-column-title">Style Numer</span>
+              <span class="p-column-title">Min Quantity</span>
               {{ slotProps.data.name }}
             </template>
           </Column>
-          <Column field="name" header="Quantity" :sortable="true">
-            <template #body="slotProps">
-              <span class="p-column-title">Quantity</span>
-              {{ slotProps.data.name }}
+          <Column field="name" header="Color">
+            <template #body>
+              <span class="p-column-title">Color</span>
+              <div
+                style="
+                  background-color: rgb(177, 4, 4);
+                  width: 30px;
+                  height: 30px;
+                  border-radius: 50px;
+                "
+              ></div>
             </template>
           </Column>
-          <Column field="name" header="Sub Category">
+          <Column field="name" header="Fabric">
             <template #body="slotProps">
-              <span class="p-column-title">Sub Category</span>
-              {{ slotProps.data.name }}
-            </template>
-          </Column>
-          <Column field="name" header="Brand">
-            <template #body="slotProps">
-              <span class="p-column-title">Brand</span>
-              {{ slotProps.data.name }}
-            </template>
-          </Column>
-          <Column field="name" header="Childs">
-            <template #body="slotProps">
-              <span class="p-column-title">Childs</span>
+              <span class="p-column-title">Fabric</span>
               {{ slotProps.data.name }}
             </template>
           </Column>
@@ -323,9 +318,6 @@ const onUpload = () => {
           </Column>
           <Column class="text-right">
             <template #body="slotProps">
-              <!-- <NuxtLink :to="{ path: '/product/child' }" class="mr-4">
-                View Child
-              </NuxtLink> -->
               <span class="p-buttonset">
                 <Button
                   icon="pi pi-pencil"
@@ -340,37 +332,7 @@ const onUpload = () => {
                   @click="confirmDeleteProduct(slotProps.data)"
                 />
               </span>
-              <!-- <div class="formgrid grid">
-                <div class="field col">
-                  <div class="grid">
-                    <div class="col-4 ml-4">
-                      <Button
-                        icon="pi pi-pencil"
-                        class="p-button-text p-button-rounded mr-2"
-                        @click="editProduct(slotProps.data)"
-                      />
-                    </div>
-                    <div class="col-4">
-                      <Button
-                        icon="pi pi-trash"
-                        severity="danger"
-                        class="p-button-text p-button-rounded"
-                        @click="confirmDeleteProduct(slotProps.data)"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div class="field col">
-                  <div class="col-4">
-                    <Button
-                      severity="default"
-                      label="Child"
-                      class="p-button-rounded small"
-                      @click="confirmDeleteProduct(slotProps.data)"
-                    />
-                  </div>
-                </div>
-              </div> -->
+          
             </template>
           </Column>
         </DataTable>
