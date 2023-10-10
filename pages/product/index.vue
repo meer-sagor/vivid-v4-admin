@@ -428,13 +428,13 @@ const onUpload = () => {
               {{ slotProps.data.updated_at }}
             </template>
           </Column>
-          <Column class="text-right" style="min-width: 270px">
+          <Column class="text-center" style="min-width: 250px">
             <template #body="slotProps">
               <NuxtLink :to="{ path: '/product/child' }" class="mr-4">
                 <Button
-                  severity="default"
-                  label="View Colors"
-                  class="p-button p-component p-button-outlined"
+                  severity="info"
+                  label="Colors"
+                  class="p-button p-component p-button-text"
                 />
               </NuxtLink>
               <span class="p-buttonset">
@@ -451,37 +451,6 @@ const onUpload = () => {
                   @click="confirmDeleteProduct(slotProps.data)"
                 />
               </span>
-              <!-- <div class="formgrid grid">
-                <div class="field col">
-                  <div class="grid">
-                    <div class="col-4 ml-4">
-                      <Button
-                        icon="pi pi-pencil"
-                        class="p-button-text p-button-rounded mr-2"
-                        @click="editProduct(slotProps.data)"
-                      />
-                    </div>
-                    <div class="col-4">
-                      <Button
-                        icon="pi pi-trash"
-                        severity="danger"
-                        class="p-button-text p-button-rounded"
-                        @click="confirmDeleteProduct(slotProps.data)"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div class="field col">
-                  <div class="col-4">
-                    <Button
-                      severity="default"
-                      label="Child"
-                      class="p-button-rounded small"
-                      @click="confirmDeleteProduct(slotProps.data)"
-                    />
-                  </div>
-                </div>
-              </div> -->
             </template>
           </Column>
         </DataTable>

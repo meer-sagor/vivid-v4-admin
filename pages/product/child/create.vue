@@ -45,7 +45,7 @@ const multiselectValues = ref([
   <div
     class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
   >
-    <NuxtLink to="/product">
+    <NuxtLink to="/product/child">
       <Button
         icon="pi pi-angle-left"
         label="Go Back"
