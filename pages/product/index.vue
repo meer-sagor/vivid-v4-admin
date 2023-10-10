@@ -202,6 +202,11 @@ const onUpload = () => {
                       class="p-button-primary mr-2"
                     />
                   </NuxtLink>
+                  <Button
+                    label="Import"
+                    icon="pi pi-upload"
+                    class="p-button-success mr-2"
+                  />
                 </div>
               </div>
 
@@ -403,9 +408,15 @@ const onUpload = () => {
             </template>
           </Column>
           <Column field="name" header="Childs">
-            <template #body="slotProps">
+            <template #body>
               <span class="p-column-title">Childs</span>
-              {{ slotProps.data.name }}
+              <NuxtLink :to="{ path: '/product/child' }" class="mr-4">
+                <Button
+                  severity="info"
+                  :label="5"
+                  class="p-button p-component p-button-rounded"
+                />
+              </NuxtLink>
             </template>
           </Column>
           <Column field="inventoryStatus" header="Status" :sortable="true">
@@ -428,15 +439,8 @@ const onUpload = () => {
               {{ slotProps.data.updated_at }}
             </template>
           </Column>
-          <Column class="text-center" style="min-width: 250px">
+          <Column class="text-center" style="min-width: 150px">
             <template #body="slotProps">
-              <NuxtLink :to="{ path: '/product/child' }" class="mr-4">
-                <Button
-                  severity="info"
-                  label="Colors"
-                  class="p-button p-component p-button-text"
-                />
-              </NuxtLink>
               <span class="p-buttonset">
                 <Button
                   icon="pi pi-pencil"
