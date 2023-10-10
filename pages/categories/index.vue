@@ -62,6 +62,7 @@ const types = ref([
   { label: "Product", value: "product" },
   { label: "Product Design", value: "product_design" },
   { label: "Embroidery Design", value: "embroidery_design" },
+  { label: "Clipart", value: "clipart" },
 ]);
 // const onPhotoSelect = ($event) => {
 //   product.value.image_id == null;
