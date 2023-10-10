@@ -23,7 +23,7 @@
 
           <template #header>
             <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-              <h3 class="m-0">Font </h3>
+              <h3 class="m-0">Clipart </h3>
               <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3">
                 <span class="block mt-2 md:mt-0 p-input-icon-left">
                   <i class="pi pi-search" />
@@ -44,6 +44,11 @@
             </template>
           </Column>
           <Column field="name" header="Name" style="width: 15%"></Column>
+          <Column field="category_id" header="Category" style="width: 15%">
+            <template #body="slotProps">
+              {{ slotProps.data.category?.name }}
+            </template>
+          </Column>
           <Column :exportable="false" header="Actions"  style="width: 15%">
             <template #body="slotProps">
               <NuxtLink

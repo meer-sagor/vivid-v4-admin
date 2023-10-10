@@ -24,6 +24,27 @@
         <div class="flex flex-row gap-3">
           <div class="col-6 mb-0">
             <div class="flex flex-column gap-2 mb-0">
+              <label for="category_id">Category </label>
+              <Field name="category_id" v-slot="{ field }">
+                <Dropdown
+                    v-bind="field"
+                    v-model="clipart.category_id"
+                    :options="categories"
+                    optionLabel="name"
+                    optionValue="id"
+                    placeholder="Select a category"
+                    display="chip"
+                    :class="{ 'p-invalid': errors.category_id }"
+                    aria-describedby="clipart-category-id-error"
+                ></Dropdown>
+              </Field>
+              <small class="p-error" id="clipart-category-id-error">{{ errors.category_id || '&nbsp;' }}</small>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-row gap-3">
+          <div class="col-6 mb-0">
+            <div class="flex flex-column gap-2 mb-0">
               <label for="image">Image <span style="font-weight: 100;">*Previous file <a :href="clipart.media?.url" target="_blank">click here</a></span></label>
               <Field type="file" id="image" name="image" @change="handleImageSelected" class="form-control" :class="{ 'p-invalid': errors.image }" aria-describedby="clipart-image-error" placeholder="Select image"/>
               <small class="p-error" id="clipart-image-error">{{ errors.image || '&nbsp;' }}</small>
@@ -56,32 +77,46 @@ export default defineComponent({
     const loading = ref(false);
     const fetching = ref(false);
     const spinner = ref(false);
+    const categories = ref([]);
     let {imageFile, imageUrl, handleImageSelected} = useImageUpload();
     const route = useRoute();
     const router = useRouter();
 
     const clipart = ref({
       name: "",
+      category_id: "",
       image: "",
     });
 
     onMounted(async () => {
       await nextTick();
+      await fetchCategories();
       await fetchCliaprts();
     });
 
     const schema = Yup.object().shape({
       name: Yup.string().required().min(2).max(100).label("Name"),
+      category_id: Yup.mixed().required().typeError('Category is a required field').label("Category"),
     });
 
+    const fetchCategories = async () => {
+      spinner.value = true;
+      const {data, error} = await useApiFetch("/api/clipart/codes", {
+        method: "GET",
+      });
+      spinner.value = false;
+      if (data.value) {
+        fetching.value = true;
+        const getCategories = JSON.parse(JSON.stringify(computed(() => data.value).value));
+        categories.value = getCategories.categories;
+      }
+    };
+
     const fetchCliaprts = async () => {
-      spinner.value = true
       const {data, error} = await useApiFetch("/api/cliparts/" + route.params.id + '/edit', {
         method: "GET",
       });
-      spinner.value = false
       if (data.value) {
-        fetching.value = true
         const getClipart = JSON.parse(JSON.stringify(computed(() => data.value).value))
         clipart.value = getClipart.clipart;
       }
@@ -92,6 +127,7 @@ export default defineComponent({
 
       const formData = new FormData();
       formData.append("name",  clipart.value.name);
+      formData.append("category_id",  clipart.value.category_id);
       formData.append("image", imageFile.value);
 
       const {data, error} = await useApiFetch("/api/cliparts/update/"+ route.params.id, {
@@ -140,6 +176,7 @@ export default defineComponent({
       spinner,
       resetModal,
       handleImageSelected,
+      categories,
     };
   },
 });
