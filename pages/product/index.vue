@@ -202,6 +202,11 @@ const onUpload = () => {
                       class="p-button-primary mr-2"
                     />
                   </NuxtLink>
+                  <Button
+                    label="Import"
+                    icon="pi pi-upload"
+                    class="p-button-success mr-2"
+                  />
                 </div>
               </div>
 
