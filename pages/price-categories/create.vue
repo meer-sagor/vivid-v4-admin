@@ -35,10 +35,6 @@
                     :class="{ 'p-invalid': errors.size_id }"
                     aria-describedby="price-size-error"
                 ></Dropdown>
-
-                <option :value="''">Select a status</option>
-                <option value="1">Active</option>
-                <option value="0">Inactive</option>
               </Field>
               <small class="p-error" id="price-size-error">{{errors.size_id || "&nbsp;"}}</small>
             </div>
