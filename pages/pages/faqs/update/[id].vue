@@ -123,11 +123,7 @@ export default defineComponent({
     }
 
     const updateFaqQuestion = (data:any, frozen:any, index:any) => {
-      let faq_question = faq.value.faq_questions[index];
-      console.log(faq_question)
-      faq_question.value = {...faq_question}
-      console.log('faq_question: ', faq_question)
-      console.log('faq_question: ', data)
+      faq_question.value = {...data}
       createNewDialog.value = true
     }
 
@@ -204,7 +200,7 @@ export default defineComponent({
         <div class="grid">
           <div class="col-12">
             <div class="card p-fluid">
-              <h5>Create FAQ</h5>
+              <h5>Update FAQ</h5>
 
               <div class="grid">
                 <div class="col-4">
@@ -291,7 +287,6 @@ export default defineComponent({
                         <template #body="{ data, frozenRow, index }">
                             <span class="p-buttonset">
                               <Button
-                                  type="button"
                                   icon="pi pi-pencil"
                                   class="p-button-text  mr-2"
                                   @click="updateFaqQuestion(data, frozenRow, index)"
@@ -315,16 +310,9 @@ export default defineComponent({
           </div>
 
           <div class="col-12">
-            <div class="card p-fluid flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+            <div class="card p-fluid flex flex-column md:flex-row justify-content-end">
               <div class="field">
-                <Button
-                  style="min-width: 150px"
-                  label="Cancel"
-                  class="p-button-text"
-                />
-              </div>
-              <div class="field">
-                <Button type="submit" style="min-width: 150px" label="Save" />
+                <Button type="submit" style="min-width: 150px" label="Update" />
               </div>
             </div>
           </div>
@@ -339,7 +327,6 @@ export default defineComponent({
       :modal="true"
       class="p-fluid"
     >
-      {{ faq_question }}
       <Form
         id="add_faq_question_form"
         @submit="saveFaqQuestion"
@@ -363,12 +350,13 @@ export default defineComponent({
           <label for="answer">Answer</label>
           <ClientOnly>
             <QuillEditor
-              ref="editor"
-              v-model.content="faq_question.answer"
-              theme="snow"
-              content-type="html"
-              :style="{ height: '200px' }"
-              @update:content="handleAnswerChange"
+                :content="faq_question.answer"
+                ref="editor"
+                v-model.content="faq_question.answer"
+                theme="snow"
+                content-type="html"
+                :style="{ height: '200px' }"
+                @update:content="handleAnswerChange"
             />
           </ClientOnly>
         </div>

@@ -110,6 +110,11 @@ export default defineComponent({
       faq.value.faq_questions.splice(index, 1);
     }
 
+    const updateFaqQuestion = (data:any, frozen:any, index:any) => {
+      faq_question.value = {...data}
+      createNewDialog.value = true
+    }
+
     const fetchCodes = async () => {
       spinner.value = true;
       const { data, error } = await useApiFetch("/api/faq/codes", {
@@ -162,6 +167,7 @@ export default defineComponent({
       faqValidationSchema,
       faqQuestionValidationSchema,
       removeFaqQuestion,
+      updateFaqQuestion,
     };
   },
 });
@@ -271,7 +277,8 @@ export default defineComponent({
                             <span class="p-buttonset">
                               <Button
                                   icon="pi pi-pencil"
-                                  class="p-button-text p-button-rounded mr-2"/>
+                                  class="p-button-text p-button-rounded mr-2"
+                                  @click="updateFaqQuestion(data, frozenRow, index)"/>
 
                               <Button
                                   icon="pi pi-trash"
@@ -290,14 +297,7 @@ export default defineComponent({
           </div>
 
           <div class="col-12">
-            <div class="card p-fluid flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-              <div class="field">
-                <Button
-                  style="min-width: 150px"
-                  label="Cancel"
-                  class="p-button-text"
-                />
-              </div>
+            <div class="card p-fluid flex flex-column md:flex-row justify-content-end">
               <div class="field">
                 <Button type="submit" style="min-width: 150px" label="Save" />
               </div>
