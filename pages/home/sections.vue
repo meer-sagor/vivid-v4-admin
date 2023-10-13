@@ -2,6 +2,12 @@
   <div class="grid p-fluid">
     <div class="col-12">
       <div class="card">
+        <div class="flex justify-content-between g-2 mb-2">
+          <Skeleton class="col-lg-6"  height="2rem"></Skeleton>
+          <Skeleton class="col-lg-3" height="2rem"></Skeleton>
+          <Skeleton class="col-lg-3"  height="2rem"></Skeleton>
+        </div>
+        <Skeleton width="100%" height="150px"></Skeleton>
         <DataTable
           :value="home_sections"
           data-key="id"
