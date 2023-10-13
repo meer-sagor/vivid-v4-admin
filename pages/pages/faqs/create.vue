@@ -338,12 +338,13 @@ export default defineComponent({
           <label for="answer">Answer</label>
           <ClientOnly>
             <QuillEditor
-              ref="editor"
-              v-model.content="faq_question.answer"
-              theme="snow"
-              content-type="html"
-              :style="{ height: '200px' }"
-              @update:content="handleAnswerChange"
+                :content="faq_question.answer"
+                ref="editor"
+                v-model.content="faq_question.answer"
+                theme="snow"
+                content-type="html"
+                :style="{ height: '200px' }"
+                @update:content="handleAnswerChange"
             />
           </ClientOnly>
         </div>
