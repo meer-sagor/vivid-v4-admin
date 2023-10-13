@@ -4,7 +4,7 @@ import { defineComponent, nextTick, onMounted, ref } from "vue";
 import { ErrorMessage, Field, FieldArray, Form, useForm } from "vee-validate";
 import * as Yup from "yup";
 import { useApiFetch } from "~/composables/useApiFetch";
-import { useRouter } from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import add_faq_validation from "@/pages/pages/faqs/validation/add_faq_validation";
 import add_faq_question_validation from "@/pages/pages/faqs/validation/add_faq_question_validation";
 
@@ -21,12 +21,14 @@ export default defineComponent({
     const pages = ref([]);
     const faqValidationSchema = add_faq_validation;
     const faqQuestionValidationSchema = add_faq_question_validation;
+    const createNewDialog = ref(false);
+    const route = useRoute();
     const router = useRouter();
-
 
     onMounted(async () => {
       await nextTick();
       await fetchCodes();
+      await fetchFaqs();
     });
 
     const faq = ref({
@@ -46,12 +48,22 @@ export default defineComponent({
       faq_question.value.answer = value;
     };
 
+    const fetchFaqs = async () => {
+      const {data, error} = await useApiFetch("/api/faqs/" + route.params.id + '/edit', {
+        method: "GET",
+      });
+      if (data.value) {
+        const getFaqs = JSON.parse(JSON.stringify(computed(() => data.value).value))
+        faq.value = getFaqs.faq;
+      }
+    };
+
     // @ts-ignore
     const onSubmit = async (values, actions: { setErrors: (arg0: any) => void }) => {
       loading.value = true;
 
-      const { data, error } = await useApiFetch("/api/faqs", {
-        method: "POST",
+      const { data, error } = await useApiFetch("/api/faqs/" + route.params.id, {
+        method: "PUT",
         body: faq.value,
       });
       loading.value = false;
@@ -110,6 +122,15 @@ export default defineComponent({
       faq.value.faq_questions.splice(index, 1);
     }
 
+    const updateFaqQuestion = (data:any, frozen:any, index:any) => {
+      let faq_question = faq.value.faq_questions[index];
+      console.log(faq_question)
+      faq_question.value = {...faq_question}
+      console.log('faq_question: ', faq_question)
+      console.log('faq_question: ', data)
+      createNewDialog.value = true
+    }
+
     const fetchCodes = async () => {
       spinner.value = true;
       const { data, error } = await useApiFetch("/api/faq/codes", {
@@ -125,7 +146,6 @@ export default defineComponent({
         pages.value = getCodes.pages;
       }
     };
-    const createNewDialog = ref(false);
 
     const openNew = () => {
       createNewDialog.value = true;
@@ -162,6 +182,7 @@ export default defineComponent({
       faqValidationSchema,
       faqQuestionValidationSchema,
       removeFaqQuestion,
+      updateFaqQuestion,
     };
   },
 });
@@ -179,7 +200,7 @@ export default defineComponent({
       </NuxtLink>
     </div>
     <template v-if="fetching">
-      <Form id="add_product_form" @submit="onSubmit" :initial-values="faq" :validation-schema="faqValidationSchema" v-slot="{ values, errors }">
+      <Form id="add_fag_form" @submit="onSubmit" :initial-values="faq" :validation-schema="faqValidationSchema" v-slot="{ values, errors }">
         <div class="grid">
           <div class="col-12">
             <div class="card p-fluid">
@@ -270,10 +291,14 @@ export default defineComponent({
                         <template #body="{ data, frozenRow, index }">
                             <span class="p-buttonset">
                               <Button
+                                  type="button"
                                   icon="pi pi-pencil"
-                                  class="p-button-text p-button-rounded mr-2"/>
+                                  class="p-button-text  mr-2"
+                                  @click="updateFaqQuestion(data, frozenRow, index)"
+                              />
 
                               <Button
+                                  type="button"
                                   icon="pi pi-trash"
                                   severity="danger"
                                   class="p-button-text p-button-rounded"
@@ -310,10 +335,11 @@ export default defineComponent({
     <Dialog
       v-model:visible="createNewDialog"
       style="min-width: 600px"
-      header="Add question & answer"
+      header="Update question & answer"
       :modal="true"
       class="p-fluid"
     >
+      {{ faq_question }}
       <Form
         id="add_faq_question_form"
         @submit="saveFaqQuestion"
@@ -333,7 +359,6 @@ export default defineComponent({
           />
           <small class="p-error" id="faq-question-error">{{errors.question || "&nbsp;"}}</small>
         </div>
-
         <div class="field">
           <label for="answer">Answer</label>
           <ClientOnly>
@@ -367,7 +392,6 @@ export default defineComponent({
         </div>
 
         <Button
-          class=""
           type="submit"
           label="Submit"
           :loading="loading"
