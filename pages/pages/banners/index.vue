@@ -23,9 +23,9 @@ const totalRecords = ref(0)
 
 onMounted(async () => {
   await nextTick();
-  await fetchFaqs();
+  await fetchBanners();
 });
-const fetchFaqs = async (event) => {
+const fetchBanners = async (event) => {
   let page = 1
   if (event?.first){
     page = event.first / event.rows + 1;
@@ -40,26 +40,37 @@ const fetchFaqs = async (event) => {
   }
 };
 
-const editFaq = (id) => {
-  console.log(editFaq)
+const editBanner = (id) => {
   router.push({ path: "/pages/banners/update/" + id });
 };
 
-const confirmDeleteFaq = (editFaq) => {
-  banner.value = editFaq;
+const confirmDeleteBanner = (editBanner) => {
+  banner.value = editBanner;
   deleteBannerDialog.value = true;
 };
 
-const deleteBanner = () => {
-  banners.value = banners.value.filter((val) => val.id !== banner.value.id);
-  deleteBannerDialog.value = false;
-  banner.value = {};
-  toast.add({
-    severity: "success",
-    summary: "Successful",
-    detail: "Banner Deleted",
-    life: 3000,
+const deleteBanner = async (id) => {
+  const { data, error } = await useApiFetch("/api/banners/" + id, {
+    method: "DELETE",
   });
+  if (error.value) {
+    toast.add({
+      severity: "info",
+      summary: "Success",
+      detail: error.value.data.message,
+      life: 3000,
+    });
+  }
+  if (data.value) {
+    toast.add({
+      severity: "info",
+      summary: "Success",
+      detail: data.value.message,
+      life: 3000,
+    });
+    deleteBannerDialog.value = false
+    await fetchBanners()
+  }
 };
 </script>
 
@@ -147,14 +158,14 @@ const deleteBanner = () => {
                 <Button
                   icon="pi pi-pencil"
                   class="p-button-text p-button-rounded mr-2"
-                  @click="editFaq(slotProps.data.id)"
+                  @click="editBanner(slotProps.data.id)"
                 />
 
                 <Button
                   icon="pi pi-trash"
                   severity="danger"
                   class="p-button-text p-button-rounded"
-                  @click="confirmDeleteFaq(slotProps.data)"
+                  @click="confirmDeleteBanner(slotProps.data)"
                 />
               </span>
             </template>
@@ -185,7 +196,7 @@ const deleteBanner = () => {
               label="Yes"
               icon="pi pi-check"
               class="p-button-text"
-              @click="deleteBanner"
+              @click="deleteBanner(banner.id)"
             />
           </template>
         </Dialog>

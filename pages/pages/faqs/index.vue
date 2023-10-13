@@ -53,16 +53,28 @@ const confirmDeleteFaq = (editFaq) => {
   deleteFaqDialog.value = true;
 };
 
-const deleteProduct = () => {
-  faqs.value = faqs.value.filter((val) => val.id !== faq.value.id);
-  deleteFaqDialog.value = false;
-  faq.value = {};
-  toast.add({
-    severity: "success",
-    summary: "Successful",
-    detail: "Product Deleted",
-    life: 3000,
+const deleteBanner = async (id) => {
+  const { data, error } = await useApiFetch("/api/faqs/" + id, {
+    method: "DELETE",
   });
+  if (error.value) {
+    toast.add({
+      severity: "info",
+      summary: "Success",
+      detail: error.value.data.message,
+      life: 3000,
+    });
+  }
+  if (data.value) {
+    toast.add({
+      severity: "info",
+      summary: "Success",
+      detail: data.value.message,
+      life: 3000,
+    });
+    deleteFaqDialog.value = false
+    await fetchFaqs()
+  }
 };
 </script>
 
@@ -186,7 +198,7 @@ const deleteProduct = () => {
               label="Yes"
               icon="pi pi-check"
               class="p-button-text"
-              @click="deleteProduct"
+              @click="deleteBanner(faq.id)"
             />
           </template>
         </Dialog>
