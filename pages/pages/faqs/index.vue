@@ -43,8 +43,9 @@ const fetchFaqs = async (event) => {
   }
 };
 
-const editFaq = (editFaq) => {
-  router.push({ path: "/faq/create" });
+const editFaq = (id) => {
+  console.log(editFaq)
+  router.push({ path: "/pages/faqs/update/" + id });
 };
 
 const confirmDeleteFaq = (editFaq) => {
@@ -111,7 +112,7 @@ const deleteProduct = () => {
             </div>
           </template>
 
-          <Column selectionMode="multiple"></Column>
+          <Column selectionMode="multiple" style="width: 5%"></Column>
           <Column field="title" header="Title" :sortable="true" style="width: 15%">
             <template #body="slotProps">
               {{ slotProps.data.title }}
@@ -144,7 +145,7 @@ const deleteProduct = () => {
                 <Button
                   icon="pi pi-pencil"
                   class="p-button-text p-button-rounded mr-2"
-                  @click="editFaq(slotProps.data)"
+                  @click="editFaq(slotProps.data.id)"
                 />
 
                 <Button
