@@ -77,10 +77,7 @@ export default defineComponent({
     };
 
     // @ts-ignore
-    const onSubmit = async (
-      values,
-      actions: { setErrors: (arg0: any) => void }
-    ) => {
+    const onSubmit = async (values, actions: { setErrors: (arg0: any) => void }) => {
       if (
         product.value.description == null ||
         product.value.description == ""

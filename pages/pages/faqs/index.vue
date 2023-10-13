@@ -2,38 +2,60 @@
 import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
-import { onMounted, ref } from "vue";
+import {nextTick, onMounted, ref} from "vue";
 import { useRoute, useRouter } from "vue-router";
+import {useFaqsStore} from "~/stores/useFaqsStore";
+import {useApiFetch} from "~/composables/useApiFetch";
+const faqsStore = useFaqsStore();
 
 const router = useRouter();
 const toast = useToast();
 
-const products = ref(null);
-const deleteProductDialog = ref(false);
-const product = ref({});
-const selectedProducts = ref(null);
+const faqs = ref([]);
+const deleteFaqDialog = ref(false);
+const faq = ref({});
+const selectedFaqs = ref(null);
 const dt = ref(null);
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
+const page = ref(1);
+const totalData = ref(null);
+const rowsPerPage = ref(0)
+const totalRecords = ref(0)
 
-onMounted(() => {
-  ProductService.getProducts().then((data) => (products.value = data));
+onMounted(async () => {
+  await nextTick();
+  await fetchFaqs();
 });
-
-const editProduct = (editProduct) => {
-  router.push({ path: "/product/create" });
+const fetchFaqs = async (event) => {
+  let page = 1
+  if (event?.first){
+    page = event.first / event.rows + 1;
+  }
+  const { data, error } = await useApiFetch("/api/faqs/?page=" + page, {
+    method: "GET",
+  });
+  if (data.value) {
+    faqs.value = data.value.faqs.data;
+    rowsPerPage.value = data.value.faqs.per_page
+    totalRecords.value = data.value.faqs.total
+  }
 };
 
-const confirmDeleteProduct = (editProduct) => {
-  product.value = editProduct;
-  deleteProductDialog.value = true;
+const editFaq = (editFaq) => {
+  router.push({ path: "/faq/create" });
+};
+
+const confirmDeleteFaq = (editFaq) => {
+  faq.value = editFaq;
+  deleteFaqDialog.value = true;
 };
 
 const deleteProduct = () => {
-  products.value = products.value.filter((val) => val.id !== product.value.id);
-  deleteProductDialog.value = false;
-  product.value = {};
+  faqs.value = faqs.value.filter((val) => val.id !== faq.value.id);
+  deleteFaqDialog.value = false;
+  faq.value = {};
   toast.add({
     severity: "success",
     summary: "Successful",
@@ -50,15 +72,15 @@ const deleteProduct = () => {
         <Toast />
         <DataTable
           ref="dt"
-          v-model:selection="selectedProducts"
-          :value="products"
+          v-model:selection="selectedFaqs"
+          :value="faqs"
           dataKey="id"
           :paginator="true"
           :rows="10"
           :filters="filters"
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
           :rowsPerPageOptions="[5, 10, 25]"
-          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} faqs"
           responsiveLayout="scroll"
         >
           <template #header>
@@ -90,71 +112,46 @@ const deleteProduct = () => {
           </template>
 
           <Column selectionMode="multiple"></Column>
-          <Column field="name" header="Title" :sortable="true">
+          <Column field="title" header="Title" :sortable="true" style="width: 15%">
             <template #body="slotProps">
-              {{ slotProps.data.name }}
+              {{ slotProps.data.title }}
             </template>
           </Column>
-          <Column field="name" header="Pages">
-            <template #body>
-              <span class="p-column-title">Pages</span>
-              <div class="flex align-items-center flex-column sm:flex-row">
-                <Tag class="mr-2" value="Landing"></Tag>
-                <Tag class="mr-2" value="Catalog"></Tag>
-                <Tag class="mr-2" value="Designs"></Tag>
-                <Tag class="mr-2" value="Products"></Tag>
-                <Tag class="mr-2" value="Custom T Shirt"></Tag>
+          <Column field="pages" header="Pages" style="width: 30%">
+            <template #body="slotProps">
+              <div class="flex align-items-center flex-row sm:flex-row gap-1" >
+                <div v-for="(page, index) in slotProps.data.pages" :key="index">
+                  <Tag class="me-2" :value="page.name"></Tag>
+                </div>
               </div>
             </template>
           </Column>
-          <Column field="name" header="Questions">
-            <template #body>
-              <span class="p-column-title">Questions</span>
-              5
+          <Column field="name" header="Questions" style="width: 5%">
+            <template #body="slotProps">
+              <Tag class="me-2" :value="slotProps.data.faq_questions.length"></Tag>
             </template>
           </Column>
-
-          <Column field="inventoryStatus" header="Status" :sortable="true">
+          <Column field="status" header="Status" :sortable="true" style="width: 15%">
             <template #body="slotProps">
               <span class="p-column-title">Status</span>
-              <span
-                :class="
-                  'product-badge status-' +
-                  (slotProps.data.inventoryStatus
-                    ? slotProps.data.inventoryStatus.toLowerCase()
-                    : '')
-                "
-                >{{ slotProps.data.inventoryStatus }}</span
-              >
+              <span :class="'faq-badge status-' +
+                  (slotProps.data.status ? slotProps.data.status.toLowerCase()  : '') ">{{ slotProps.data.status }}</span>
             </template>
           </Column>
-          <Column field="updated_at" header="Updated" :sortable="true">
+          <Column header="Actions" style="width: 15%">
             <template #body="slotProps">
-              <span class="p-column-title">Updated</span>
-              {{ slotProps.data.updated_at }}
-            </template>
-          </Column>
-          <Column class="text-right">
-            <template #body="slotProps">
-              <NuxtLink :to="{ path: '/pages/faqs/create' }" class="mr-4">
-                <Button
-                  severity="default"
-                  label="View Questions"
-                  class="p-button p-component p-button-outlined"
-                />
-              </NuxtLink>
               <span class="p-buttonset">
                 <Button
                   icon="pi pi-pencil"
                   class="p-button-text p-button-rounded mr-2"
-                  @click="editProduct(slotProps.data)"
+                  @click="editFaq(slotProps.data)"
                 />
 
                 <Button
                   icon="pi pi-trash"
                   severity="danger"
                   class="p-button-text p-button-rounded"
-                  @click="confirmDeleteProduct(slotProps.data)"
+                  @click="confirmDeleteFaq(slotProps.data)"
                 />
               </span>
             </template>
@@ -162,7 +159,7 @@ const deleteProduct = () => {
         </DataTable>
 
         <Dialog
-          v-model:visible="deleteProductDialog"
+          v-model:visible="deleteFaqDialog"
           :style="{ width: '450px' }"
           header="Confirm"
           :modal="true"
@@ -172,8 +169,8 @@ const deleteProduct = () => {
               class="pi pi-exclamation-triangle mr-3"
               style="font-size: 2rem"
             />
-            <span v-if="product"
-              >Are you sure you want to delete <b>{{ product.name }}</b
+            <span v-if="faq"
+              >Are you sure you want to delete <b>{{ faq.name }}</b
               >?</span
             >
           </div>
@@ -182,7 +179,7 @@ const deleteProduct = () => {
               label="No"
               icon="pi pi-times"
               class="p-button-text"
-              @click="deleteProductDialog = false"
+              @click="deleteFaqDialog = false"
             />
             <Button
               label="Yes"
