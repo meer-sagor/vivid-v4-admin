@@ -1,9 +1,10 @@
 <script setup>
 const dropdownValues = ref([
-  { name: "Font Side", code: "FS" },
-  { name: "Back Side", code: "BS" },
-  { name: "Left Side", code: "LS" },
-  { name: "Right Side", code: "RS" },
+  { name: "Font Side", value: "front_side", code: "FS" },
+  { name: "Back Side", value: "back_side", code: "BS" },
+  { name: "Left Side", value: "left_side", code: "LS" },
+  { name: "Right Side", value: "right_side", code: "RS" },
+  { name: "Top Side", value: "top_side", code: "TS" },
 ]);
 const dropdownValue = ref(null);
 const checkboxValue1 = ref([]);
@@ -12,6 +13,10 @@ const checkboxValue3 = ref([]);
 const checkboxValue4 = ref([]);
 const checkboxValue5 = ref([]);
 const checkboxValue6 = ref([]);
+
+const newArray = ref([
+  {}
+])
 </script>
 
 <template>

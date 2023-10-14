@@ -63,6 +63,32 @@ export default defineComponent({
           price: "",
         },
       ],
+      print_areas: [
+        {
+          print_area_side: "front_side",
+          width: 200,
+          height: 100,
+          top: 20,
+          left: 10,
+          image_id: 1,
+        },
+        {
+          print_area_side: "back_side",
+          width: 100,
+          height: 200,
+          top: 24,
+          left: 11,
+          image_id: 2,
+        },
+        {
+          print_area_side: "left_side",
+          width: 233,
+          height: 133,
+          top: 55,
+          left: 66,
+          image_id: 3,
+        },
+      ]
     });
 
     const onUpload = () => {
@@ -351,9 +377,7 @@ export default defineComponent({
                   >
                   </Dropdown>
                 </Field>
-                <small class="p-error" id="product-status-error">{{
-                  errors.status || "&nbsp;"
-                }}</small>
+                <small class="p-error" id="product-status-error">{{errors.status || "&nbsp;"}}</small>
               </div>
             </div>
           </div>
