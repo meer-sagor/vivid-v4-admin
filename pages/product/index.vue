@@ -2,13 +2,14 @@
 import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
-import { onMounted, ref } from "vue";
+import {nextTick, onMounted, ref} from "vue";
 import { useRoute, useRouter } from "vue-router";
+import {useApiFetch} from "~/composables/useApiFetch";
 
 const router = useRouter();
 const toast = useToast();
 
-const products = ref(null);
+const products = ref([]);
 const productDialog = ref(false);
 const deleteProductDialog = ref(false);
 const deleteProductsDialog = ref(false);
@@ -20,17 +21,28 @@ const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 const submitted = ref(false);
-const statuses = ref([
-  { label: "Enable", value: "enable" },
-  { label: "Disable", value: "disable" },
-]);
 
-onMounted(() => {
-  ProductService.getProducts().then((data) => (products.value = data));
+
+onMounted(async () => {
+  // ProductService.getProducts().then((data) => (products.value = data));
+  await nextTick();
+  await fetchProducts()
 });
 
-const formatCurrency = (value) => {
-  return value.toLocaleString("en-US", { style: "currency", currency: "USD" });
+
+const fetchProducts = async (event) => {
+  let page = 1
+  if (event?.first){
+    page = event.first / event.rows + 1;
+  }
+  const { data, error } = await useApiFetch("/api/products/?page=" + page, {
+    method: "GET",
+  });
+  if (data.value) {
+    products.value = data.value.products.data;
+    rowsPerPage.value = data.value.products.per_page
+    totalRecords.value = data.value.products.total
+  }
 };
 
 const openNew = () => {
@@ -44,47 +56,8 @@ const hideDialog = () => {
   submitted.value = false;
 };
 
-const saveProduct = () => {
-  submitted.value = true;
-
-  if (product.value.name && product.value.name.trim() && product.value.price) {
-    if (product.value.id) {
-      product.value.inventoryStatus = product.value.inventoryStatus.value
-        ? product.value.inventoryStatus.value
-        : product.value.inventoryStatus;
-      products.value[findIndexById(product.value.id)] = product.value;
-      toast.add({
-        severity: "success",
-        summary: "Successful",
-        detail: "Product Updated",
-        life: 3000,
-      });
-    } else {
-      product.value.id = createId();
-      product.value.code = createId();
-      product.value.image = "product-placeholder.svg";
-      product.value.inventoryStatus = product.value.inventoryStatus
-        ? product.value.inventoryStatus.value
-        : "Enable";
-      products.value.push(product.value);
-      toast.add({
-        severity: "success",
-        summary: "Successful",
-        detail: "Product Created",
-        life: 3000,
-      });
-    }
-
-    productDialog.value = false;
-    product.value = {};
-  }
-};
-
-const editProduct = (editProduct) => {
-  // product.value = { ...editProduct };
-  // console.log(product);
-  // productDialog.value = true;
-  router.push({ path: "/product/create" });
+const editProduct = (id) => {
+  router.push({ path: "/product/update/" + id });
 };
 
 const confirmDeleteProduct = (editProduct) => {
@@ -372,80 +345,44 @@ const onUpload = () => {
               {{ slotProps.data.name }}
             </template>
           </Column>
-          <Column header="Image">
+          <Column field="style_number" header="Style Number"></Column>
+          <Column field="sub_category" header="Sub Category">
             <template #body="slotProps">
-              <span class="p-column-title">Image</span>
-              <img
-                :src="'/demo/images/product/' + slotProps.data.image"
-                :alt="slotProps.data.image"
-                style="border-radius: 4px"
-                width="50"
-              />
+              {{ slotProps.data.sub_category?.name }}
             </template>
           </Column>
-          <Column field="name" header="Style Numer">
+          <Column field="brand" header="Brand">
             <template #body="slotProps">
-              <span class="p-column-title">Style Number</span>
-              {{ slotProps.data.name }}
+              {{ slotProps.data.brand?.name}}
             </template>
           </Column>
-          <Column field="name" header="Quantity" :sortable="true">
+          <Column header="Childs">
             <template #body="slotProps">
-              <span class="p-column-title">Quantity</span>
-              {{ slotProps.data.name }}
-            </template>
-          </Column>
-          <Column field="name" header="Sub Category">
-            <template #body="slotProps">
-              <span class="p-column-title">Sub-Category</span>
-              {{ slotProps.data.name }}
-            </template>
-          </Column>
-          <Column field="name" header="Brand">
-            <template #body="slotProps">
-              <span class="p-column-title">Brand</span>
-              {{ slotProps.data.name }}
-            </template>
-          </Column>
-          <Column field="name" header="Childs">
-            <template #body>
               <span class="p-column-title">Childs</span>
               <NuxtLink :to="{ path: '/product/child' }" class="mr-4">
                 <Button
                   severity="info"
-                  :label="5"
+                  :label="slotProps.data.child_products?.length || 0"
                   class="p-button p-component p-button-rounded"
                 />
               </NuxtLink>
             </template>
           </Column>
-          <Column field="inventoryStatus" header="Status" :sortable="true">
+          <Column field="status" header="Status" :sortable="true">
             <template #body="slotProps">
               <span class="p-column-title">Status</span>
               <span
-                :class="
-                  'product-badge status-' +
-                  (slotProps.data.inventoryStatus
-                    ? slotProps.data.inventoryStatus.toLowerCase()
-                    : '')
-                "
-                >{{ slotProps.data.inventoryStatus }}</span
-              >
+                :class="'product-badge status-' +(slotProps.data.status? slotProps.data.status.toLowerCase()
+                  : '')">{{ slotProps.data.status }}</span>
             </template>
           </Column>
-          <Column field="updated_at" header="Updated" :sortable="true">
-            <template #body="slotProps">
-              <span class="p-column-title">Updated</span>
-              {{ slotProps.data.updated_at }}
-            </template>
-          </Column>
-          <Column class="text-center" style="min-width: 150px">
+          <Column header="Actions" class="text-center" style="min-width: 150px">
             <template #body="slotProps">
               <span class="p-buttonset">
                 <Button
                   icon="pi pi-pencil"
                   class="p-button-text p-button-rounded mr-2"
-                  @click="editProduct(slotProps.data)"
+                  @click="editProduct(slotProps.data.id)"
                 />
 
                 <Button
