@@ -58,7 +58,7 @@ export default defineComponent({
       description: "",
       size_chart_description: "",
       status: "enable",
-      primary_image_id: 1,
+      primary_image: 1,
       additional_images: [1, 2, 3],
       size_charts: [
         {
@@ -145,7 +145,7 @@ export default defineComponent({
       product.value.size_charts = values.size_charts;
       product.value.price_shirt_charts = values.price_shirt_charts;
 
-      const { data, error } = await useApiFetch("/api/products/store", {
+      const { data, error } = await useApiFetch("/api/products/update/" + route.params.id, {
         method: "POST",
         body: product.value,
       });
@@ -187,9 +187,7 @@ export default defineComponent({
       spinner.value = false;
       if (data.value) {
         fetching.value = true;
-        const getCodes = JSON.parse(
-          JSON.stringify(computed(() => data.value).value)
-        );
+        const getCodes = JSON.parse(JSON.stringify(computed(() => data.value).value));
         statuses.value = getCodes.statuses;
         categories.value = getCodes.categories;
         sub_categories.value = getCodes.sub_categories;
@@ -201,9 +199,7 @@ export default defineComponent({
     };
 
     const resetModal = () => {
-      const resetForm = document.getElementById(
-        "add_product_form"
-      ) as HTMLFormElement;
+      const resetForm = document.getElementById("add_product_form") as HTMLFormElement;
       if (resetForm) {
         resetForm.reset();
       }

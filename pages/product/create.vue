@@ -46,7 +46,7 @@ export default defineComponent({
       description: "",
       size_chart_description: "",
       status: "enable",
-      primary_image_id: 1,
+      primary_image: 1,
       additional_images: [1, 2, 3],
       size_charts: [
         {
