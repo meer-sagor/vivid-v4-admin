@@ -65,16 +65,29 @@ const confirmDeleteProduct = (editProduct) => {
   deleteProductDialog.value = true;
 };
 
-const deleteProduct = () => {
-  products.value = products.value.filter((val) => val.id !== product.value.id);
-  deleteProductDialog.value = false;
-  product.value = {};
-  toast.add({
-    severity: "success",
-    summary: "Successful",
-    detail: "Product Deleted",
-    life: 3000,
+
+const deleteProduct = async (id) => {
+  const { data, error } = await useApiFetch("/api/products/" + id, {
+    method: "DELETE",
   });
+  if (error.value) {
+    toast.add({
+      severity: "info",
+      summary: "Success",
+      detail: error.value.data.message,
+      life: 3000,
+    });
+  }
+  if (data.value) {
+    toast.add({
+      severity: "info",
+      summary: "Success",
+      detail: data.value.message,
+      life: 3000,
+    });
+    deleteProductDialog.value = false
+    await fetchProducts()
+  }
 };
 
 const findIndexById = (id) => {
@@ -423,7 +436,7 @@ const onUpload = () => {
               label="Yes"
               icon="pi pi-check"
               class="p-button-text"
-              @click="deleteProduct"
+              @click="deleteProduct(product.id)"
             />
           </template>
         </Dialog>

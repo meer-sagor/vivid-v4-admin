@@ -65,7 +65,7 @@ export default defineComponent({
       ],
       print_areas: [
         {
-          print_area_side: "front_side",
+          side: "front_side",
           width: 200,
           height: 100,
           top: 20,
@@ -73,7 +73,7 @@ export default defineComponent({
           image_id: 1,
         },
         {
-          print_area_side: "back_side",
+          side: "back_side",
           width: 100,
           height: 200,
           top: 24,
@@ -81,7 +81,7 @@ export default defineComponent({
           image_id: 2,
         },
         {
-          print_area_side: "left_side",
+          side: "left_side",
           width: 233,
           height: 133,
           top: 55,

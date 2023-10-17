@@ -27,22 +27,6 @@ export default defineComponent({
     const route = useRoute();
     const router = useRouter();
 
-    onMounted(async () => {
-      await nextTick();
-      await fetchCodes();
-      await fetchProduct();
-    });
-
-    const fetchProduct = async () => {
-      const {data, error} = await useApiFetch("/api/products/" + route.params.id + '/edit', {
-        method: "GET",
-      });
-      if (data.value) {
-        const getProduct = JSON.parse(JSON.stringify(computed(() => data.value).value))
-        product.value = getProduct.product;
-      }
-    };
-
     const product = ref({
       name: "",
       url_key: "",
@@ -77,7 +61,7 @@ export default defineComponent({
       ],
       print_areas: [
         {
-          print_area_side: "front_side",
+          side: "front_side",
           width: 200,
           height: 100,
           top: 20,
@@ -85,7 +69,7 @@ export default defineComponent({
           image_id: 1,
         },
         {
-          print_area_side: "back_side",
+          side: "back_side",
           width: 100,
           height: 200,
           top: 24,
@@ -93,7 +77,7 @@ export default defineComponent({
           image_id: 2,
         },
         {
-          print_area_side: "left_side",
+          side: "left_side",
           width: 233,
           height: 133,
           top: 55,
@@ -102,6 +86,23 @@ export default defineComponent({
         },
       ]
     });
+
+    onMounted(async () => {
+      await nextTick();
+      await fetchCodes();
+      await fetchProduct();
+    });
+
+    const fetchProduct = async () => {
+      const {data, error} = await useApiFetch("/api/products/" + route.params.id + '/edit', {
+        method: "GET",
+      });
+      if (data.value) {
+        const getProduct = JSON.parse(JSON.stringify(computed(() => data.value).value))
+        product.value = getProduct.product;
+      }
+    };
+
 
     const onUpload = () => {
       console.log("image");
