@@ -22,6 +22,10 @@ const selectedChildProducts = ref(null);
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
+const page = ref(1);
+const totalData = ref(null);
+const rowsPerPage = ref(0)
+const totalRecords = ref(0)
 
 
 onMounted(async () => {
