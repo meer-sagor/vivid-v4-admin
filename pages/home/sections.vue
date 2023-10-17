@@ -79,16 +79,16 @@
                   <span v-if="slotProps.data.status == 'enable'">Enable</span>
                   <span v-if="slotProps.data.status == 'disable'">Disable</span>
                 </div>
-                <label class="switch">
-                  <input
-                    type="checkbox"
-                    :checked="slotProps.data.status == 'enable'"
-                    :id="'checkbox_' + slotProps.data.id"
-                    :name="'checkbox_' + slotProps.data.id"
-                    @change="updateStatus(slotProps.data)"
-                  />
-                  <span class="slider round"></span>
-                </label>
+<!--                <label class="switch">-->
+<!--                  <input-->
+<!--                    type="checkbox"-->
+<!--                    :checked="slotProps.data.status == 'enable'"-->
+<!--                    :id="'checkbox_' + slotProps.data.id"-->
+<!--                    :name="'checkbox_' + slotProps.data.id"-->
+<!--                    @change="updateStatus(slotProps.data)"-->
+<!--                  />-->
+<!--                  <span class="slider round"></span>-->
+<!--                </label>-->
               </div>
             </template>
           </Column>

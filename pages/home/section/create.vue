@@ -30,13 +30,31 @@
           <Field v-model="home_section.view_all_url" id="view_all_url" name="view_all_url" :class="{ 'p-invalid': errors.view_all_url }" class="p-inputtext p-component" aria-describedby="home-section-view-all-url-error" placeholder="Enter url"/>
           <small class="p-error" id="home-section-view-all-url-error">{{ errors.view_all_url || '&nbsp;' }}</small>
         </div>
+        <div class="flex flex-column gap-2 mb-3">
+          <label for="category_type">Category Type</label>
+          <Field name="category_type" v-slot="{ field }">
+            <Dropdown
+                v-bind="field"
+                v-model="home_section.category_type"
+                :options="category_types"
+                optionLabel="name"
+                optionValue="name"
+                placeholder="Select a category type"
+                display="chip"
+                :class="{ 'p-invalid': errors.category_type }"
+                aria-describedby="associate-category-type-error"
+                @change="filterSubcategories"
+            ></Dropdown>
+          </Field>
+          <small class="p-error" id="associate-category-type-error">{{ errors.category_type || '&nbsp;' }}</small>
+        </div>
         <div class="flex flex-column gap-2 mb-1">
           <label for="categories">Categories</label>
           <Field name="categories" v-slot="{ field }">
             <MultiSelect
                 v-bind="field"
                 v-model="home_section.categories"
-                :options="categories"
+                :options="filter_categories"
                 optionLabel="name"
                 optionValue="id"
                 placeholder="Select a categories"
@@ -53,7 +71,7 @@
             <Dropdown
                 v-bind="field"
                 v-model="home_section.status"
-                :options="status_enums"
+                :options="statuses"
                 optionLabel="name"
                 optionValue="name"
                 placeholder="Select a status"
@@ -91,7 +109,9 @@ export default defineComponent({
     const fetching = ref(false);
     const spinner = ref(false);
     const categories = ref([]);
-    const status_enums = ref([]);
+    const filter_categories = ref([]);
+    const statuses = ref([]);
+    const category_types = ref([]);
     const router = useRouter();
 
     const home_section = ref({
@@ -99,6 +119,7 @@ export default defineComponent({
       section_title: "",
       description: "",
       view_all_url: "",
+      category_type: "",
       categories: [],
       status: "",
     });
@@ -118,16 +139,17 @@ export default defineComponent({
       if (data.value) {
         fetching.value = true
         const getEnums = JSON.parse(JSON.stringify(computed(() => data.value).value))
-        status_enums.value = getEnums.statuses;
+        statuses.value = getEnums.statuses;
+        category_types.value = getEnums.category_types;
       }
     };
     const fetchCategories = async () => {
-      const {data, error} = await useApiFetch("/api/categories", {
+      const {data, error} = await useApiFetch("/api/product/codes", {
         method: "GET",
       });
       if (data.value) {
         const getCategories = JSON.parse(JSON.stringify(computed(() => data.value).value))
-        categories.value = getCategories.categories.data;
+        categories.value = getCategories.categories;
       }
     };
 
@@ -136,6 +158,7 @@ export default defineComponent({
       section_title: Yup.string().required().min(2).max(100).label("Section title"),
       view_all_url: Yup.string().url().required().min(2).max(100).label("Url"),
       categories: Yup.mixed().required().label("Categories"),
+      category_type: Yup.mixed().required().label("Category type"),
       status: Yup.mixed().required().label("Status"),
     });
 
@@ -195,8 +218,12 @@ export default defineComponent({
       home_section.value.description = value
     };
 
+    const filterSubcategories = () => {
+      filter_categories.value = categories.value.filter((category:any) => category.type.toLowerCase() == home_section.value.category_type.toLowerCase());
+    }
+
     return {
-      schema, onSubmit, home_section, loading, fetching, spinner, resetModal, categories, status_enums, handleChange
+      schema, onSubmit, home_section, loading, fetching, spinner, resetModal, categories, statuses, category_types, handleChange, filterSubcategories, filter_categories
     }
 
   }

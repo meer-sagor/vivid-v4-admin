@@ -31,13 +31,31 @@
           <Field v-model="home_section.view_all_url" id="view_all_url" name="view_all_url" :class="{ 'p-invalid': errors.view_all_url }" class="p-inputtext p-component" aria-describedby="home-section-view-all-url-error" placeholder="Enter url"/>
           <small class="p-error" id="home-section-view-all-url-error">{{ errors.view_all_url || '&nbsp;' }}</small>
         </div>
+        <div class="flex flex-column gap-2 mb-3">
+          <label for="category_type">Category Type</label>
+          <Field name="category_type" v-slot="{ field }">
+            <Dropdown
+                v-bind="field"
+                v-model="home_section.category_type"
+                :options="category_types"
+                optionLabel="name"
+                optionValue="name"
+                placeholder="Select a category type"
+                display="chip"
+                :class="{ 'p-invalid': errors.category_type }"
+                aria-describedby="associate-category-type-error"
+                @change="filterSubcategories"
+            ></Dropdown>
+          </Field>
+          <small class="p-error" id="associate-category-type-error">{{ errors.category_type || '&nbsp;' }}</small>
+        </div>
         <div class="flex flex-column gap-2 mb-1">
           <label for="categories">Categories</label>
           <Field name="categories" v-slot="{ field }">
             <MultiSelect
                 v-bind="field"
                 v-model="home_section.categories"
-                :options="categories"
+                :options="filter_categories"
                 optionLabel="name"
                 optionValue="id"
                 placeholder="Select a categories"
@@ -47,6 +65,23 @@
             ></MultiSelect>
           </Field>
           <small class="p-error" id="associate-categories-error">{{ errors.categories || '&nbsp;' }}</small>
+        </div>
+        <div class="flex flex-column gap-2 mb-3">
+          <label for="status">Status</label>
+          <Field name="status" v-slot="{ field }">
+            <Dropdown
+                v-bind="field"
+                v-model="home_section.status"
+                :options="statuses"
+                optionLabel="name"
+                optionValue="name"
+                placeholder="Select a status"
+                display="chip"
+                :class="{ 'p-invalid': errors.status }"
+                aria-describedby="associate-status-error"
+            ></Dropdown>
+          </Field>
+          <small class="p-error" id="associate-status-error">{{ errors.status || '&nbsp;' }}</small>
         </div>
         <Button class="" type="submit" label="Submit" :loading="loading" icon="pi pi-check"/>
       </Form>
@@ -77,18 +112,25 @@ export default defineComponent({
     const route = useRoute();
     const router = useRouter();
     const categories = ref([]);
+    const filter_categories = ref([]);
+    const statuses = ref([]);
+    const category_types = ref([]);
+
 
     const home_section = ref({
       name: "",
       section_title: "",
       description: "",
       view_all_url: "",
+      category_type: "",
       categories: [],
+      status: "",
     });
 
     onMounted(async () => {
       await nextTick();
       await fetchCategories()
+      await fetchEnums();
       await fetchHomeSection();
     });
 
@@ -97,18 +139,34 @@ export default defineComponent({
       name: Yup.string().required().min(2).max(100).label("Name"),
       section_title: Yup.string().required().min(2).max(100).label("Section title"),
       view_all_url: Yup.string().url().required().min(2).max(100).label("Url"),
+      category_type: Yup.mixed().required().label("Category type"),
+      status: Yup.mixed().required().label("Status"),
     });
+
+    const fetchEnums = async () => {
+      spinner.value = true
+      const {data, error} = await useApiFetch("/api/getEnums", {
+        method: "GET",
+      });
+      spinner.value = false
+      if (data.value) {
+        fetching.value = true
+        const getEnums = JSON.parse(JSON.stringify(computed(() => data.value).value))
+        statuses.value = getEnums.statuses;
+        category_types.value = getEnums.category_types;
+      }
+    };
 
      const fetchCategories = async () => {
        spinner.value = true
-       const {data, error} = await useApiFetch("/api/categories", {
+       const {data, error} = await useApiFetch("/api/product/codes", {
         method: "GET",
       });
        spinner.value = false
       if (data.value) {
         fetching.value = true
         const getCategories = JSON.parse(JSON.stringify(computed(() => data.value).value))
-        categories.value = getCategories.categories.data;
+        categories.value = getCategories.categories;
       }
     };
 
@@ -179,8 +237,13 @@ export default defineComponent({
       home_section.value.description = value
     };
 
+    const filterSubcategories = () => {
+      filter_categories.value = categories.value.filter((category:any) => category.type.toLowerCase() == home_section.value.category_type.toLowerCase());
+    }
+
+
     return {
-      schema, onSubmit, home_section, loading, fetching, spinner, resetModal, categories, handleChange
+      schema, onSubmit, home_section, loading, fetching, spinner, resetModal, categories, statuses, handleChange, category_types, filterSubcategories, filter_categories
     }
 
   }
