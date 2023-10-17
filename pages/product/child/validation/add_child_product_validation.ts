@@ -5,6 +5,7 @@ const add_child_product_validation = Yup.object().shape({
     fabric_id: Yup.mixed().required().typeError('Fabric is a required field').label("Fabric"),
     quantity: Yup.number().required().typeError('Quantity is a required field').label("Quantity"),
     status: Yup.mixed().required().label("Status"),
+    sizes: Yup.mixed().required().label("Sizes"),
 })
 
 

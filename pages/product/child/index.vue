@@ -2,147 +2,105 @@
 import { ProductService } from "@/service/ProductService";
 import { FilterMatchMode } from "primevue/api";
 import { useToast } from "primevue/usetoast";
-import { onMounted, ref } from "vue";
+import {nextTick, onMounted, ref} from "vue";
 import { useRoute, useRouter } from "vue-router";
+import {useApiFetch} from "~/composables/useApiFetch";
 
 const router = useRouter();
 const toast = useToast();
-
-const products = ref(null);
-const productDialog = ref(false);
-const deleteProductDialog = ref(false);
-const deleteProductsDialog = ref(false);
-const product = ref({});
-const selectedProducts = ref(null);
+const loading = ref(false);
+const fetching = ref(false);
+const spinner = ref(false);
+const child_products = ref([]);
+const statuses = ref([]);
+const childProductDialog = ref(false);
+const deleteChildProductDialog = ref(false);
+const deleteChildProductsDialog = ref(false);
+const child_product = ref({});
 const dt = ref(null);
-const switchValue = ref(false);
+const selectedChildProducts = ref(null);
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
-const submitted = ref(false);
-const statuses = ref([
-  { label: "Enable", value: "enable" },
-  { label: "Disable", value: "disable" },
-]);
 
-onMounted(() => {
-  ProductService.getProducts().then((data) => (products.value = data));
+
+onMounted(async () => {
+  await nextTick();
+  await fetchCodes()
+  await fetchChildProducts()
 });
 
-const formatCurrency = (value) => {
-  return value.toLocaleString("en-US", { style: "currency", currency: "USD" });
-};
-
-const openNew = () => {
-  product.value = {};
-  submitted.value = false;
-  productDialog.value = true;
-};
-
-const hideDialog = () => {
-  productDialog.value = false;
-  submitted.value = false;
-};
-
-const saveProduct = () => {
-  submitted.value = true;
-
-  if (product.value.name && product.value.name.trim() && product.value.price) {
-    if (product.value.id) {
-      product.value.inventoryStatus = product.value.inventoryStatus.value
-        ? product.value.inventoryStatus.value
-        : product.value.inventoryStatus;
-      products.value[findIndexById(product.value.id)] = product.value;
-      toast.add({
-        severity: "success",
-        summary: "Successful",
-        detail: "Product Updated",
-        life: 3000,
-      });
-    } else {
-      product.value.id = createId();
-      product.value.code = createId();
-      product.value.image = "product-placeholder.svg";
-      product.value.inventoryStatus = product.value.inventoryStatus
-        ? product.value.inventoryStatus.value
-        : "Enable";
-      products.value.push(product.value);
-      toast.add({
-        severity: "success",
-        summary: "Successful",
-        detail: "Product Created",
-        life: 3000,
-      });
-    }
-
-    productDialog.value = false;
-    product.value = {};
-  }
-};
-
-const editProduct = (editProduct) => {
-  // product.value = { ...editProduct };
-  // console.log(product);
-  // productDialog.value = true;
-  router.push({ path: "/product/create" });
-};
-
-const confirmDeleteProduct = (editProduct) => {
-  product.value = editProduct;
-  deleteProductDialog.value = true;
-};
-
-const deleteProduct = () => {
-  products.value = products.value.filter((val) => val.id !== product.value.id);
-  deleteProductDialog.value = false;
-  product.value = {};
-  toast.add({
-    severity: "success",
-    summary: "Successful",
-    detail: "Product Deleted",
-    life: 3000,
+const fetchCodes = async () => {
+  spinner.value = true;
+  const { data, error } = await useApiFetch("/api/product/codes", {
+    method: "GET",
   });
-};
-
-const findIndexById = (id) => {
-  let index = -1;
-
-  for (let i = 0; i < products.value.length; i++) {
-    if (products.value[i].id === id) {
-      index = i;
-      break;
-    }
+  spinner.value = false;
+  if (data.value) {
+    fetching.value = true;
+    const getCodes = JSON.parse(JSON.stringify(computed(() => data.value).value));
+    statuses.value = getCodes.statuses;
   }
-
-  return index;
 };
 
-const createId = () => {
-  let id = "";
-  const chars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-  for (let i = 0; i < 5; i++) {
-    id += chars.charAt(Math.floor(Math.random() * chars.length));
+const fetchChildProducts = async (event) => {
+  let page = 1
+  if (event?.first){
+    page = event.first / event.rows + 1;
   }
-
-  return id;
+  const { data, error } = await useApiFetch("/api/child-products/?page=" + page, {
+    method: "GET",
+  });
+  if (data.value) {
+    child_products.value = data.value.child_products.data;
+    rowsPerPage.value = data.value.child_products.per_page
+    totalRecords.value = data.value.child_products.total
+  }
 };
 
-const exportCSV = () => {
-  dt.value.exportCSV();
+const editProduct = (id) => {
+  router.push({ path: "/product/child/update/" + id });
 };
+
+const confirmDeleteChildProduct = (editProduct) => {
+  child_product.value = editProduct;
+  deleteChildProductDialog.value = true;
+};
+const deleteChildProduct = async (id) => {
+  const { data, error } = await useApiFetch("/api/child-products/" + id, {
+    method: "DELETE",
+  });
+  if (error.value) {
+    toast.add({
+      severity: "info",
+      summary: "Success",
+      detail: error.value.data.message,
+      life: 3000,
+    });
+  }
+  if (data.value) {
+    toast.add({
+      severity: "info",
+      summary: "Success",
+      detail: data.value.message,
+      life: 3000,
+    });
+    deleteChildProductDialog.value = false
+    await fetchChildProducts()
+  }
+};
+
 
 const confirmDeleteSelected = () => {
-  deleteProductsDialog.value = true;
+  deleteChildProductsDialog.value = true;
 };
 
 const deleteSelectedProducts = () => {
-  products.value = products.value.filter(
-    (val) => !selectedProducts.value.includes(val)
+  child_products.value = child_products.value.filter(
+    (val) => !selectedChildProducts.value.includes(val)
   );
-  deleteProductsDialog.value = false;
-  selectedProducts.value = null;
+  deleteChildProductsDialog.value = false;
+  selectedChildProducts.value = null;
   toast.add({
     severity: "success",
     summary: "Successful",
@@ -151,21 +109,11 @@ const deleteSelectedProducts = () => {
   });
 };
 
-const onUpload = () => {
-  toast.add({
-    severity: "info",
-    summary: "Success",
-    detail: "File Uploaded",
-    life: 3000,
-  });
-};
 </script>
 
 <template>
-  <div
-    class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
-  >
-    <NuxtLink to="/product">
+  <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+    <NuxtLink to="/product/child">
       <Button
         icon="pi pi-angle-left"
         label="Go Back"
@@ -173,22 +121,21 @@ const onUpload = () => {
       />
     </NuxtLink>
   </div>
-
+  <template v-if="fetching">
   <div class="grid">
     <div class="col-12">
       <div class="card">
         <Toast />
         <DataTable
           ref="dt"
-          v-model:selection="selectedProducts"
-          :value="products"
+          v-model:selection="selectedChildProducts"
+          :value="child_products"
           dataKey="id"
           :paginator="true"
           :rows="10"
           :filters="filters"
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-          :rowsPerPageOptions="[5, 10, 25]"
-          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} child products"
           responsiveLayout="scroll"
         >
           <h3 class="mb-4">Child Products</h3>
@@ -200,33 +147,20 @@ const onUpload = () => {
                 class="flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3"
               >
                 <div class="flex gap-2 md:align-items-center">
-                  <label for="inventoryStatus" class="mb-0">Status</label>
+                  <label for="status" class="mb-0">Status</label>
                   <Dropdown
-                    id="inventoryStatus"
-                    v-model="product.inventoryStatus"
+                    id="status"
+                    v-model="child_product.status"
                     :options="statuses"
                     optionLabel="label"
                     placeholder="Select a Status"
                   >
                     <template #value="slotProps">
                       <div v-if="slotProps.value && slotProps.value.value">
-                        <span
-                          :class="
-                            'product-badge status-' + slotProps.value.value
-                          "
-                          >{{ slotProps.value.label }}</span
-                        >
+                        <span :class="'product-badge status-' + slotProps.value.value">{{ slotProps.value.label }}</span>
                       </div>
-                      <div
-                        v-else-if="slotProps.value && !slotProps.value.value"
-                      >
-                        <span
-                          :class="
-                            'product-badge status-' +
-                            slotProps.value.toLowerCase()
-                          "
-                          >{{ slotProps.value }}</span
-                        >
+                      <div v-else-if="slotProps.value && !slotProps.value.value">
+                        <span :class=" 'product-badge status-' + slotProps.value.toLowerCase()">{{ slotProps.value }}</span>
                       </div>
                       <span v-else>
                         {{ slotProps.placeholder }}
@@ -254,66 +188,45 @@ const onUpload = () => {
           </template>
 
           <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
-          <Column field="name" header="Name" :sortable="true">
-            <template #body="slotProps">
-              <span class="p-column-title">Name</span>
-              {{ slotProps.data.name }}
-            </template>
-          </Column>
           <Column header="Image">
             <template #body="slotProps">
-              <span class="p-column-title">Image</span>
-              <img
-                :src="'/demo/images/product/' + slotProps.data.image"
-                :alt="slotProps.data.image"
-                style="border-radius: 4px"
-                width="50"
-              />
+              <Image :src="slotProps.data.media?.url" alt="image" width="80" class="w-6rem shadow-2 border-round" preview />
             </template>
           </Column>
-          <Column field="name" header="Min Quantity" :sortable="true">
+          <Column field="color" header="Color" :sortable="true">
             <template #body="slotProps">
-              <span class="p-column-title">Min Quantity</span>
-              {{ slotProps.data.name }}
+              {{ slotProps.data.color?.name }}
             </template>
           </Column>
-          <Column field="name" header="Color">
-            <template #body>
-              <span class="p-column-title">Color</span>
-              <div
-                style="
-                  background-color: rgb(177, 4, 4);
-                  width: 30px;
-                  height: 30px;
-                  border-radius: 50px;
-                "
-              ></div>
-            </template>
-          </Column>
-          <Column field="name" header="Fabric">
+          <Column field="fabric" header="Fabric">
             <template #body="slotProps">
-              <span class="p-column-title">Fabric</span>
-              {{ slotProps.data.name }}
+              {{ slotProps.data.fabric?.name }}
             </template>
           </Column>
-          <Column field="inventoryStatus" header="Status" :sortable="true">
+          <Column field="sizes" header="Sizes">
+            <template #body="slotProps">
+              <div class="flex align-items-center flex-row sm:flex-row gap-1" >
+                <div v-for="(size, index) in slotProps.data.sizes" :key="index">
+                  <Tag class="me-2" :value="size.size?.name"></Tag>
+                </div>
+              </div>
+            </template>
+          </Column>
+          <Column field="sides" header="Sides">
+            <template #body="slotProps">
+              <div class="flex align-items-center flex-row sm:flex-row gap-1" >
+                <div v-for="(child_product_side, index) in slotProps.data.child_product_sides" :key="index">
+                  <Tag class="me-2" :value="child_product_side.side"></Tag>
+                </div>
+              </div>
+            </template>
+          </Column>
+          <Column field="quantity" header="Quantity"></Column>
+          <Column field="status" header="Status" :sortable="true">
             <template #body="slotProps">
               <span class="p-column-title">Status</span>
-              <span
-                :class="
-                  'product-badge status-' +
-                  (slotProps.data.inventoryStatus
-                    ? slotProps.data.inventoryStatus.toLowerCase()
-                    : '')
-                "
-                >{{ slotProps.data.inventoryStatus }}</span
-              >
-            </template>
-          </Column>
-          <Column field="updated_at" header="Updated_at" :sortable="true">
-            <template #body="slotProps">
-              <span class="p-column-title">Updated_at</span>
-              {{ slotProps.data.updated_at }}
+              <span :class=" 'product-badge status-' +
+                  (slotProps.data.status ? slotProps.data.status.toLowerCase(): '')">{{ slotProps.data.status }}</span>
             </template>
           </Column>
           <Column class="text-right">
@@ -322,14 +235,14 @@ const onUpload = () => {
                 <Button
                   icon="pi pi-pencil"
                   class="p-button-text p-button-rounded mr-2"
-                  @click="editProduct(slotProps.data)"
+                  @click="editProduct(slotProps.data.id)"
                 />
 
                 <Button
                   icon="pi pi-trash"
                   severity="danger"
                   class="p-button-text p-button-rounded"
-                  @click="confirmDeleteProduct(slotProps.data)"
+                  @click="confirmDeleteChildProduct(slotProps.data)"
                 />
               </span>
           
@@ -338,7 +251,7 @@ const onUpload = () => {
         </DataTable>
 
         <Dialog
-          v-model:visible="deleteProductDialog"
+          v-model:visible="deleteChildProductDialog"
           :style="{ width: '450px' }"
           header="Confirm"
           :modal="true"
@@ -348,28 +261,29 @@ const onUpload = () => {
               class="pi pi-exclamation-triangle mr-3"
               style="font-size: 2rem"
             />
-            <span v-if="product"
-              >Are you sure you want to delete <b>{{ product.name }}</b
-              >?</span
-            >
+            <span v-if="child_product">Are you sure you want to delete <b>{{ child_product.name }}</b>?</span>
           </div>
           <template #footer>
             <Button
               label="No"
               icon="pi pi-times"
               class="p-button-text"
-              @click="deleteProductDialog = false"
+              @click="deleteChildProductDialog = false"
             />
             <Button
               label="Yes"
               icon="pi pi-check"
               class="p-button-text"
-              @click="deleteProduct"
+              @click="deleteChildProduct(child_product.id)"
             />
           </template>
         </Dialog>
       </div>
     </div>
+  </div>
+  </template>
+  <div class="flex justify-content-center">
+    <ProgressSpinner v-if="spinner" />
   </div>
 </template>
 

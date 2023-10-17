@@ -27,14 +27,24 @@ export default defineComponent({
     });
 
     const child_product = ref({
-      product_id: '',
+      product_id: 3,
       color_id: '',
       fabric_id: '',
       quantity: '',
       status: '',
       sizes: [],
       is_primary: 1,
-      image_id: '',
+      image_id: 1,
+      child_product_sides: [
+        {
+          side: 'front_side',
+          image_id: 1,
+        },
+        {
+          side: 'left_side',
+          image_id: 1,
+        }
+      ],
     })
 
     const onUpload = () => {
@@ -68,12 +78,8 @@ export default defineComponent({
         body: child_product.value,
       });
       loading.value = false;
-      const data_obj = JSON.parse(
-          JSON.stringify(computed(() => data.value).value)
-      );
-      const error_obj = JSON.parse(
-          JSON.stringify(computed(() => error.value).value)
-      );
+      const data_obj = JSON.parse(JSON.stringify(computed(() => data.value).value));
+      const error_obj = JSON.parse(JSON.stringify(computed(() => error.value).value));
 
       if (error_obj && Object.keys(error_obj).length > 0) {
         const errorList = error_obj.data.errors;
@@ -121,6 +127,7 @@ export default defineComponent({
       />
     </NuxtLink>
   </div>
+  <template v-if="fetching">
   <Form
       id="add_child_product_form"
       @submit="onSubmit"
@@ -359,7 +366,10 @@ export default defineComponent({
       </div>
     </div>
   </Form>
-
+  </template>
+  <div class="flex justify-content-center">
+    <ProgressSpinner v-if="spinner" />
+  </div>
 </template>
 
 <style scoped lang="scss">

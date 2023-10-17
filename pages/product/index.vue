@@ -24,7 +24,6 @@ const submitted = ref(false);
 
 
 onMounted(async () => {
-  // ProductService.getProducts().then((data) => (products.value = data));
   await nextTick();
   await fetchProducts()
 });
@@ -43,17 +42,6 @@ const fetchProducts = async (event) => {
     rowsPerPage.value = data.value.products.per_page
     totalRecords.value = data.value.products.total
   }
-};
-
-const openNew = () => {
-  product.value = {};
-  submitted.value = false;
-  productDialog.value = true;
-};
-
-const hideDialog = () => {
-  productDialog.value = false;
-  submitted.value = false;
 };
 
 const editProduct = (id) => {
@@ -90,35 +78,6 @@ const deleteProduct = async (id) => {
   }
 };
 
-const findIndexById = (id) => {
-  let index = -1;
-
-  for (let i = 0; i < products.value.length; i++) {
-    if (products.value[i].id === id) {
-      index = i;
-      break;
-    }
-  }
-
-  return index;
-};
-
-const createId = () => {
-  let id = "";
-  const chars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-  for (let i = 0; i < 5; i++) {
-    id += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-
-  return id;
-};
-
-const exportCSV = () => {
-  dt.value.exportCSV();
-};
-
 const confirmDeleteSelected = () => {
   deleteProductsDialog.value = true;
 };
@@ -133,15 +92,6 @@ const deleteSelectedProducts = () => {
     severity: "success",
     summary: "Successful",
     detail: "Products Deleted",
-    life: 3000,
-  });
-};
-
-const onUpload = () => {
-  toast.add({
-    severity: "info",
-    summary: "Success",
-    detail: "File Uploaded",
     life: 3000,
   });
 };
@@ -372,7 +322,7 @@ const onUpload = () => {
           <Column header="Childs">
             <template #body="slotProps">
               <span class="p-column-title">Childs</span>
-              <NuxtLink :to="{ path: '/product/child' }" class="mr-4">
+              <NuxtLink :to="{ path: '/product/child'}" class="mr-4">
                 <Button
                   severity="info"
                   :label="slotProps.data.child_products?.length || 0"
