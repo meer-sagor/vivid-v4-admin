@@ -1,4 +1,6 @@
-<script setup>
+<script setup lang="ts">
+import { FileUploadSelectEvent, FileUploadUploaderEvent } from 'primevue/fileupload';
+
 const dropdownValues = ref([
   { name: "Font Side", code: "FS" },
   { name: "Back Side", code: "BS" },
@@ -12,6 +14,25 @@ const checkboxValue3 = ref([]);
 const checkboxValue4 = ref([]);
 const checkboxValue5 = ref([]);
 const checkboxValue6 = ref([]);
+
+const frontSideImage = ref<string | undefined>(undefined)
+
+const imageUploadPrintArea = ref({
+  frontSide: {
+    
+  }
+})
+
+
+
+const frontSideImageUploadHandler =(e: FileUploadSelectEvent)=>{
+  const uploadedFile = e.files[0].objectURL
+  console.log('uploadedFile ================', uploadedFile)
+  console.log(e);
+  frontSideImage.value = uploadedFile
+  
+}
+
 </script>
 
 <template>
@@ -28,19 +49,31 @@ const checkboxValue6 = ref([]);
             <div class="col-12 md:col-3">
               <div class="">
                 <h5 class="mb-4">Front Side</h5>
-                <div class="mb-3">
-                  <img src="/images/placeholder.svg" alt="" height="100" />
+                <div v-if="!frontSideImage" >
+                  <div class="mb-3">
+                    <img src="/images/placeholder.svg" alt="" height="100" />
+                  </div>
+                  <div class="flex justify-content-center gap-3">
+                    <FileUpload
+                      class="file-upload-btn"
+                      mode="basic"
+                      name="demo[]"
+                      accept="image/*"
+                      :maxFileSize="1000000"
+                      @select="frontSideImageUploadHandler"
+                      customUpload
+                    />
+                  </div>
                 </div>
-                <div class="flex justify-content-center gap-3">
-                  <FileUpload
-                    class="file-upload-btn"
-                    mode="basic"
-                    name="demo[]"
-                    accept="image/*"
-                    :maxFileSize="1000000"
-                    @uploader="onUpload"
-                    customUpload
+                <div v-else class="mb-3">
+                  <img
+                    :src="frontSideImage"
+                    alt=""
+                    height="100"
+                    class="w-full"
                   />
+                  <span @click="frontSideImage = undefined"><i class="pi pi-times" style="font-size: 1.5rem"></i>
+</span>
                 </div>
               </div>
             </div>

@@ -2,7 +2,10 @@
 import { environment, baseURL, apiURL } from "./config/environment";
 
 export default defineNuxtConfig({
-  devtools: { enabled: environment === "dev" ? true : false },
+  // devtools: { enabled: environment === "dev" ? true : false },
+  devtools: {
+    enabled: true
+  },
   app: {
     head: {
       title: "Vividcustoms - Admin Panel",
